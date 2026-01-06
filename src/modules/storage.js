@@ -1,21 +1,37 @@
 import { generateUUID } from './utils.js';
 
+function isHexColor(value) {
+  return typeof value === 'string' && /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(value.trim());
+}
+
+function defaultColumnColor(id) {
+  if (id === 'todo') return '#3b82f6';
+  if (id === 'inprogress') return '#f59e0b';
+  if (id === 'done') return '#16a34a';
+  return '#3b82f6';
+}
+
+function normalizeColumn(c) {
+  const color = isHexColor(c?.color) ? c.color.trim() : defaultColumnColor(c?.id);
+  return { ...c, color };
+}
+
 // Load columns from localStorage
 export function loadColumns() {
   const stored = localStorage.getItem('kanbanColumns');
   if (stored) {
     try {
       const parsed = JSON.parse(stored);
-      if (Array.isArray(parsed)) return parsed;
+      if (Array.isArray(parsed)) return parsed.map(normalizeColumn);
     } catch {
       // ignore malformed localStorage
     }
   }
   // Default columns if none exist
   return [
-    { id: 'todo', name: 'To Do' },
-    { id: 'inprogress', name: 'In Progress' },
-    { id: 'done', name: 'Done' }
+    { id: 'todo', name: 'To Do', color: '#3b82f6' },
+    { id: 'inprogress', name: 'In Progress', color: '#f59e0b' },
+    { id: 'done', name: 'Done', color: '#16a34a' }
   ];
 }
 
@@ -37,12 +53,66 @@ export function loadTasks() {
   }
   // Default tasks if none exist
   return [
-    { id: generateUUID(), text: 'Find out where Soul Stone is', column: 'todo', labels: ['urgent'], creationDate: new Date().toISOString() },
-    { id: generateUUID(), text: 'Collect Time Stone from Dr. Strange', column: 'verified', labels: ['feature'], creationDate: new Date().toISOString() },
-    { id: generateUUID(), text: 'Collect Mind Stone from Vision', column: 'verified', labels: [], creationDate: new Date().toISOString() },
-    { id: generateUUID(), text: 'Collect Reality Stone from the Collector', column: 'verified', labels: ['bug'], creationDate: new Date().toISOString() },
-    { id: generateUUID(), text: 'Collect Power Stone from Xandar', column: 'done', labels: ['urgent', 'feature'], creationDate: new Date().toISOString() },
-    { id: generateUUID(), text: 'Collect Space Stone from Asgard', column: 'done', labels: [], creationDate: new Date().toISOString() }
+    {
+      id: generateUUID(),
+      title: 'Find out where the Soul Stone is',
+      description: 'Identify current location and access requirements.',
+      priority: 'high',
+      dueDate: '',
+      column: 'todo',
+      labels: ['urgent'],
+      creationDate: new Date().toISOString()
+    },
+    {
+      id: generateUUID(),
+      title: 'Collect the Time Stone',
+      description: 'Coordinate with Dr. Strange and plan retrieval.',
+      priority: 'medium',
+      dueDate: '',
+      column: 'inprogress',
+      labels: ['feature'],
+      creationDate: new Date().toISOString()
+    },
+    {
+      id: generateUUID(),
+      title: 'Collect the Mind Stone',
+      description: 'Determine safe extraction approach.',
+      priority: 'medium',
+      dueDate: '',
+      column: 'inprogress',
+      labels: [],
+      creationDate: new Date().toISOString()
+    },
+    {
+      id: generateUUID(),
+      title: 'Collect the Reality Stone',
+      description: 'Negotiate with the Collector, avoid escalation.',
+      priority: 'low',
+      dueDate: '',
+      column: 'inprogress',
+      labels: ['task'],
+      creationDate: new Date().toISOString()
+    },
+    {
+      id: generateUUID(),
+      title: 'Collect the Power Stone',
+      description: 'Verify secure containment after retrieval.',
+      priority: 'high',
+      dueDate: '',
+      column: 'done',
+      labels: ['urgent', 'feature'],
+      creationDate: new Date().toISOString()
+    },
+    {
+      id: generateUUID(),
+      title: 'Collect the Space Stone',
+      description: '',
+      priority: 'low',
+      dueDate: '',
+      column: 'done',
+      labels: [],
+      creationDate: new Date().toISOString()
+    }
   ];
 }
 

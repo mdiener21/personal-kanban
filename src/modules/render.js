@@ -29,11 +29,18 @@ function createTaskElement(task) {
     });
   }
   
-  const textSpan = document.createElement('span');
-  textSpan.classList.add('task-text');
-  textSpan.textContent = task.text;
-  textSpan.addEventListener('click', () => showEditModal(task.id));
-  
+  const header = document.createElement('div');
+  header.classList.add('task-header');
+
+  const titleEl = document.createElement('div');
+  titleEl.classList.add('task-title');
+  const legacyTitle = typeof task.text === 'string' ? task.text : '';
+  titleEl.textContent = (typeof task.title === 'string' && task.title.trim() !== '') ? task.title : legacyTitle;
+  titleEl.addEventListener('click', () => showEditModal(task.id));
+
+  const actions = document.createElement('div');
+  actions.classList.add('task-actions');
+
   const deleteBtn = document.createElement('button');
   deleteBtn.classList.add('delete-task-btn');
   const deleteIcon = document.createElement('span');
@@ -45,10 +52,44 @@ function createTaskElement(task) {
       renderBoard();
     }
   });
-  
-  li.appendChild(textSpan);
+
+  actions.appendChild(deleteBtn);
+  header.appendChild(titleEl);
+  header.appendChild(actions);
+
+  const descriptionValue = typeof task.description === 'string' ? task.description.trim() : '';
+  const descriptionEl = document.createElement('div');
+  descriptionEl.classList.add('task-description');
+  descriptionEl.textContent = descriptionValue;
+  descriptionEl.style.display = descriptionValue ? 'block' : 'none';
+  descriptionEl.addEventListener('click', () => showEditModal(task.id));
+
+  const meta = document.createElement('div');
+  meta.classList.add('task-meta');
+
+  const priority = typeof task.priority === 'string' ? task.priority : 'medium';
+  const priorityEl = document.createElement('span');
+  priorityEl.classList.add('task-priority', `priority-${priority}`);
+  priorityEl.textContent = priority;
+
+  const dueDateRaw = typeof task.dueDate === 'string' ? task.dueDate.trim() : '';
+  const dueDateEl = document.createElement('span');
+  dueDateEl.classList.add('task-date');
+  if (!dueDateRaw) {
+    dueDateEl.textContent = 'No due date';
+  } else {
+    const dateForParse = dueDateRaw.includes('T') ? dueDateRaw : `${dueDateRaw}T00:00:00`;
+    const parsed = new Date(dateForParse);
+    dueDateEl.textContent = Number.isNaN(parsed.getTime()) ? dueDateRaw : parsed.toLocaleDateString();
+  }
+
+  meta.appendChild(priorityEl);
+  meta.appendChild(dueDateEl);
+
+  li.appendChild(header);
+  li.appendChild(descriptionEl);
   li.appendChild(labelsContainer);
-  li.appendChild(deleteBtn);
+  li.appendChild(meta);
   
   return li;
 }
@@ -59,6 +100,10 @@ function createColumnElement(column) {
   div.classList.add('task-column');
   div.dataset.column = column.id;
   div.draggable = false;
+
+  if (column?.color) {
+    div.style.setProperty('--column-accent', column.color);
+  }
   
   const dragHandle = document.createElement('div');
   dragHandle.classList.add('column-drag-handle');

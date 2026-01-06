@@ -20,7 +20,10 @@
 ```javascript
 {
   id: "uuid",
-  text: "task description",
+  title: "task title",
+  description: "optional longer description",
+  priority: "low" | "medium" | "high",
+  dueDate: "YYYY-MM-DD" | "",
   column: "column-id",
   order: number,
   labels: ["label-id-1", "label-id-2"],
@@ -34,6 +37,7 @@
 {
   id: "column-id",
   name: "Column Name",
+  color: "#hexcolor",
   order: number
 }
 ```
@@ -65,19 +69,25 @@
 
 ### Column Features
 
-- **Create**: Modal form with column name input
-- **Edit**: Click pencil icon, edit name in modal
+- **Create**: Modal form with column name input + color picker
+- **Edit**: Click pencil icon, edit name + color in modal
 - **Delete**: Click trash icon, confirm if tasks exist
 - **Reorder**: Drag via grip icon handle, updates order property
 - **Actions**: Plus icon (add task), pencil (edit), trash (delete)
 
+#### Column Color
+
+- Each column has a user-selected hex `color`.
+- Column UI uses this color as its accent.
+- Tasks inside the column inherit the column accent color for consistent styling.
+
 ### Task Features
 
-- **Create**: Click plus icon in column header, modal with description, column select, label checkboxes
-- **Edit**: Click task text, modal pre-filled with current data
+- **Create**: Click plus icon in column header, modal with Title, Description, Priority, Due Date, column select, label checkboxes
+- **Edit**: Click task title/description, modal pre-filled with current data
 - **Delete**: Click X button, confirm deletion
 - **Move**: Drag between columns, auto-saves new column and order
-- **Display**: Text above, labels below (colored badges), delete button
+- **Display**: Title (clickable), optional description, labels (colored badges), meta row (priority + due date), delete button
 - **Label selection UX (modal)**:
   - Selected labels are shown as a single horizontal row of colored label pills
   - Each selected label pill has a small **×** button to remove it from the task
@@ -127,6 +137,14 @@
 - Close on Escape key or backdrop click
 
 #### Task Modal Details
+
+- **Fields** include:
+  - Title (required)
+  - Description (optional)
+  - Priority (low/medium/high)
+  - Due Date (optional, YYYY-MM-DD)
+  - Column selection
+  - Labels selection
 
 - **Labels section** includes:
   - Active labels row (single line, left-to-right)

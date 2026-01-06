@@ -66,21 +66,27 @@ export function showModal(columnName) {
   
   const modal = document.getElementById('task-modal');
   const columnSelect = document.getElementById('task-column');
-  const taskText = document.getElementById('task-text');
+  const taskTitle = document.getElementById('task-title');
+  const taskDescription = document.getElementById('task-description');
+  const taskPriority = document.getElementById('task-priority');
+  const taskDueDate = document.getElementById('task-due-date');
   const modalTitle = document.getElementById('task-modal-title');
   const submitBtn = document.getElementById('task-submit-btn');
   
   modalTitle.textContent = 'Add New Task';
   submitBtn.textContent = 'Add Task';
   columnSelect.value = currentColumn;
-  taskText.value = '';
+  taskTitle.value = '';
+  taskDescription.value = '';
+  if (taskPriority) taskPriority.value = 'medium';
+  if (taskDueDate) taskDueDate.value = '';
 
   const labelSearch = document.getElementById('task-label-search');
   if (labelSearch) labelSearch.value = '';
 
   updateTaskLabelsSelection();
   modal.classList.remove('hidden');
-  taskText.focus();
+  taskTitle.focus();
 }
 
 export function showEditModal(taskId) {
@@ -93,21 +99,33 @@ export function showEditModal(taskId) {
   
   const modal = document.getElementById('task-modal');
   const columnSelect = document.getElementById('task-column');
-  const taskText = document.getElementById('task-text');
+  const taskTitle = document.getElementById('task-title');
+  const taskDescription = document.getElementById('task-description');
+  const taskPriority = document.getElementById('task-priority');
+  const taskDueDate = document.getElementById('task-due-date');
   const modalTitle = document.getElementById('task-modal-title');
   const submitBtn = document.getElementById('task-submit-btn');
   
   modalTitle.textContent = 'Edit Task';
   submitBtn.textContent = 'Save Changes';
   columnSelect.value = task.column;
-  taskText.value = task.text;
+
+  const legacyTitle = typeof task.text === 'string' ? task.text : '';
+  taskTitle.value = (typeof task.title === 'string' && task.title.trim() !== '') ? task.title : legacyTitle;
+  taskDescription.value = typeof task.description === 'string' ? task.description : '';
+  if (taskPriority) taskPriority.value = typeof task.priority === 'string' ? task.priority : 'medium';
+
+  const rawDue = typeof task.dueDate === 'string' ? task.dueDate : '';
+  // If dueDate is ISO, reduce to YYYY-MM-DD for <input type="date">
+  const dueForInput = rawDue.includes('T') ? rawDue.slice(0, 10) : rawDue;
+  if (taskDueDate) taskDueDate.value = dueForInput;
 
   const labelSearch = document.getElementById('task-label-search');
   if (labelSearch) labelSearch.value = '';
 
   updateTaskLabelsSelection();
   modal.classList.remove('hidden');
-  taskText.focus();
+  taskTitle.focus();
 }
 
 function hideModal() {
@@ -120,12 +138,14 @@ export function showColumnModal() {
   editingColumnId = null;
   const modal = document.getElementById('column-modal');
   const columnName = document.getElementById('column-name');
+  const columnColor = document.getElementById('column-color');
   const modalTitle = document.getElementById('column-modal-title');
   const submitBtn = document.getElementById('column-submit-btn');
   
   modalTitle.textContent = 'Add New Column';
   submitBtn.textContent = 'Add Column';
   columnName.value = '';
+  if (columnColor) columnColor.value = '#3b82f6';
   modal.classList.remove('hidden');
   columnName.focus();
 }
@@ -138,12 +158,14 @@ export function showEditColumnModal(columnId) {
   editingColumnId = columnId;
   const modal = document.getElementById('column-modal');
   const columnName = document.getElementById('column-name');
+  const columnColor = document.getElementById('column-color');
   const modalTitle = document.getElementById('column-modal-title');
   const submitBtn = document.getElementById('column-submit-btn');
   
   modalTitle.textContent = 'Edit Column';
   submitBtn.textContent = 'Save Changes';
   columnName.value = column.name;
+  if (columnColor) columnColor.value = column.color || '#3b82f6';
   modal.classList.remove('hidden');
   columnName.focus();
 }
@@ -323,13 +345,16 @@ export function initializeModalHandlers() {
   // Task modal
   document.getElementById('task-form').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const text = document.getElementById('task-text').value;
+    const title = document.getElementById('task-title').value;
+    const description = document.getElementById('task-description').value;
+    const priority = document.getElementById('task-priority')?.value;
+    const dueDate = document.getElementById('task-due-date')?.value;
     const column = document.getElementById('task-column').value;
     
     if (editingTaskId) {
-      updateTask(editingTaskId, text, column, selectedTaskLabels);
+      updateTask(editingTaskId, title, description, priority, dueDate, column, selectedTaskLabels);
     } else {
-      addTask(text, column, selectedTaskLabels);
+      addTask(title, description, priority, dueDate, column, selectedTaskLabels);
     }
     hideModal();
     const { renderBoard } = await import('./render.js');
@@ -343,11 +368,12 @@ export function initializeModalHandlers() {
   document.getElementById('column-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const name = document.getElementById('column-name').value;
+    const color = document.getElementById('column-color')?.value;
     
     if (editingColumnId) {
-      updateColumn(editingColumnId, name);
+      updateColumn(editingColumnId, name, color);
     } else {
-      addColumn(name);
+      addColumn(name, color);
     }
     hideColumnModal();
     const { renderBoard } = await import('./render.js');

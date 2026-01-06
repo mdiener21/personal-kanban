@@ -30,8 +30,24 @@
     <h3 id="task-modal-title">Add New Task</h3>
     <form id="task-form">
       <div class="form-group">
-        <label for="task-text">Task Description</label>
-        <textarea id="task-text" rows="3" required placeholder="Enter task description..."></textarea>
+        <label for="task-title">Title</label>
+        <input id="task-title" type="text" required placeholder="Enter task title...">
+      </div>
+      <div class="form-group">
+        <label for="task-description">Description</label>
+        <textarea id="task-description" rows="3" placeholder="Enter task description..."></textarea>
+      </div>
+      <div class="form-group">
+        <label for="task-priority">Priority</label>
+        <select id="task-priority">
+          <option value="low">Low</option>
+          <option value="medium" selected>Medium</option>
+          <option value="high">High</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="task-due-date">Due Date</label>
+        <input id="task-due-date" type="date">
       </div>
       <div class="form-group">
         <label for="task-column">Column</label>
@@ -68,6 +84,10 @@
       <div class="form-group">
         <label for="column-name">Column Name</label>
         <input type="text" id="column-name" required placeholder="Enter column name...">
+      </div>
+      <div class="form-group">
+        <label for="column-color">Color</label>
+        <input type="color" id="column-color" value="#3b82f6">
       </div>
       <div class="form-actions">
         <button type="button" id="cancel-column-btn" class="btn btn-secondary">Cancel</button>

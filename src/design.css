@@ -64,6 +64,14 @@ body {
 }
 
 .task-column {
+  --column-accent: #3b82f6;
+  --column-accent-hover: color-mix(in srgb, var(--column-accent) 80%, #000000);
+  --column-bg-tint: color-mix(in srgb, var(--column-accent) 8%, transparent);
+  --task-bg-tint: color-mix(in srgb, var(--column-accent) 7%, transparent);
+  --task-border-tint: color-mix(in srgb, var(--column-accent) 22%, transparent);
+  --task-hover-border-tint: color-mix(in srgb, var(--column-accent) 45%, transparent);
+  --task-hover-shadow: color-mix(in srgb, var(--column-accent) 18%, transparent);
+
   border: 1px solid var(--border);
   border-radius: 5px;
   margin: 10px;
@@ -73,6 +81,45 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 0;
+
+  /* Column accent + motion (accent is set per column via nth-child below) */
+  position: relative;
+  overflow: hidden;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+/* Per-column accent colors (cycles with column order) */
+#board-container > .task-column:nth-child(3n + 1) {
+  --column-accent: #3b82f6;
+}
+
+#board-container > .task-column:nth-child(3n + 2) {
+  --column-accent: #f59e0b;
+}
+
+#board-container > .task-column:nth-child(3n + 3) {
+  --column-accent: #16a34a;
+}
+
+/* Accent stripe on the column, similar to the example */
+.task-column::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: var(--column-accent, #3b82f6);
+  opacity: 0.9;
+}
+
+.task-column:hover {
+  border-color: color-mix(in srgb, var(--column-accent, #3b82f6), var(--border) 35%);
+  background-color: color-mix(in srgb, var(--surface), var(--column-bg-tint, transparent) 100%);
+  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
 }
 
 .tasks {
@@ -102,12 +149,12 @@ body {
 }
 
 .tasks::-webkit-scrollbar-thumb {
-  background: #3b82f6;
+  background: var(--column-accent, #3b82f6);
   border-radius: 4px;
 }
 
 .tasks::-webkit-scrollbar-thumb:hover {
-  background: #2563eb;
+  background: var(--column-accent-hover, #2563eb);
 }
 
 .task-column h2 {
@@ -223,20 +270,122 @@ body {
 }
 
 .task {
-  background-color: var(--surface-muted);
-  border: 1px solid var(--border-subtle);
-  border-radius: 3px;
-  padding: 8px;
+  background-color: color-mix(in srgb, var(--surface-muted), var(--task-bg-tint, transparent) 100%);
+  border: 1px solid color-mix(in srgb, var(--border-subtle), var(--task-border-tint, transparent) 100%);
+  border-radius: 8px;
+  padding: 12px;
   cursor: grab;
   display: flex;
   flex-direction: column;
   gap: 6px;
+
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.task::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: var(--column-accent, #3b82f6);
+  opacity: 0.9;
+}
+
+.task:hover {
+  transform: translateY(-2px);
+  border-color: var(--task-hover-border-tint, rgba(59, 130, 246, 0.4));
+  box-shadow: 0 10px 15px var(--task-hover-shadow, rgba(59, 130, 246, 0.12));
 }
 
 .task:active {
   cursor: grabbing;
 }
 
+/* Task card content (matches example structure) */
+.task-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.task-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.task-title {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.35;
+  cursor: pointer;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.task-title:hover {
+  color: var(--column-accent, #3b82f6);
+}
+
+.task-description {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.45;
+  cursor: pointer;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.task-description:hover {
+  color: var(--text-subtle);
+}
+
+.task-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.task-date {
+  white-space: nowrap;
+}
+
+.task-priority {
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.priority-high {
+  background-color: rgba(239, 68, 68, 0.18);
+  color: #ef4444;
+}
+
+.priority-medium {
+  background-color: rgba(234, 179, 8, 0.18);
+  color: #eab308;
+}
+
+.priority-low {
+  background-color: rgba(107, 114, 128, 0.18);
+  color: #6b7280;
+}
+
+/* Back-compat (older markup/class) */
 .task-text {
   flex: 1;
   cursor: pointer;
@@ -246,7 +395,7 @@ body {
 }
 
 .task-text:hover {
-  color: #3b82f6;
+  color: var(--column-accent, #3b82f6);
 }
 
 .task > button {

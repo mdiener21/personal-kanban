@@ -4,12 +4,49 @@ function isHexColor(value) {
   return typeof value === 'string' && /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(value.trim());
 }
 
+const allowedPriorities = new Set(['low', 'medium', 'high']);
+
+function normalizePriority(value) {
+  const v = (value || '').toString().trim().toLowerCase();
+  return allowedPriorities.has(v) ? v : 'medium';
+}
+
+function normalizeDueDate(value) {
+  const v = (value || '').toString().trim();
+  // Prefer storing/exporting YYYY-MM-DD; tolerate ISO and keep as-is if unknown.
+  if (v.length >= 10 && v.includes('T')) return v.slice(0, 10);
+  return v;
+}
+
+function normalizeTaskForExport(task) {
+  const legacyTitle = typeof task?.text === 'string' ? task.text : '';
+  const title = typeof task?.title === 'string' ? task.title : legacyTitle;
+  const description = typeof task?.description === 'string' ? task.description : '';
+  const dueDate = normalizeDueDate(task?.dueDate ?? task?.['due-date']);
+
+  return {
+    ...task,
+    title: title.toString().trim(),
+    description: description.toString().trim(),
+    priority: normalizePriority(task?.priority),
+    dueDate
+  };
+}
+
 function normalizeImportedTasks(tasks) {
   if (!Array.isArray(tasks)) return null;
 
   const normalized = tasks.map((t) => {
     const id = typeof t?.id === 'string' ? t.id : String(t?.id ?? '');
-    const text = typeof t?.text === 'string' ? t.text : String(t?.text ?? '');
+    const legacyText = typeof t?.text === 'string' ? t.text : String(t?.text ?? '');
+    const title = typeof t?.title === 'string' ? t.title : legacyText;
+    const description = typeof t?.description === 'string' ? t.description : String(t?.description ?? '');
+    const priority = normalizePriority(t?.priority);
+    const dueDateRaw =
+      typeof t?.dueDate === 'string'
+        ? t.dueDate
+        : (typeof t?.['due-date'] === 'string' ? t['due-date'] : String(t?.dueDate ?? t?.['due-date'] ?? ''));
+    const dueDate = normalizeDueDate(dueDateRaw);
     const column = typeof t?.column === 'string' ? t.column : String(t?.column ?? '');
 
     const labels = Array.isArray(t?.labels) ? t.labels.map((l) => (typeof l === 'string' ? l : String(l))) : [];
@@ -18,7 +55,10 @@ function normalizeImportedTasks(tasks) {
 
     return {
       id: id.trim(),
-      text: text.trim(),
+      title: title.trim(),
+      description: description.trim(),
+      priority,
+      dueDate: dueDate.trim(),
       column: column.trim(),
       ...(order !== undefined ? { order } : {}),
       ...(creationDate ? { creationDate } : {}),
@@ -26,7 +66,7 @@ function normalizeImportedTasks(tasks) {
     };
   });
 
-  const isValid = normalized.every((t) => t.id && t.text && t.column);
+  const isValid = normalized.every((t) => t.id && t.title && t.column);
   return isValid ? normalized : null;
 }
 
@@ -37,9 +77,11 @@ function normalizeImportedColumns(columns) {
     const id = typeof c?.id === 'string' ? c.id : String(c?.id ?? '');
     const name = typeof c?.name === 'string' ? c.name : String(c?.name ?? '');
     const order = Number.isFinite(c?.order) ? c.order : undefined;
+    const color = isHexColor(c?.color) ? c.color.trim() : '#3b82f6';
     return {
       id: id.trim(),
       name: name.trim(),
+      color,
       ...(order !== undefined ? { order } : {})
     };
   });
@@ -64,8 +106,11 @@ function normalizeImportedLabels(labels) {
 
 // Export tasks and columns to JSON file
 export function exportTasks() {
-  const tasks = loadTasks();
-  const columns = loadColumns();
+  const tasks = loadTasks().map(normalizeTaskForExport);
+  const columns = loadColumns().map((c) => ({
+    ...c,
+    color: isHexColor(c?.color) ? c.color.trim() : '#3b82f6'
+  }));
   const labels = loadLabels();
   const exportData = { columns, tasks, labels };
   const dataStr = JSON.stringify(exportData, null, 2);

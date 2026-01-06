@@ -1,9 +1,22 @@
 import { generateUUID } from './utils.js';
 import { loadTasks, saveTasks } from './storage.js';
 
+const ALLOWED_PRIORITIES = new Set(['low', 'medium', 'high']);
+
+function normalizePriority(priority) {
+  const value = (priority || '').toString().trim().toLowerCase();
+  return ALLOWED_PRIORITIES.has(value) ? value : 'medium';
+}
+
+function normalizeDueDate(value) {
+  const date = (value || '').toString().trim();
+  // Expecting YYYY-MM-DD from <input type="date">; keep empty if unset.
+  return date;
+}
+
 // Add a new task
-export function addTask(text, columnName, labels = []) {
-  if (!text || text.trim() === '') return;
+export function addTask(title, description, priority, dueDate, columnName, labels = []) {
+  if (!title || title.trim() === '') return;
   
   const tasks = loadTasks();
   // Get max order for tasks in this column
@@ -12,7 +25,10 @@ export function addTask(text, columnName, labels = []) {
   
   const newTask = {
     id: generateUUID(),
-    text: text.trim(),
+    title: title.trim(),
+    description: (description || '').toString().trim(),
+    priority: normalizePriority(priority),
+    dueDate: normalizeDueDate(dueDate),
     column: columnName,
     order: maxOrder + 1,
     labels: [...labels],
@@ -23,13 +39,16 @@ export function addTask(text, columnName, labels = []) {
 }
 
 // Update an existing task
-export function updateTask(taskId, text, columnName, labels = []) {
-  if (!text || text.trim() === '') return;
+export function updateTask(taskId, title, description, priority, dueDate, columnName, labels = []) {
+  if (!title || title.trim() === '') return;
   
   const tasks = loadTasks();
   const taskIndex = tasks.findIndex(t => t.id === taskId);
   if (taskIndex !== -1) {
-    tasks[taskIndex].text = text.trim();
+    tasks[taskIndex].title = title.trim();
+    tasks[taskIndex].description = (description || '').toString().trim();
+    tasks[taskIndex].priority = normalizePriority(priority);
+    tasks[taskIndex].dueDate = normalizeDueDate(dueDate);
     tasks[taskIndex].column = columnName;
     tasks[taskIndex].labels = [...labels];
     saveTasks(tasks);
