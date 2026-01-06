@@ -23,16 +23,46 @@ This is intended for personal use: quick capture, simple workflow columns, and a
 
 ## Quick start
 
-The board is a static site (HTML/CSS/JS). The most reliable way to run it is via a tiny local web server.
+This repo uses Vite for local development. From the repository root:
 
-1. Start a local server from this folder:
+1. Install dependencies:
+   - `npm install`
 
-   - Python: `python3 -m http.server 8000`
-   - Or any static server you like
+2. Start the dev server:
+   - `npm run dev`
 
-2. Open: `http://localhost:8000/`
+3. Open the app:
+   - `http://localhost:3000/`
 
-If you *really* want to, you can try opening `index.html` directly in the browser, but some browsers restrict storage behavior for `file://` URLs. A local server avoids that.
+Note: while the app is “just HTML/CSS/JS”, most browsers restrict storage behavior for `file://` URLs. Using a local server (Vite, or any static server) avoids those issues.
+
+## Development setup (first time)
+
+### Prerequisites
+
+- Node.js 18+ (recommended)
+- npm
+
+### Common commands
+
+- Dev server (hot reload): `npm run dev`
+- Production build to `dist/`: `npm run build`
+- Preview the production build locally: `npm run preview`
+
+The dev server uses `src/` as the Vite root (see `vite.config.js`).
+
+## Deploy (static site)
+
+This is a static site. Deploy the contents of `dist/` to any static hosting provider.
+
+1. Build:
+   - `npm ci` (or `npm install`)
+   - `npm run build`
+
+2. Deploy:
+   - Upload the `dist/` folder
+
+If you deploy under a sub-path (for example GitHub Pages at `https://user.github.io/repo/`), set Vite’s `base` in `vite.config.js` so asset URLs resolve correctly.
 
 ## Daily use
 

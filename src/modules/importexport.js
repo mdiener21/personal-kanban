@@ -1,5 +1,67 @@
 import { loadTasks, loadColumns, loadLabels, saveColumns, saveTasks, saveLabels } from './storage.js';
 
+function isHexColor(value) {
+  return typeof value === 'string' && /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(value.trim());
+}
+
+function normalizeImportedTasks(tasks) {
+  if (!Array.isArray(tasks)) return null;
+
+  const normalized = tasks.map((t) => {
+    const id = typeof t?.id === 'string' ? t.id : String(t?.id ?? '');
+    const text = typeof t?.text === 'string' ? t.text : String(t?.text ?? '');
+    const column = typeof t?.column === 'string' ? t.column : String(t?.column ?? '');
+
+    const labels = Array.isArray(t?.labels) ? t.labels.map((l) => (typeof l === 'string' ? l : String(l))) : [];
+    const order = Number.isFinite(t?.order) ? t.order : undefined;
+    const creationDate = typeof t?.creationDate === 'string' ? t.creationDate : undefined;
+
+    return {
+      id: id.trim(),
+      text: text.trim(),
+      column: column.trim(),
+      ...(order !== undefined ? { order } : {}),
+      ...(creationDate ? { creationDate } : {}),
+      labels
+    };
+  });
+
+  const isValid = normalized.every((t) => t.id && t.text && t.column);
+  return isValid ? normalized : null;
+}
+
+function normalizeImportedColumns(columns) {
+  if (!Array.isArray(columns)) return null;
+
+  const normalized = columns.map((c) => {
+    const id = typeof c?.id === 'string' ? c.id : String(c?.id ?? '');
+    const name = typeof c?.name === 'string' ? c.name : String(c?.name ?? '');
+    const order = Number.isFinite(c?.order) ? c.order : undefined;
+    return {
+      id: id.trim(),
+      name: name.trim(),
+      ...(order !== undefined ? { order } : {})
+    };
+  });
+
+  const isValid = normalized.every((c) => c.id && c.name);
+  return isValid ? normalized : null;
+}
+
+function normalizeImportedLabels(labels) {
+  if (!Array.isArray(labels)) return null;
+
+  const normalized = labels.map((l) => {
+    const id = typeof l?.id === 'string' ? l.id : String(l?.id ?? '');
+    const name = typeof l?.name === 'string' ? l.name : String(l?.name ?? '');
+    const color = isHexColor(l?.color) ? l.color.trim() : '#3b82f6';
+    return { id: id.trim(), name: name.trim(), color };
+  });
+
+  const isValid = normalized.every((l) => l.id && l.name && l.color);
+  return isValid ? normalized : null;
+}
+
 // Export tasks and columns to JSON file
 export function exportTasks() {
   const tasks = loadTasks();
@@ -43,30 +105,19 @@ export function importTasks(file) {
         alert('Invalid JSON file format');
         return;
       }
-      
-      // Validate tasks
-      const isValidTasks = tasks.every(task => 
-        task.id && task.text && task.column
-      );
-      
-      // Validate columns
-      const isValidColumns = columns.every(col => 
-        col.id && col.name
-      );
-      
-      // Validate labels (optional)
-      const isValidLabels = !labels || labels.every(label => 
-        label.id && label.name && label.color
-      );
-      
-      if (!isValidTasks || !isValidColumns || !isValidLabels) {
+
+      const normalizedTasks = normalizeImportedTasks(tasks);
+      const normalizedColumns = normalizeImportedColumns(columns);
+      const normalizedLabels = labels ? normalizeImportedLabels(labels) : null;
+
+      if (!normalizedTasks || !normalizedColumns || (labels && !normalizedLabels)) {
         alert('Invalid data structure');
         return;
       }
-      
-      saveColumns(columns);
-      saveTasks(tasks);
-      if (labels) saveLabels(labels);
+
+      saveColumns(normalizedColumns);
+      saveTasks(normalizedTasks);
+      if (normalizedLabels) saveLabels(normalizedLabels);
       
       const { renderBoard } = await import('./render.js');
       renderBoard();

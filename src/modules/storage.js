@@ -4,7 +4,12 @@ import { generateUUID } from './utils.js';
 export function loadColumns() {
   const stored = localStorage.getItem('kanbanColumns');
   if (stored) {
-    return JSON.parse(stored);
+    try {
+      const parsed = JSON.parse(stored);
+      if (Array.isArray(parsed)) return parsed;
+    } catch {
+      // ignore malformed localStorage
+    }
   }
   // Default columns if none exist
   return [
@@ -23,7 +28,12 @@ export function saveColumns(columns) {
 export function loadTasks() {
   const stored = localStorage.getItem('kanbanTasks');
   if (stored) {
-    return JSON.parse(stored);
+    try {
+      const parsed = JSON.parse(stored);
+      if (Array.isArray(parsed)) return parsed;
+    } catch {
+      // ignore malformed localStorage
+    }
   }
   // Default tasks if none exist
   return [
@@ -45,7 +55,12 @@ export function saveTasks(tasks) {
 export function loadLabels() {
   const stored = localStorage.getItem('kanbanLabels');
   if (stored) {
-    return JSON.parse(stored);
+    try {
+      const parsed = JSON.parse(stored);
+      if (Array.isArray(parsed)) return parsed;
+    } catch {
+      // ignore malformed localStorage
+    }
   }
   // Default labels if none exist
   return [

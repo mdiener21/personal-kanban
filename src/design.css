@@ -18,6 +18,11 @@
   --btn-small-hover-bg: #e5e7eb;
 }
 
+html,
+body {
+  height: 100%;
+}
+
 :root[data-theme="dark"] {
   color-scheme: dark;
   --app-bg: #111827;
@@ -44,11 +49,18 @@ body {
   padding: 10px;
   background-color: var(--app-bg);
   color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 .container {
   display: flex;
   gap: 0.5rem;
+  flex: 1 1 auto;
+  align-items: stretch;
+  overflow-x: auto;
+  min-height: 0;
 }
 
 .task-column {
@@ -58,6 +70,9 @@ body {
   padding: 10px;
   flex: 1;
   background-color: var(--surface);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
 .tasks {
@@ -66,13 +81,15 @@ body {
   gap: 0.5rem;
   list-style: none;
   padding: 0;
-  max-height: 600px;
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: none;
   overflow-y: auto;
   overflow-x: hidden;
 }
 
 .tasks.expanded {
-  max-height: 80vh;
+  max-height: none;
 }
 
 .tasks::-webkit-scrollbar {
@@ -730,7 +747,7 @@ body {
 
 /* Footer */
 .footer {
-  margin-top: 40px;
+  margin-top: auto;
   padding: 16px;
   background-color: var(--footer-bg);
   border-top: 1px solid var(--border-subtle);

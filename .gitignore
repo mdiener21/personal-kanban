@@ -3,7 +3,6 @@
 *.env
 .env
 node_modules
-dist
 *.log
 .DS_Store
 package-lock.json

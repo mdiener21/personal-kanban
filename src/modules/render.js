@@ -37,7 +37,7 @@ function createTaskElement(task) {
   const deleteBtn = document.createElement('button');
   deleteBtn.classList.add('delete-task-btn');
   const deleteIcon = document.createElement('span');
-  deleteIcon.dataset.lucide = 'x';
+  deleteIcon.dataset.lucide = 'trash-2';
   deleteBtn.appendChild(deleteIcon);
   deleteBtn.addEventListener('click', async (e) => {
     e.stopPropagation();

@@ -10,6 +10,17 @@ A fully local, no-server-required personal kanban board with localStorage persis
 - 💾 Export/Import to JSON
 - 📱 Responsive design
 
+## Quick Start
+
+From the repository root:
+
+```bash
+npm install
+npm run dev
+```
+
+Vite will open the app (default: `http://localhost:3000`).
+
 ## Development Setup
 
 ### Prerequisites
@@ -20,16 +31,18 @@ A fully local, no-server-required personal kanban board with localStorage persis
 ### Installation
 
 1. Install dependencies:
-```bash
-npm install
-```
 
-2. Start the development server:
-```bash
-npm run dev
-```
+   ```bash
+   npm install
+   ```
 
-The app will open in your browser at `http://localhost:3000`
+1. Start the development server:
+
+   ```bash
+   npm run dev
+   ```
+
+The app will open in your browser at `http://localhost:3000`.
 
 ### Build for Production
 
@@ -45,9 +58,21 @@ The built files will be in the `dist` directory.
 npm run preview
 ```
 
+## Deploy (Static Site)
+
+This app builds to a static site. Deploy the contents of `dist/` to any static host.
+
+```bash
+npm ci
+npm run build
+```
+
+- Upload/publish the `dist/` directory.
+- If deploying under a sub-path (for example GitHub Pages), set `base` in `vite.config.js` so asset URLs work.
+
 ## Project Structure
 
-```
+```text
 personal-kanban/
 ├── src/
 │   ├── modules/
