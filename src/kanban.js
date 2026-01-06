@@ -1,9 +1,12 @@
 import { renderBoard } from './modules/render.js';
 import { initializeModalHandlers } from './modules/modals.js';
 import { exportTasks, importTasks } from './modules/importexport.js';
+import { initializeThemeToggle } from './modules/theme.js';
 
 // Add task button listeners
 document.addEventListener('DOMContentLoaded', () => {
+  initializeThemeToggle();
+
   // Initialize modal handlers
   initializeModalHandlers();
 

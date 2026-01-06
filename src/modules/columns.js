@@ -32,14 +32,22 @@ export function deleteColumn(columnId) {
     alert('Cannot delete the last column!');
     return false;
   }
+
+  const column = columns.find(c => c.id === columnId);
+  const columnName = column?.name ? `"${column.name}"` : 'this column';
   
   const tasks = loadTasks();
   const tasksInColumn = tasks.filter(t => t.column === columnId);
+
+  const message = tasksInColumn.length > 0
+    ? `Delete ${columnName}? This will also delete ${tasksInColumn.length} task(s).`
+    : `Delete ${columnName}?`;
+
+  if (!confirm(message)) {
+    return false;
+  }
   
   if (tasksInColumn.length > 0) {
-    if (!confirm(`This column has ${tasksInColumn.length} task(s). Delete anyway?`)) {
-      return false;
-    }
     // Remove tasks in this column
     const filteredTasks = tasks.filter(t => t.column !== columnId);
     saveTasks(filteredTasks);
