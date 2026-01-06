@@ -70,10 +70,15 @@
 ### Column Features
 
 - **Create**: Modal form with column name input + color picker
-- **Edit**: Click pencil icon, edit name + color in modal
-- **Delete**: Click trash icon, confirm if tasks exist
+- **Edit**: Open column menu (ellipsis) → pencil, edit name + color in modal
+- **Delete**: Open column menu (ellipsis) → trash, confirm if tasks exist
 - **Reorder**: Drag via grip icon handle, updates order property
 - **Actions**: Plus icon (add task), pencil (edit), trash (delete)
+
+#### Column Header Actions
+
+- Plus icon: adds a task to this column
+- Ellipsis icon: opens a small menu with Edit (pencil) and Delete (trash)
 
 #### Column Color
 

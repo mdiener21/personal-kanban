@@ -4,6 +4,15 @@ import { deleteColumn } from './columns.js';
 import { showModal, showEditModal, showEditColumnModal } from './modals.js';
 import { attachTaskListeners, attachColumnListeners, attachColumnDragListeners } from './dragdrop.js';
 
+let columnMenuCloseHandlerAttached = false;
+
+function closeAllColumnMenus(exceptMenu = null) {
+  document.querySelectorAll('.column-menu').forEach((menu) => {
+    if (exceptMenu && menu === exceptMenu) return;
+    menu.classList.add('hidden');
+  });
+}
+
 // Create a task element
 function createTaskElement(task) {
   const li = document.createElement('li');
@@ -133,30 +142,65 @@ function createColumnElement(column) {
   addBtn.appendChild(plusIcon);
   addBtn.title = 'Add task';
   addBtn.addEventListener('click', () => showModal(column.id));
-  
+
+  // Overflow menu: ellipsis-vertical -> (pencil, trash)
+  const menuWrapper = document.createElement('div');
+  menuWrapper.classList.add('column-menu-wrapper');
+
+  const menuBtn = document.createElement('button');
+  menuBtn.classList.add('column-menu-btn');
+  const menuIcon = document.createElement('span');
+  menuIcon.dataset.lucide = 'ellipsis-vertical';
+  menuBtn.appendChild(menuIcon);
+  menuBtn.title = 'Column menu';
+  menuBtn.type = 'button';
+
+  const menu = document.createElement('div');
+  menu.classList.add('column-menu', 'hidden');
+
   const editColBtn = document.createElement('button');
-  editColBtn.classList.add('edit-column-btn');
+  editColBtn.classList.add('column-menu-item');
+  editColBtn.type = 'button';
   const editIcon = document.createElement('span');
   editIcon.dataset.lucide = 'pencil';
   editColBtn.appendChild(editIcon);
-  editColBtn.title = 'Edit column name';
-  editColBtn.addEventListener('click', () => showEditColumnModal(column.id));
-  
+  editColBtn.title = 'Edit column';
+  editColBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closeAllColumnMenus();
+    showEditColumnModal(column.id);
+  });
+
   const deleteColBtn = document.createElement('button');
-  deleteColBtn.classList.add('delete-column-btn');
+  deleteColBtn.classList.add('column-menu-item', 'danger');
+  deleteColBtn.type = 'button';
   const deleteIcon = document.createElement('span');
   deleteIcon.dataset.lucide = 'trash-2';
   deleteColBtn.appendChild(deleteIcon);
   deleteColBtn.title = 'Delete column';
-  deleteColBtn.addEventListener('click', async () => {
+  deleteColBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closeAllColumnMenus();
     if (deleteColumn(column.id)) {
       renderBoard();
     }
   });
-  
+
+  menu.appendChild(editColBtn);
+  menu.appendChild(deleteColBtn);
+
+  menuBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = !menu.classList.contains('hidden');
+    closeAllColumnMenus();
+    if (!isOpen) menu.classList.remove('hidden');
+  });
+
+  menuWrapper.appendChild(menuBtn);
+  menuWrapper.appendChild(menu);
+
   headerActions.appendChild(addBtn);
-  headerActions.appendChild(editColBtn);
-  headerActions.appendChild(deleteColBtn);
+  headerActions.appendChild(menuWrapper);
   
   headerDiv.appendChild(dragHandle);
   headerDiv.appendChild(h2);
@@ -234,4 +278,12 @@ export function renderBoard() {
   attachColumnDragListeners();
   updateColumnSelect();
   lucide.createIcons();
+
+  if (!columnMenuCloseHandlerAttached) {
+    columnMenuCloseHandlerAttached = true;
+    document.addEventListener('click', () => closeAllColumnMenus());
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeAllColumnMenus();
+    });
+  }
 }
