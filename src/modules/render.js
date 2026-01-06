@@ -19,10 +19,13 @@ function createTaskElement(task) {
   li.classList.add('task');
   li.draggable = true;
   li.dataset.taskId = task.id;
+  li.setAttribute('role', 'listitem');
+  li.setAttribute('aria-label', `Task: ${task.title || task.text || 'Untitled'}`);
   
   // Labels container
   const labelsContainer = document.createElement('div');
   labelsContainer.classList.add('task-labels');
+  labelsContainer.setAttribute('aria-label', 'Task labels');
   
   const labels = loadLabels();
   if (task.labels && task.labels.length > 0) {
@@ -43,17 +46,28 @@ function createTaskElement(task) {
 
   const titleEl = document.createElement('div');
   titleEl.classList.add('task-title');
+  titleEl.setAttribute('role', 'button');
+  titleEl.setAttribute('tabindex', '0');
   const legacyTitle = typeof task.text === 'string' ? task.text : '';
   titleEl.textContent = (typeof task.title === 'string' && task.title.trim() !== '') ? task.title : legacyTitle;
   titleEl.addEventListener('click', () => showEditModal(task.id));
+  titleEl.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      showEditModal(task.id);
+    }
+  });
 
   const actions = document.createElement('div');
   actions.classList.add('task-actions');
 
   const deleteBtn = document.createElement('button');
   deleteBtn.classList.add('delete-task-btn');
+  deleteBtn.setAttribute('aria-label', 'Delete task');
+  deleteBtn.type = 'button';
   const deleteIcon = document.createElement('span');
   deleteIcon.dataset.lucide = 'trash-2';
+  deleteIcon.setAttribute('aria-hidden', 'true');
   deleteBtn.appendChild(deleteIcon);
   deleteBtn.addEventListener('click', async (e) => {
     e.stopPropagation();
@@ -80,6 +94,7 @@ function createTaskElement(task) {
   const priorityEl = document.createElement('span');
   priorityEl.classList.add('task-priority', `priority-${priority}`);
   priorityEl.textContent = priority;
+  priorityEl.setAttribute('aria-label', `Priority: ${priority}`);
 
   const dueDateRaw = typeof task.dueDate === 'string' ? task.dueDate.trim() : '';
   const dueDateEl = document.createElement('span');
@@ -105,40 +120,49 @@ function createTaskElement(task) {
 
 // Create a column element
 function createColumnElement(column) {
-  const div = document.createElement('div');
+  const div = document.createElement('article');
   div.classList.add('task-column');
   div.dataset.column = column.id;
   div.draggable = false;
+  div.setAttribute('aria-labelledby', `column-title-${column.id}`);
 
   if (column?.color) {
     div.style.setProperty('--column-accent', column.color);
   }
   
-  const dragHandle = document.createElement('div');
+  const dragHandle = document.createElement('button');
   dragHandle.classList.add('column-drag-handle');
+  dragHandle.type = 'button';
+  dragHandle.setAttribute('aria-label', 'Drag to reorder column');
   const gripIcon = document.createElement('span');
   gripIcon.dataset.lucide = 'grip-vertical';
+  gripIcon.setAttribute('aria-hidden', 'true');
   dragHandle.appendChild(gripIcon);
   dragHandle.title = 'Drag to reorder';
   
-  const headerDiv = document.createElement('div');
+  const headerDiv = document.createElement('header');
   headerDiv.classList.add('column-header');
   
   const h2 = document.createElement('h2');
+  h2.id = `column-title-${column.id}`;
   h2.textContent = column.name;
   
   const taskCounter = document.createElement('span');
   taskCounter.classList.add('task-counter');
   taskCounter.dataset.columnId = column.id;
   taskCounter.textContent = '0';
+  taskCounter.setAttribute('aria-label', 'Task count');
   
   const headerActions = document.createElement('div');
   headerActions.classList.add('column-actions');
   
   const addBtn = document.createElement('button');
   addBtn.classList.add('add-task-btn-icon');
+  addBtn.type = 'button';
+  addBtn.setAttribute('aria-label', `Add task to ${column.name}`);
   const plusIcon = document.createElement('span');
   plusIcon.dataset.lucide = 'plus';
+  plusIcon.setAttribute('aria-hidden', 'true');
   addBtn.appendChild(plusIcon);
   addBtn.title = 'Add task';
   addBtn.addEventListener('click', () => showModal(column.id));
@@ -149,21 +173,30 @@ function createColumnElement(column) {
 
   const menuBtn = document.createElement('button');
   menuBtn.classList.add('column-menu-btn');
+  menuBtn.type = 'button';
+  menuBtn.setAttribute('aria-haspopup', 'menu');
+  menuBtn.setAttribute('aria-expanded', 'false');
+  menuBtn.setAttribute('aria-label', `${column.name} column menu`);
   const menuIcon = document.createElement('span');
   menuIcon.dataset.lucide = 'ellipsis-vertical';
+  menuIcon.setAttribute('aria-hidden', 'true');
   menuBtn.appendChild(menuIcon);
   menuBtn.title = 'Column menu';
-  menuBtn.type = 'button';
 
   const menu = document.createElement('div');
   menu.classList.add('column-menu', 'hidden');
+  menu.setAttribute('role', 'menu');
 
   const editColBtn = document.createElement('button');
   editColBtn.classList.add('column-menu-item');
   editColBtn.type = 'button';
+  editColBtn.setAttribute('role', 'menuitem');
   const editIcon = document.createElement('span');
   editIcon.dataset.lucide = 'pencil';
+  editIcon.setAttribute('aria-hidden', 'true');
   editColBtn.appendChild(editIcon);
+  const editText = document.createTextNode(' Edit');
+  editColBtn.appendChild(editText);
   editColBtn.title = 'Edit column';
   editColBtn.addEventListener('click', (e) => {
     e.stopPropagation();
@@ -174,9 +207,13 @@ function createColumnElement(column) {
   const deleteColBtn = document.createElement('button');
   deleteColBtn.classList.add('column-menu-item', 'danger');
   deleteColBtn.type = 'button';
+  deleteColBtn.setAttribute('role', 'menuitem');
   const deleteIcon = document.createElement('span');
   deleteIcon.dataset.lucide = 'trash-2';
+  deleteIcon.setAttribute('aria-hidden', 'true');
   deleteColBtn.appendChild(deleteIcon);
+  const deleteText = document.createTextNode(' Delete');
+  deleteColBtn.appendChild(deleteText);
   deleteColBtn.title = 'Delete column';
   deleteColBtn.addEventListener('click', (e) => {
     e.stopPropagation();
@@ -193,7 +230,12 @@ function createColumnElement(column) {
     e.stopPropagation();
     const isOpen = !menu.classList.contains('hidden');
     closeAllColumnMenus();
-    if (!isOpen) menu.classList.remove('hidden');
+    if (!isOpen) {
+      menu.classList.remove('hidden');
+      menuBtn.setAttribute('aria-expanded', 'true');
+    } else {
+      menuBtn.setAttribute('aria-expanded', 'false');
+    }
   });
 
   menuWrapper.appendChild(menuBtn);
@@ -209,6 +251,8 @@ function createColumnElement(column) {
   
   const ul = document.createElement('ul');
   ul.classList.add('tasks');
+  ul.setAttribute('role', 'list');
+  ul.setAttribute('aria-label', `Tasks in ${column.name}`);
   
   div.appendChild(headerDiv);
   div.appendChild(ul);

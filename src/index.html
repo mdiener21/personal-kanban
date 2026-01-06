@@ -3,190 +3,224 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kanban Board</title>
+  <meta name="description" content="Personal Kanban Board - A fully local task management tool with no server required">
+  <title>Personal Kanban Board</title>
   <link rel="stylesheet" href="design.css">
-    <!-- Kanban favicon (inline SVG data URI) -->
+  <!-- Kanban favicon (inline SVG data URI) -->
   <link rel="icon" href="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='2' y='3' width='6' height='18' rx='1.5' fill='%233b82f6'/%3E%3Crect x='9' y='3' width='6' height='12' rx='1.5' fill='%2360a5fa'/%3E%3Crect x='16' y='3' width='6' height='8' rx='1.5' fill='%2393c5fd'/%3E%3C/svg%3E">
-
-
 </head>
 <body>
-<div class="controls">
-  <button id="help-btn" class="control-btn"><span data-lucide="help-circle"></span> Help</button>
-  <button id="manage-labels-btn" class="control-btn"><span data-lucide="tag"></span> Manage Labels</button>
-  <button id="add-column-btn" class="control-btn"><span data-lucide="columns"></span> Add Column</button>
-  <button id="export-btn" class="control-btn"><span data-lucide="download"></span> Export</button>
-  <button id="import-btn" class="control-btn"><span data-lucide="upload"></span> Import</button>
-  <button id="theme-toggle-btn" class="control-btn" type="button" aria-pressed="false"><span data-lucide="moon"></span> Dark</button>
-  <input type="file" id="import-file" accept="application/json" style="display: none;">
-</div>
-<div class="container" id="board-container">
-</div>
+  <!-- Skip link for accessibility -->
+  <a href="#board-container" class="sr-only">Skip to board</a>
 
-<!-- Add Task Modal -->
-<div id="task-modal" class="modal hidden">
-  <div class="modal-backdrop"></div>
-  <div class="modal-content">
-    <h3 id="task-modal-title">Add New Task</h3>
-    <form id="task-form">
-      <div class="form-group">
-        <label for="task-title">Title</label>
-        <input id="task-title" type="text" required placeholder="Enter task title...">
-      </div>
-      <div class="form-group">
-        <label for="task-description">Description</label>
-        <textarea id="task-description" rows="3" placeholder="Enter task description..."></textarea>
-      </div>
-      <div class="form-group">
-        <label for="task-priority">Priority</label>
-        <select id="task-priority">
-          <option value="low">Low</option>
-          <option value="medium" selected>Medium</option>
-          <option value="high">High</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="task-due-date">Due Date</label>
-        <input id="task-due-date" type="date">
-      </div>
-      <div class="form-group">
-        <label for="task-column">Column</label>
-        <select id="task-column">
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Labels</label>
-        <div id="task-active-labels" class="active-labels" aria-label="Selected labels"></div>
-        <input
-          type="text"
-          id="task-label-search"
-          placeholder="Search labels…"
-          autocomplete="off"
-        >
-        <div id="task-labels-selection" class="labels-selection">
-          <!-- Labels will be populated here -->
+  <header>
+    <nav class="controls" role="toolbar" aria-label="Board controls">
+      <button id="help-btn" class="control-btn" type="button" aria-haspopup="dialog">
+        <span data-lucide="help-circle" aria-hidden="true"></span>
+        <span>Help</span>
+      </button>
+      <button id="manage-labels-btn" class="control-btn" type="button" aria-haspopup="dialog">
+        <span data-lucide="tag" aria-hidden="true"></span>
+        <span>Manage Labels</span>
+      </button>
+      <button id="add-column-btn" class="control-btn" type="button" aria-haspopup="dialog">
+        <span data-lucide="columns" aria-hidden="true"></span>
+        <span>Add Column</span>
+      </button>
+      <button id="export-btn" class="control-btn" type="button">
+        <span data-lucide="download" aria-hidden="true"></span>
+        <span>Export</span>
+      </button>
+      <button id="import-btn" class="control-btn" type="button">
+        <span data-lucide="upload" aria-hidden="true"></span>
+        <span>Import</span>
+      </button>
+      <button id="theme-toggle-btn" class="control-btn" type="button" aria-pressed="false" aria-label="Toggle dark mode">
+        <span data-lucide="moon" aria-hidden="true"></span>
+        <span>Dark</span>
+      </button>
+      <input type="file" id="import-file" accept="application/json" class="sr-only" aria-label="Import board file">
+    </nav>
+  </header>
+
+  <main id="board-container" class="board-container" role="region" aria-label="Kanban board">
+    <!-- Columns rendered dynamically by JavaScript -->
+  </main>
+
+  <!-- Task Modal -->
+  <div id="task-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="task-modal-title">
+    <div class="modal-backdrop" data-close-modal></div>
+    <article class="modal-content">
+      <h3 id="task-modal-title">Add New Task</h3>
+      <form id="task-form" novalidate>
+        <div class="form-group">
+          <label for="task-title">Title <span aria-hidden="true">*</span></label>
+          <input id="task-title" type="text" required placeholder="Enter task title..." aria-required="true">
         </div>
+        <div class="form-group">
+          <label for="task-description">Description</label>
+          <textarea id="task-description" rows="3" placeholder="Enter task description..."></textarea>
+        </div>
+        <div class="form-group">
+          <label for="task-priority">Priority</label>
+          <select id="task-priority">
+            <option value="low">Low</option>
+            <option value="medium" selected>Medium</option>
+            <option value="high">High</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="task-due-date">Due Date</label>
+          <input id="task-due-date" type="date">
+        </div>
+        <div class="form-group">
+          <label for="task-column">Column</label>
+          <select id="task-column" aria-describedby="task-column-help">
+            <!-- Options populated dynamically -->
+          </select>
+          <span id="task-column-help" class="sr-only">Select which column to place this task in</span>
+        </div>
+        <fieldset class="form-group">
+          <legend>Labels</legend>
+          <div id="task-active-labels" class="active-labels" role="list" aria-label="Selected labels"></div>
+          <input type="text" id="task-label-search" placeholder="Search labels…" autocomplete="off" aria-label="Filter available labels">
+          <div id="task-labels-selection" class="labels-selection" role="listbox" aria-label="Available labels">
+            <!-- Labels populated dynamically -->
+          </div>
+        </fieldset>
+        <div class="form-actions">
+          <button type="button" id="cancel-task-btn" class="btn btn-secondary">Cancel</button>
+          <button type="submit" id="task-submit-btn" class="btn btn-primary">Add Task</button>
+        </div>
+      </form>
+    </article>
+  </div>
+
+  <!-- Column Modal -->
+  <div id="column-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="column-modal-title">
+    <div class="modal-backdrop" data-close-modal></div>
+    <article class="modal-content">
+      <h3 id="column-modal-title">Add New Column</h3>
+      <form id="column-form" novalidate>
+        <div class="form-group">
+          <label for="column-name">Column Name <span aria-hidden="true">*</span></label>
+          <input type="text" id="column-name" required placeholder="Enter column name..." aria-required="true">
+        </div>
+        <div class="form-group">
+          <label for="column-color">Color</label>
+          <input type="color" id="column-color" value="#3b82f6" aria-describedby="column-color-help">
+          <span id="column-color-help" class="sr-only">Choose accent color for the column</span>
+        </div>
+        <div class="form-actions">
+          <button type="button" id="cancel-column-btn" class="btn btn-secondary">Cancel</button>
+          <button type="submit" id="column-submit-btn" class="btn btn-primary">Add Column</button>
+        </div>
+      </form>
+    </article>
+  </div>
+
+  <!-- Labels Management Modal -->
+  <div id="labels-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="labels-modal-title">
+    <div class="modal-backdrop" data-close-modal></div>
+    <article class="modal-content">
+      <h3 id="labels-modal-title">Manage Labels</h3>
+      <div id="labels-list" class="labels-list" role="list" aria-label="Available labels">
+        <!-- Labels populated dynamically -->
       </div>
       <div class="form-actions">
-        <button type="button" id="cancel-task-btn" class="btn btn-secondary">Cancel</button>
-        <button type="submit" id="task-submit-btn" class="btn btn-primary">Add Task</button>
+        <button id="add-label-btn" type="button" class="btn btn-primary">Add Label</button>
+        <button type="button" id="labels-close-btn" class="btn btn-secondary">Close</button>
       </div>
-    </form>
+    </article>
   </div>
-</div>
 
-<!-- Add Column Modal -->
-<div id="column-modal" class="modal hidden">
-  <div class="modal-backdrop"></div>
-  <div class="modal-content">
-    <h3 id="column-modal-title">Add New Column</h3>
-    <form id="column-form">
-      <div class="form-group">
-        <label for="column-name">Column Name</label>
-        <input type="text" id="column-name" required placeholder="Enter column name...">
-      </div>
-      <div class="form-group">
-        <label for="column-color">Color</label>
-        <input type="color" id="column-color" value="#3b82f6">
+  <!-- Label Edit Modal -->
+  <div id="label-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="label-modal-title">
+    <div class="modal-backdrop" data-close-modal></div>
+    <article class="modal-content">
+      <h3 id="label-modal-title">Add Label</h3>
+      <form id="label-form" novalidate>
+        <div class="form-group">
+          <label for="label-name">Label Name <span aria-hidden="true">*</span></label>
+          <input type="text" id="label-name" required placeholder="Enter label name..." aria-required="true">
+        </div>
+        <div class="form-group">
+          <label for="label-color">Color</label>
+          <input type="color" id="label-color" value="#3b82f6">
+        </div>
+        <div class="form-actions">
+          <button type="button" id="cancel-label-btn" class="btn btn-secondary">Cancel</button>
+          <button type="submit" id="label-submit-btn" class="btn btn-primary">Save Label</button>
+        </div>
+      </form>
+    </article>
+  </div>
+
+  <!-- Help Modal -->
+  <div id="help-modal" class="modal modal-large hidden" role="dialog" aria-modal="true" aria-labelledby="help-modal-title">
+    <div class="modal-backdrop" data-close-modal></div>
+    <article class="modal-content">
+      <h3 id="help-modal-title">Personal Kanban Board Help</h3>
+      <div class="help-content">
+        <section>
+          <h4>About This Board</h4>
+          <p>This is a fully local personal kanban board. <strong>NO SERVER REQUIRED</strong> - all data is stored in your browser's localStorage.</p>
+        </section>
+        
+        <section>
+          <h4>Getting Started</h4>
+          <ul>
+            <li><strong>Create Columns:</strong> Click "Add Column" to create new workflow stages (e.g., To Do, In Progress, Done)</li>
+            <li><strong>Add Tasks:</strong> Click the plus icon in a column header to add a task to that column</li>
+            <li><strong>Edit Tasks:</strong> Click on task text to edit the task description, column, or assigned labels</li>
+            <li><strong>Move Tasks:</strong> Drag and drop tasks between columns to update their status</li>
+            <li><strong>Reorder Columns:</strong> Drag the grip icon on column headers to reorder columns</li>
+          </ul>
+        </section>
+        
+        <section>
+          <h4>Labels</h4>
+          <ul>
+            <li><strong>Manage Labels:</strong> Click "Manage Labels" to create, edit, or delete labels</li>
+            <li><strong>Assign Labels:</strong> Click on a task to assign one or more labels to it</li>
+            <li><strong>Custom Colors:</strong> Each label can have its own color for visual organization</li>
+          </ul>
+        </section>
+        
+        <section>
+          <h4>Data Storage &amp; Persistence</h4>
+          <ul>
+            <li><strong>Local Storage:</strong> All data (tasks, columns, labels) is stored in your browser's localStorage</li>
+            <li><strong>No Server:</strong> This board runs 100% locally - no internet connection required after loading</li>
+            <li><strong>Browser Specific:</strong> Data is stored only in this browser on this device</li>
+          </ul>
+        </section>
+        
+        <section>
+          <h4>Saving Your Work</h4>
+          <ul>
+            <li><strong>IMPORTANT:</strong> To preserve your board permanently, you MUST export to a JSON file</li>
+            <li><strong>Export:</strong> Click "Export" to download your complete board as a JSON file to your computer</li>
+            <li><strong>Import:</strong> Click "Import" to load a previously exported JSON file back into the board</li>
+            <li><strong>Browser Data:</strong> Clearing browser cache, cookies, or using incognito mode will delete your localStorage data</li>
+          </ul>
+        </section>
+        
+        <section>
+          <h4>Tips</h4>
+          <ul>
+            <li>Delete tasks by clicking the X button and confirming deletion</li>
+            <li>Delete columns by clicking the trash icon in the column header</li>
+            <li>Export your board regularly to avoid data loss</li>
+            <li>You can export and import your board on different devices</li>
+          </ul>
+        </section>
       </div>
       <div class="form-actions">
-        <button type="button" id="cancel-column-btn" class="btn btn-secondary">Cancel</button>
-        <button type="submit" id="column-submit-btn" class="btn btn-primary">Add Column</button>
+        <button type="button" id="help-close-btn" class="btn btn-primary">Close</button>
       </div>
-    </form>
+    </article>
   </div>
-</div>
-
-<!-- Manage Labels Modal -->
-<div id="labels-modal" class="modal hidden">
-  <div class="modal-backdrop"></div>
-  <div class="modal-content">
-    <h3>Manage Labels</h3>
-    <div id="labels-list" class="labels-list">
-      <!-- Labels will be populated here -->
-    </div>
-    <div class="form-actions">
-      <button id="add-label-btn" class="btn btn-primary">Add Label</button>
-      <button type="button" id="labels-close-btn" class="btn btn-secondary">Close</button>
-    </div>
-  </div>
-</div>
-
-<!-- Add/Edit Label Modal -->
-<div id="label-modal" class="modal hidden">
-  <div class="modal-backdrop"></div>
-  <div class="modal-content">
-    <h3 id="label-modal-title">Add Label</h3>
-    <form id="label-form">
-      <div class="form-group">
-        <label for="label-name">Label Name</label>
-        <input type="text" id="label-name" required placeholder="Enter label name...">
-      </div>
-      <div class="form-group">
-        <label for="label-color">Color</label>
-        <input type="color" id="label-color" value="#3b82f6">
-      </div>
-      <div class="form-actions">
-        <button type="button" id="cancel-label-btn" class="btn btn-secondary">Cancel</button>
-        <button type="submit" id="label-submit-btn" class="btn btn-primary">Save Label</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<!-- Help Modal -->
-<div id="help-modal" class="modal hidden">
-  <div class="modal-backdrop"></div>
-  <div class="modal-content modal-large">
-    <h3>Personal Kanban Board Help</h3>
-    <div class="help-content">
-      <h4>About This Board</h4>
-      <p>This is a fully local personal kanban board. <strong>NO SERVER REQUIRED</strong> - all data is stored in your browser's localStorage.</p>
-      
-      <h4>Getting Started</h4>
-      <ul>
-        <li><strong>Create Columns:</strong> Click "Add Column" to create new workflow stages (e.g., To Do, In Progress, Done)</li>
-        <li><strong>Add Tasks:</strong> Click the plus icon in a column header to add a task to that column</li>
-        <li><strong>Edit Tasks:</strong> Click on task text to edit the task description, column, or assigned labels</li>
-        <li><strong>Move Tasks:</strong> Drag and drop tasks between columns to update their status</li>
-        <li><strong>Reorder Columns:</strong> Drag the grip icon on column headers to reorder columns</li>
-      </ul>
-      
-      <h4>Labels</h4>
-      <ul>
-        <li><strong>Manage Labels:</strong> Click "Manage Labels" to create, edit, or delete labels</li>
-        <li><strong>Assign Labels:</strong> Click on a task to assign one or more labels to it</li>
-        <li><strong>Custom Colors:</strong> Each label can have its own color for visual organization</li>
-      </ul>
-      
-      <h4>Data Storage & Persistence</h4>
-      <ul>
-        <li><strong>Local Storage:</strong> All data (tasks, columns, labels) is stored in your browser's localStorage</li>
-        <li><strong>No Server:</strong> This board runs 100% locally - no internet connection required after loading</li>
-        <li><strong>Browser Specific:</strong> Data is stored only in this browser on this device</li>
-      </ul>
-      
-      <h4>Saving Your Work</h4>
-      <ul>
-        <li><strong>IMPORTANT:</strong> To preserve your board permanently, you MUST export to a JSON file</li>
-        <li><strong>Export:</strong> Click "Export" to download your complete board as a JSON file to your computer</li>
-        <li><strong>Import:</strong> Click "Import" to load a previously exported JSON file back into the board</li>
-        <li><strong>Browser Data:</strong> Clearing browser cache, cookies, or using incognito mode will delete your localStorage data</li>
-      </ul>
-      
-      <h4>Tips</h4>
-      <ul>
-        <li>Delete tasks by clicking the X button and confirming deletion</li>
-        <li>Delete columns by clicking the trash icon in the column header</li>
-        <li>Export your board regularly to avoid data loss</li>
-        <li>You can export and import your board on different devices</li>
-      </ul>
-    </div>
-    <div class="form-actions">
-      <button type="button" id="help-close-btn" class="btn btn-primary">Close</button>
-    </div>
-  </div>
-</div>
 
 <footer class="footer">
   <p>📌 Personal Kanban Board | Data stored in browser localStorage | <strong>Export your board to save to disk</strong> | No server required</p>
