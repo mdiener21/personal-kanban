@@ -2,4 +2,7 @@
 *.json
 *.env
 .env
-
+node_modules
+dist
+.venv
+.vscode
