@@ -17,10 +17,21 @@
     <nav class="controls" role="toolbar" aria-label="Board controls">
       <div class="brand">
         <span data-lucide="square-kanban" aria-hidden="true" class="brand-icon"></span>
-        <span class="brand-text">Private First Kanban</span>
+        <span id="brand-text" class="brand-text"></span>
       </div>
       
       <div id="board-controls-menu" class="controls-actions">
+        <label class="sr-only" for="board-select">Select board</label>
+        <select id="board-select" class="control-select" aria-label="Select board"></select>
+        <button id="new-board-btn" class="control-btn" type="button">
+          <span data-lucide="plus" aria-hidden="true"></span>
+          <span>New Board</span>
+        </button>
+        <button id="manage-boards-btn" class="control-btn" type="button" aria-haspopup="dialog">
+          <span data-lucide="settings" aria-hidden="true"></span>
+          <span>Manage Boards</span>
+        </button>
+
         <button id="help-btn" class="control-btn" type="button" aria-haspopup="dialog">
           <span data-lucide="help-circle" aria-hidden="true"></span>
           <span>Help</span>
@@ -142,6 +153,18 @@
       <div class="form-actions">
         <button id="add-label-btn" type="button" class="btn btn-primary">Add Label</button>
         <button type="button" id="labels-close-btn" class="btn btn-secondary">Close</button>
+      </div>
+    </article>
+  </div>
+
+  <!-- Boards Modal -->
+  <div id="boards-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="boards-modal-title">
+    <div class="modal-backdrop" data-close-modal></div>
+    <article class="modal-content">
+      <h3 id="boards-modal-title">Manage Boards</h3>
+      <div id="boards-list" class="labels-list" aria-label="Boards list"></div>
+      <div class="form-actions">
+        <button type="button" id="boards-close-btn" class="btn btn-primary">Close</button>
       </div>
     </article>
   </div>

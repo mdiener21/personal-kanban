@@ -152,6 +152,24 @@ body {
   align-items: center;
 }
 
+/* Toolbar select (board picker) */
+.control-select {
+  padding: 8px 12px;
+  background-color: var(--input-bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  font-size: 14px;
+  font-family: inherit;
+  cursor: pointer;
+  max-width: 220px;
+}
+
+.control-select:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--input-focus-ring);
+}
+
 /* Mobile Menu Button - Hidden by default */
 #mobile-menu-btn {
   display: none;
@@ -1092,6 +1110,15 @@ fieldset.form-group legend {
     justify-content: flex-start;
     background: none;
     color: var(--text);
+    padding: 10px 12px;
+  }
+
+  /* Board picker should be easy to tap and use */
+  .controls-actions .control-select {
+    width: 100%;
+    max-width: 100%;
+    min-height: 44px;
+    font-size: 16px; /* avoids iOS zoom + improves readability */
     padding: 10px 12px;
   }
   

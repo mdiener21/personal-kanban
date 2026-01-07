@@ -2,6 +2,15 @@ import { loadLabels, loadColumns, loadTasks } from './storage.js';
 import { addTask, updateTask, deleteTask } from './tasks.js';
 import { addColumn, updateColumn, deleteColumn } from './columns.js';
 import { addLabel, updateLabel, deleteLabel } from './labels.js';
+import {
+  ensureBoardsInitialized,
+  listBoards,
+  getActiveBoardId,
+  setActiveBoardId,
+  getActiveBoardName,
+  renameBoard,
+  deleteBoard as deleteBoardById
+} from './storage.js';
 
 // Modal state
 let currentColumn = 'todo';
@@ -289,6 +298,151 @@ function renderLabelsList() {
   }
 }
 
+function renderBoardsSelect() {
+  const selectEl = document.getElementById('board-select');
+  if (!selectEl) return;
+
+  const boards = listBoards();
+  const active = getActiveBoardId();
+  selectEl.innerHTML = '';
+
+  boards.forEach((b) => {
+    const option = document.createElement('option');
+    option.value = b.id;
+    option.textContent = (typeof b.name === 'string' && b.name.trim()) ? b.name.trim() : 'Untitled board';
+    selectEl.appendChild(option);
+  });
+
+  if (active) selectEl.value = active;
+
+  const brandEl = document.getElementById('brand-text') || document.querySelector('.brand-text');
+  if (brandEl) brandEl.textContent = getActiveBoardName();
+}
+
+function renderBoardsList() {
+  ensureBoardsInitialized();
+  const container = document.getElementById('boards-list');
+  if (!container) return;
+
+  container.innerHTML = '';
+  const boards = listBoards();
+  const activeId = getActiveBoardId();
+
+  boards.forEach((board) => {
+    const item = document.createElement('div');
+    item.classList.add('label-item');
+    item.style.display = 'flex';
+    item.style.alignItems = 'center';
+    item.style.justifyContent = 'space-between';
+    item.style.gap = '10px';
+
+    const nameWrap = document.createElement('div');
+    nameWrap.style.display = 'flex';
+    nameWrap.style.alignItems = 'center';
+    nameWrap.style.gap = '8px';
+
+    const nameEl = document.createElement('span');
+    nameEl.textContent = (board.name || '').toString();
+    nameWrap.appendChild(nameEl);
+
+    if (board.id === activeId) {
+      const activeBadge = document.createElement('span');
+      activeBadge.classList.add('task-label');
+      activeBadge.style.backgroundColor = 'var(--color-primary)';
+      activeBadge.textContent = 'Active';
+      nameWrap.appendChild(activeBadge);
+    }
+
+    const actions = document.createElement('div');
+    actions.classList.add('label-actions');
+    actions.style.display = 'flex';
+    actions.style.gap = '4px';
+
+    const switchBtn = document.createElement('button');
+    switchBtn.classList.add('btn-small');
+    switchBtn.textContent = 'Open';
+    switchBtn.title = 'Open board';
+    switchBtn.addEventListener('click', async () => {
+      setActiveBoardId(board.id);
+      renderBoardsSelect();
+      renderBoardsList();
+      const { renderBoard } = await import('./render.js');
+      renderBoard();
+    });
+
+    const editBtn = document.createElement('button');
+    editBtn.classList.add('btn-small');
+    const editIcon = document.createElement('span');
+    editIcon.dataset.lucide = 'pencil';
+    editBtn.appendChild(editIcon);
+    editBtn.title = 'Rename board';
+    editBtn.addEventListener('click', async () => {
+      const next = window.prompt('Rename board:', board.name);
+      if (next === null) return;
+      const trimmed = next.trim();
+      if (!trimmed) {
+        alert('Board name cannot be empty.');
+        return;
+      }
+      if (!renameBoard(board.id, trimmed)) {
+        alert('Unable to rename board.');
+        return;
+      }
+      renderBoardsSelect();
+      renderBoardsList();
+      if (window.lucide && typeof window.lucide.createIcons === 'function') {
+        window.lucide.createIcons();
+      }
+    });
+
+    const deleteBtn = document.createElement('button');
+    deleteBtn.classList.add('btn-small', 'btn-danger');
+    const deleteIcon = document.createElement('span');
+    deleteIcon.dataset.lucide = 'trash-2';
+    deleteBtn.appendChild(deleteIcon);
+    deleteBtn.title = 'Delete board';
+    deleteBtn.addEventListener('click', async () => {
+      const ok = confirm(`Do you really want to delete the board "${board.name}"? This cannot be undone.`);
+      if (!ok) return;
+      const deleted = deleteBoardById(board.id);
+      if (!deleted) {
+        alert('Unable to delete board (you may be trying to delete the last board).');
+        return;
+      }
+      renderBoardsSelect();
+      renderBoardsList();
+      const { renderBoard } = await import('./render.js');
+      renderBoard();
+      if (window.lucide && typeof window.lucide.createIcons === 'function') {
+        window.lucide.createIcons();
+      }
+    });
+
+    actions.appendChild(switchBtn);
+    actions.appendChild(editBtn);
+    actions.appendChild(deleteBtn);
+
+    item.appendChild(nameWrap);
+    item.appendChild(actions);
+    container.appendChild(item);
+  });
+
+  if (window.lucide && typeof window.lucide.createIcons === 'function') {
+    window.lucide.createIcons();
+  }
+}
+
+function showBoardsModal() {
+  renderBoardsList();
+  const modal = document.getElementById('boards-modal');
+  modal?.classList.remove('hidden');
+}
+
+function hideBoardsModal() {
+  const modal = document.getElementById('boards-modal');
+  modal?.classList.add('hidden');
+}
+
 function updateTaskLabelsSelection() {
   renderActiveTaskLabels();
   const container = document.getElementById('task-labels-selection');
@@ -410,6 +564,11 @@ export function initializeModalHandlers() {
   document.querySelector('#labels-modal .modal-backdrop').addEventListener('click', hideLabelsModal);
   document.querySelector('#label-modal .modal-backdrop').addEventListener('click', hideLabelModal);
 
+  // Boards modal
+  document.getElementById('manage-boards-btn')?.addEventListener('click', showBoardsModal);
+  document.getElementById('boards-close-btn')?.addEventListener('click', hideBoardsModal);
+  document.querySelector('#boards-modal .modal-backdrop')?.addEventListener('click', hideBoardsModal);
+
   // Help modal
   document.getElementById('help-btn').addEventListener('click', showHelpModal);
   document.getElementById('help-close-btn').addEventListener('click', hideHelpModal);
@@ -425,6 +584,7 @@ export function initializeModalHandlers() {
       hideColumnModal();
       hideLabelsModal();
       hideLabelModal();
+      hideBoardsModal();
       hideHelpModal();
     }
   });

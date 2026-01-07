@@ -2,10 +2,14 @@ import { renderBoard } from './modules/render.js';
 import { initializeModalHandlers } from './modules/modals.js';
 import { exportTasks, importTasks } from './modules/importexport.js';
 import { initializeThemeToggle } from './modules/theme.js';
+import { initializeBoardsUI } from './modules/boards.js';
 
 // Add task button listeners
 document.addEventListener('DOMContentLoaded', () => {
   initializeThemeToggle();
+
+  // Boards (create/select + restore last active)
+  initializeBoardsUI();
 
   // Initialize modal handlers
   initializeModalHandlers();
@@ -43,12 +47,17 @@ document.addEventListener('DOMContentLoaded', () => {
       document.querySelectorAll('.column-menu').forEach(m => m.classList.add('hidden'));
     });
 
-    // Close menu when clicking items inside it
-    controlsActions.addEventListener('click', () => {
-       if (window.innerWidth <= 768) {
-         controlsActions.classList.remove('show');
-         mobileMenuBtn.setAttribute('aria-expanded', 'false');
-       }
+    // Close menu when clicking action buttons inside it.
+    // Don't close for form controls like the board <select>, otherwise it's impossible to change selection.
+    controlsActions.addEventListener('click', (e) => {
+      if (window.innerWidth > 768) return;
+      const isFormControl = e.target.closest('select, option, input, textarea, label');
+      if (isFormControl) return;
+      const isAction = e.target.closest('button, a, [role="menuitem"]');
+      if (!isAction) return;
+
+      controlsActions.classList.remove('show');
+      mobileMenuBtn.setAttribute('aria-expanded', 'false');
     });
 
     // Close menu when clicking outside
