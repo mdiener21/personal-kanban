@@ -63,7 +63,7 @@
 
 ### Board Layout
 
-- Horizontal flexbox container with columns
+- Horizontal flexbox container with columns (scrollable horizontally on mobile)
 - Each column: header (drag handle, title, task counter, actions) + task list + optional show-all button
 - Task counter: circular blue badge showing task count, updates on any task add/remove/move
 
@@ -134,6 +134,7 @@
 
 ### Modals
 
+- **Mobile Behavior**: Full-screen modals with scrollable form and sticky footer. "Manage Labels" list expands to fill the screen. "Edit Task" label selection shows full list.
 - Task modal (add/edit)
 - Column modal (add/edit)
 - Labels management modal
@@ -166,9 +167,8 @@
 
 ### Scrolling
 
-- Default: max-height 600px per column task list
-- If >12 tasks: show "Show all tasks (N)" button
-- Expanded state: max-height 80vh, scrollbar active
+- **Desktop**: Default max-height 600px per column task list. If >12 tasks: show "Show all tasks (N)" button. Expanded state: max-height 80vh.
+- **Mobile**: Columns have fixed height based on viewport with internal vertical scrolling. Board scrolls horizontally with snap-to-column.
 - Styled scrollbar: 8px width, blue thumb
 
 ### Warnings
