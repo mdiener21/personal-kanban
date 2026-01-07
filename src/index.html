@@ -292,8 +292,10 @@
         <section>
           <h4>Import / Export (Backups)</h4>
           <ul>
-            <li><strong>Export:</strong> Downloads the <strong>active board</strong> (columns + tasks + labels) as a JSON file.</li>
-            <li><strong>Import:</strong> Loads a JSON file into the <strong>active board</strong>.</li>
+            <li><strong>Export:</strong> Downloads the <strong>active board only</strong> (columns + tasks + labels) as a JSON file. It does not back up all boards.</li>
+            <li><strong>To back up all boards:</strong> Switch boards and export each one.</li>
+            <li><strong>Import:</strong> Loads a JSON file into the <strong>active board</strong> and <strong>overwrites</strong> its tasks, columns, and labels.</li>
+            <li><strong>Recommended:</strong> Create a new blank board first, switch to it, then click Import.</li>
             <li><strong>IMPORTANT:</strong> If you care about your data, export regularly (clearing site data or using private browsing can delete <code>localStorage</code>).</li>
           </ul>
         </section>

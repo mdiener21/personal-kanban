@@ -235,7 +235,9 @@
 ## Export/Import Logic
 
 - **Export**: Combines active board's tasks, columns, labels into single JSON object
+- **Export warning**: Before exporting, the app warns that export only includes the active board (not all boards).
 - **Import**: Imports into the active board (tasks + columns + labels), supports backward compatibility
+- **Import warning**: Before importing, the app warns that the active board will be overwritten and recommends creating a new blank board first.
 - **Filename**: `kanban-board-YYYY-MM-DD.json`
 
 ## CSS Architecture

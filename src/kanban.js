@@ -3,6 +3,7 @@ import { initializeModalHandlers } from './modules/modals.js';
 import { exportTasks, importTasks } from './modules/importexport.js';
 import { initializeThemeToggle } from './modules/theme.js';
 import { initializeBoardsUI } from './modules/boards.js';
+import { confirmDialog } from './modules/dialog.js';
 
 // Add task button listeners
 document.addEventListener('DOMContentLoaded', () => {
@@ -15,10 +16,26 @@ document.addEventListener('DOMContentLoaded', () => {
   initializeModalHandlers();
 
   // Export button listener
-  document.getElementById('export-btn').addEventListener('click', exportTasks);
+  document.getElementById('export-btn').addEventListener('click', async () => {
+    const ok = await confirmDialog({
+      title: 'Export Board (Active Only)',
+      message:
+        'Export ONLY saves the current active board. It does NOT back up all boards.\n\nTo back up everything, export each board individually.\n\nContinue with export?',
+      confirmText: 'Export'
+    });
+    if (!ok) return;
+    exportTasks();
+  });
 
   // Import button listener
-  document.getElementById('import-btn').addEventListener('click', () => {
+  document.getElementById('import-btn').addEventListener('click', async () => {
+    const ok = await confirmDialog({
+      title: 'Import Board (Overwrite)',
+      message:
+        'Import will OVERWRITE the current active board (tasks, columns, and labels).\n\nRecommended: Create a new blank board first, switch to it, then click Import.\n\nContinue with import?',
+      confirmText: 'Import'
+    });
+    if (!ok) return;
     document.getElementById('import-file').click();
   });
 

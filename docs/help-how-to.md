@@ -59,8 +59,17 @@ All controls are in the header menu.
 
 ### Import / Export (Backups)
 
-- **Export** downloads the active board (columns + tasks + labels) as a JSON file.
-- **Import** loads a JSON file into the active board.
+- **Export** downloads the active board only (columns + tasks + labels) as a JSON file. It does not back up all boards.
+
+To back up everything:
+- Switch boards
+- Export each board individually
+- **Import** loads a JSON file into the active board and **overwrites** its tasks, columns, and labels.
+
+Recommended workflow:
+- Create a new blank board first
+- Switch to it
+- Then click **Import**
 
 Important notes:
 - Clearing site data, using private browsing, or switching browsers/devices can make your data disappear.

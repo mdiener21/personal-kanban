@@ -7,7 +7,7 @@
   <title>Personal Kanban Board</title>
   <!-- Kanban favicon (inline SVG data URI) -->
   <link rel="icon" href="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='2' y='3' width='6' height='18' rx='1.5' fill='%233b82f6'/%3E%3Crect x='9' y='3' width='6' height='12' rx='1.5' fill='%2360a5fa'/%3E%3Crect x='16' y='3' width='6' height='8' rx='1.5' fill='%2393c5fd'/%3E%3C/svg%3E">
-  <script type="module" crossorigin src="/assets/index-V1i5__wm.js"></script>
+  <script type="module" crossorigin src="/assets/index-CuXkmj5t.js"></script>
   <link rel="stylesheet" crossorigin href="/assets/index-CjcKfymQ.css">
 </head>
 <body>
@@ -293,8 +293,10 @@
         <section>
           <h4>Import / Export (Backups)</h4>
           <ul>
-            <li><strong>Export:</strong> Downloads the <strong>active board</strong> (columns + tasks + labels) as a JSON file.</li>
-            <li><strong>Import:</strong> Loads a JSON file into the <strong>active board</strong>.</li>
+            <li><strong>Export:</strong> Downloads the <strong>active board only</strong> (columns + tasks + labels) as a JSON file. It does not back up all boards.</li>
+            <li><strong>To back up all boards:</strong> Switch boards and export each one.</li>
+            <li><strong>Import:</strong> Loads a JSON file into the <strong>active board</strong> and <strong>overwrites</strong> its tasks, columns, and labels.</li>
+            <li><strong>Recommended:</strong> Create a new blank board first, switch to it, then click Import.</li>
             <li><strong>IMPORTANT:</strong> If you care about your data, export regularly (clearing site data or using private browsing can delete <code>localStorage</code>).</li>
           </ul>
         </section>
