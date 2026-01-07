@@ -1,8 +1,7 @@
 /data
-*.json
 *.env
 .env
-node_modules
-dist
 .venv
-.vscode
+node_modules
+*.log
+.DS_Store

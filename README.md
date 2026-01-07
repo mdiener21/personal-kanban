@@ -1,73 +1,109 @@
-# Personal Kanban Board (Local-First)
+# Personal Kanban Board
 
-In a world full of JavaScript and CSS frameworks, going back to basics can feel a little painful — but it’s also a great learning experience. This project intentionally sticks to vanilla web fundamentals to help people (re)learn how browsers, DOM events, storage, and simple UI patterns actually work.
+A fully local, no-server-required personal kanban board with localStorage persistence.
 
-At some point I’ll likely add a “same app, but with a framework” variant just for fun — mainly to compare speed, bundle size, and complexity as a learning exercise.
+## Features
 
-Scope note: this is **not** meant to be a team collaboration tool. It’s a personal board you can use at work *if your company allows it*.
+- ✅ Local-first (no server needed)
+- 🎨 Drag & drop tasks and columns
+- 🏷️ Custom labels with colors
+- 💾 Export/Import to JSON
+- 📱 Responsive design
 
-A lightweight, **fully local** personal Kanban board for day-to-day task tracking.
+## Quick Start
 
-- **No server, no accounts, no build step**: open the page, start moving cards.
-- **Local-first**: everything is stored in your browser via `localStorage`.
-- **Portable**: export/import your board as a single JSON file for backups.
+From the repository root:
 
-This is intended for personal use: quick capture, simple workflow columns, and a frictionless “open-and-plan” loop.
+```bash
+npm install
+npm run dev
+```
 
-## What you get
+Vite will open the app (default: `http://localhost:3000`).
 
-- Columns (create / rename / delete / reorder)
-- Tasks (add / edit / delete / drag between columns)
-- Labels (create / edit / delete, multi-label tasks)
-- Import/export JSON to move the board between machines or keep backups
+## Development Setup
 
-## Quick start
+### Prerequisites
 
-The board is a static site (HTML/CSS/JS). The most reliable way to run it is via a tiny local web server.
+- Node.js (v18 or higher)
+- npm or yarn
 
-1. Start a local server from this folder:
+### Installation
 
-   - Python: `python3 -m http.server 8000`
-   - Or any static server you like
+1. Install dependencies:
 
-2. Open: `http://localhost:8000/`
+   ```bash
+   npm install
+   ```
 
-If you *really* want to, you can try opening `index.html` directly in the browser, but some browsers restrict storage behavior for `file://` URLs. A local server avoids that.
+1. Start the development server:
 
-## Daily use
+   ```bash
+   npm run dev
+   ```
 
-- Add a task via the **plus** button in a column header
-- Click a task’s text to edit it
-- Drag tasks to update status
-- Drag the column grip handle to reorder columns
+The app will open in your browser at `http://localhost:3000`.
 
-## Data, backups, and portability
+### Build for Production
 
-All board data lives in your browser’s `localStorage` (on this device, in this browser profile).
+```bash
+npm run build
+```
 
-- Use **Export** to download a snapshot JSON
-- Use **Import** to restore from a snapshot JSON
+The built files will be in the `dist` directory.
 
-Tip: if you care about your board history, export regularly (e.g., end of day / end of week) and store the JSON somewhere you back up.
+### Preview Production Build
 
-### Storage keys (for troubleshooting)
+```bash
+npm run preview
+```
 
-The app stores data under these `localStorage` keys:
+## Deploy (Static Site)
 
-- `kanbanTasks`
-- `kanbanColumns`
-- `kanbanLabels`
+This app builds to a static site. Deploy the contents of `dist/` to any static host.
 
-If you ever need a “hard reset”, clear site data for the page in your browser settings, or delete those keys in DevTools.
+```bash
+npm ci
+npm run build
+```
 
-## Project constraints
+- Upload/publish the `dist/` directory.
+- If deploying under a sub-path (for example GitHub Pages), set `base` in `vite.config.js` so asset URLs work.
 
-- Vanilla HTML/CSS/JS
-- Single external dependency: Lucide icons (CDN)
-- No backend; no database
+## Project Structure
 
-## Files
+```text
+personal-kanban/
+├── src/
+│   ├── modules/
+│   │   ├── utils.js          # Utility functions
+│   │   ├── storage.js        # localStorage operations
+│   │   ├── labels.js         # Label management
+│   │   ├── columns.js        # Column management
+│   │   ├── tasks.js          # Task management
+│   │   ├── dragdrop.js       # Drag & drop functionality
+│   │   ├── modals.js         # Modal UI logic
+│   │   ├── render.js         # Rendering logic
+│   │   └── importexport.js   # Import/Export functionality
+│   ├── index.html            # Main HTML file
+│   ├── kanban.js             # Main entry point
+│   └── design.css            # Styles
+├── package.json
+├── vite.config.js
+└── README.md
+```
 
-- `index.html`: UI shell and modals
-- `design.css`: styling
-- `kanban.js`: board logic + localStorage + import/export
+## Usage
+
+- **Add Column**: Click "Add Column" button
+- **Add Task**: Click the + icon in any column header
+- **Edit Task**: Click on task text to edit
+- **Move Task**: Drag and drop tasks between columns
+- **Reorder Columns**: Drag column headers using the grip icon
+- **Manage Labels**: Click "Manage Labels" to create/edit/delete labels
+- **Export Data**: Click "Export" to save your board as JSON
+- **Import Data**: Click "Import" to load a previously exported board
+
+## Data Persistence
+
+All data is stored in browser localStorage. **Remember to export regularly** to avoid data loss when clearing browser data.

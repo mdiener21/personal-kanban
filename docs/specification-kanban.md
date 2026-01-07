@@ -6,21 +6,35 @@
 - Single external dependency: Lucide icons (CDN)
 - Storage: browser localStorage only
 - Data persistence: JSON import/export to local disk
-- No server, no frameworks, no build process
+- No server, no frameworks
+- Build tooling: Vite (ES modules)
 
 ## AI LLM Rules
 
-- Always update the specification upon comnpleting a new tasks to keep the specification up to date.
+- Always update the specification upon completing new tasks to keep the specification up to date.
 - Always follow the Technology Rules and Principles section in the document
 
 ## Core Data Structures
+
+### Board Model
+
+```javascript
+{
+  id: "board-uuid",
+  name: "Board Name",
+  createdAt: "YYYY-MM-DDTHH:MM:SSZ"
+}
+```
 
 ### Task Model
 
 ```javascript
 {
   id: "uuid",
-  text: "task description",
+  title: "task title",
+  description: "optional longer description",
+  priority: "low" | "medium" | "high",
+  dueDate: "YYYY-MM-DD" | "",
   column: "column-id",
   order: number,
   labels: ["label-id-1", "label-id-2"],
@@ -34,6 +48,7 @@
 {
   id: "column-id",
   name: "Column Name",
+  color: "#hexcolor",
   order: number
 }
 ```
@@ -50,34 +65,51 @@
 
 ## Storage
 
-- **localStorage keys**: `kanbanTasks`, `kanbanColumns`, `kanbanLabels`
-- All CRUD operations save/load from localStorage
-- Export: JSON file with all three data types
-- Import: Supports legacy (tasks only) and full format (tasks + columns + labels)
+- **Boards registry**:
+  - `kanbanBoards`: array of Board metadata
+  - `kanbanActiveBoardId`: last active board id (restored on page load)
+- **Per-board data (namespaced)**:
+  - `kanbanBoard:<boardId>:tasks`
+  - `kanbanBoard:<boardId>:columns`
+  - `kanbanBoard:<boardId>:labels`
+- Legacy storage (`kanbanTasks`, `kanbanColumns`, `kanbanLabels`) is migrated into a default board on first run.
+- All CRUD operations load/save against the currently active board.
+- Export/Import operates on the active board.
 
 ## UI Components
 
 ### Board Layout
 
-- Horizontal flexbox container with columns
+- Horizontal flexbox container with columns (scrollable horizontally on mobile)
 - Each column: header (drag handle, title, task counter, actions) + task list + optional show-all button
 - Task counter: circular blue badge showing task count, updates on any task add/remove/move
 
 ### Column Features
 
-- **Create**: Modal form with column name input
-- **Edit**: Click pencil icon, edit name in modal
-- **Delete**: Click trash icon, confirm if tasks exist
+- **Create**: Modal form with column name input + color picker
+- **Edit**: Open column menu (ellipsis) → pencil, edit name + color in modal
+- **Delete**: Open column menu (ellipsis) → trash, confirm if tasks exist
 - **Reorder**: Drag via grip icon handle, updates order property
 - **Actions**: Plus icon (add task), pencil (edit), trash (delete)
 
+#### Column Header Actions
+
+- Plus icon: adds a task to this column
+- Ellipsis icon: opens a small menu with Edit (pencil) and Delete (trash)
+
+#### Column Color
+
+- Each column has a user-selected hex `color`.
+- Column UI uses this color as its accent.
+- Tasks inside the column inherit the column accent color for consistent styling.
+
 ### Task Features
 
-- **Create**: Click plus icon in column header, modal with description, column select, label checkboxes
-- **Edit**: Click task text, modal pre-filled with current data
+- **Create**: Click plus icon in column header, modal with Title, Description, Priority, Due Date, column select, label checkboxes
+- **Edit**: Click task title/description, modal pre-filled with current data
 - **Delete**: Click X button, confirm deletion
 - **Move**: Drag between columns, auto-saves new column and order
-- **Display**: Text above, labels below (colored badges), delete button
+- **Display**: Title (clickable), optional description, labels (colored badges), meta row (priority + due date), delete button
 - **Label selection UX (modal)**:
   - Selected labels are shown as a single horizontal row of colored label pills
   - Each selected label pill has a small **×** button to remove it from the task
@@ -94,11 +126,19 @@
 
 ### Controls Bar
 
-- Help button (opens help modal)
-- Manage Labels button
-- Add Column button
-- Export button (downloads JSON)
-- Import button (file picker for JSON)
+- Single menu button (ellipsis) that opens a dropdown containing:
+  - Board selector dropdown (shows all boards)
+  - New Board button (prompt for name)
+  - Manage Boards button (opens boards management modal)
+  - Help button (opens help modal)
+  - Manage Labels button
+  - Add Column button
+  - Export button (downloads JSON)
+  - Import button (file picker for JSON)
+
+### Branding
+
+- Brand text displays the active board name (no static title text).
 
 ## Key Behaviors
 
@@ -119,14 +159,38 @@
 
 ### Modals
 
+- **Mobile Behavior**: Full-screen modals with scrollable form and sticky footer. "Manage Labels" list expands to fill the screen. "Edit Task" label selection shows full list.
 - Task modal (add/edit)
 - Column modal (add/edit)
 - Labels management modal
+- Boards management modal
 - Label add/edit modal
 - Help modal
 - Close on Escape key or backdrop click
 
+### Boards
+
+- **Select active board**: via the board dropdown; selection persists and is restored on next page load.
+- **Create board**: via New Board button (prompt for name). New boards start with default columns + labels, and empty tasks.
+- **Manage boards**: via Manage Boards modal:
+  - List boards
+  - Open a board (sets active and renders)
+  - Rename a board
+  - Delete a board (always confirms: “Do you really want to delete…?”)
+  - The last remaining board cannot be deleted
+- **Mobile UX**:
+  - Board selector is full-width with a larger tap target.
+  - The controls dropdown does not auto-close when interacting with the selector.
+
 #### Task Modal Details
+
+- **Fields** include:
+  - Title (required)
+  - Description (optional)
+  - Priority (low/medium/high)
+  - Due Date (optional, YYYY-MM-DD)
+  - Column selection
+  - Labels selection
 
 - **Labels section** includes:
   - Active labels row (single line, left-to-right)
@@ -143,9 +207,8 @@
 
 ### Scrolling
 
-- Default: max-height 600px per column task list
-- If >12 tasks: show "Show all tasks (N)" button
-- Expanded state: max-height 80vh, scrollbar active
+- **Desktop**: Default max-height 600px per column task list. If >12 tasks: show "Show all tasks (N)" button. Expanded state: max-height 80vh.
+- **Mobile**: Columns have fixed height based on viewport with internal vertical scrolling. Board scrolls horizontally with snap-to-column.
 - Styled scrollbar: 8px width, blue thumb
 
 ### Warnings
@@ -164,15 +227,17 @@
 ## Technology Constraints
 
 - Pure JavaScript (no frameworks)
-- No build process
+- Vite build/dev tooling (ES modules)
 - Lucide icons CDN
 - localStorage only (no server, no database)
-- Single HTML file + CSS file + JS file
+- Single HTML entry + CSS + JS modules
 
 ## Export/Import Logic
 
-- **Export**: Combines tasks, columns, labels into single JSON object
-- **Import**: Validates structure, supports backward compatibility
+- **Export**: Combines active board's tasks, columns, labels into single JSON object
+- **Export warning**: Before exporting, the app warns that export only includes the active board (not all boards).
+- **Import**: Imports into the active board (tasks + columns + labels), supports backward compatibility
+- **Import warning**: Before importing, the app warns that the active board will be overwritten and recommends creating a new blank board first.
 - **Filename**: `kanban-board-YYYY-MM-DD.json`
 
 ## CSS Architecture
@@ -204,3 +269,5 @@
 - Import/export instructions
 - Feature overview
 - Keyboard shortcuts (Escape to close modals)
+
+The canonical Help modal copy lives in `docs/help-how-to.md`.

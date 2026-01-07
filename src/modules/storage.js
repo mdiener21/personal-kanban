@@ -1,0 +1,329 @@
+import { generateUUID } from './utils.js';
+
+const BOARDS_KEY = 'kanbanBoards';
+const ACTIVE_BOARD_KEY = 'kanbanActiveBoardId';
+
+const LEGACY_COLUMNS_KEY = 'kanbanColumns';
+const LEGACY_TASKS_KEY = 'kanbanTasks';
+const LEGACY_LABELS_KEY = 'kanbanLabels';
+
+const DEFAULT_BOARD_ID = 'default';
+
+// Per-board in-memory cache to keep defaults stable within a session.
+const taskCacheByBoard = new Map();
+
+function nowIso() {
+  return new Date().toISOString();
+}
+
+function keyFor(boardId, kind) {
+  return `kanbanBoard:${boardId}:${kind}`;
+}
+
+function safeParseArray(value) {
+  if (!value) return null;
+  try {
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed) ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+export function listBoards() {
+  const boards = safeParseArray(localStorage.getItem(BOARDS_KEY));
+  if (!boards) return [];
+
+  return boards
+    .filter((b) => b && typeof b.id === 'string')
+    .map((b) => ({
+      id: b.id,
+      name: typeof b.name === 'string' ? b.name : 'Untitled board',
+      createdAt: typeof b.createdAt === 'string' ? b.createdAt : undefined
+    }));
+}
+
+export function getBoardById(boardId) {
+  const id = typeof boardId === 'string' ? boardId : '';
+  if (!id) return null;
+  return listBoards().find((b) => b.id === id) || null;
+}
+
+export function getActiveBoardName() {
+  const id = getActiveBoardId();
+  const board = id ? getBoardById(id) : null;
+  const name = typeof board?.name === 'string' ? board.name.trim() : '';
+  return name || 'Untitled board';
+}
+
+function saveBoards(boards) {
+  localStorage.setItem(BOARDS_KEY, JSON.stringify(boards));
+}
+
+export function getActiveBoardId() {
+  const stored = localStorage.getItem(ACTIVE_BOARD_KEY);
+  const boards = listBoards();
+  if (stored && boards.some((b) => b.id === stored)) return stored;
+  return boards[0]?.id || null;
+}
+
+export function setActiveBoardId(boardId) {
+  const id = typeof boardId === 'string' ? boardId : '';
+  if (!id) return;
+  const boards = listBoards();
+  if (!boards.some((b) => b.id === id)) return;
+  localStorage.setItem(ACTIVE_BOARD_KEY, id);
+}
+
+function defaultColumns() {
+  return [
+    { id: 'todo', name: 'To Do', color: '#3b82f6' },
+    { id: 'inprogress', name: 'In Progress', color: '#f59e0b' },
+    { id: 'done', name: 'Done', color: '#16a34a' }
+  ];
+}
+
+function defaultLabels() {
+  return [
+    { id: 'urgent', name: 'Urgent', color: '#ef4444' },
+    { id: 'feature', name: 'Feature', color: '#3b82f6' },
+    { id: 'task', name: 'Task', color: '#f59e0b' }
+  ];
+}
+
+function defaultTasks() {
+  return [
+    {
+      id: generateUUID(),
+      title: 'Find out where the Soul Stone is',
+      description: 'Identify current location and access requirements.',
+      priority: 'high',
+      dueDate: '',
+      column: 'todo',
+      labels: ['urgent'],
+      creationDate: nowIso()
+    },
+    {
+      id: generateUUID(),
+      title: 'Collect the Time Stone',
+      description: 'Coordinate with Dr. Strange and plan retrieval.',
+      priority: 'medium',
+      dueDate: '',
+      column: 'inprogress',
+      labels: ['feature'],
+      creationDate: nowIso()
+    },
+    {
+      id: generateUUID(),
+      title: 'Collect the Mind Stone',
+      description: 'Determine safe extraction approach.',
+      priority: 'medium',
+      dueDate: '',
+      column: 'inprogress',
+      labels: [],
+      creationDate: nowIso()
+    },
+    {
+      id: generateUUID(),
+      title: 'Collect the Reality Stone',
+      description: 'Negotiate with the Collector, avoid escalation.',
+      priority: 'low',
+      dueDate: '',
+      column: 'inprogress',
+      labels: ['task'],
+      creationDate: nowIso()
+    },
+    {
+      id: generateUUID(),
+      title: 'Collect the Power Stone',
+      description: 'Verify secure containment after retrieval.',
+      priority: 'high',
+      dueDate: '',
+      column: 'done',
+      labels: ['urgent', 'feature'],
+      creationDate: nowIso()
+    },
+    {
+      id: generateUUID(),
+      title: 'Collect the Space Stone',
+      description: '',
+      priority: 'low',
+      dueDate: '',
+      column: 'done',
+      labels: [],
+      creationDate: nowIso()
+    }
+  ];
+}
+
+function migrateLegacySingleBoardIntoDefault() {
+  const legacyColumns = safeParseArray(localStorage.getItem(LEGACY_COLUMNS_KEY));
+  const legacyTasks = safeParseArray(localStorage.getItem(LEGACY_TASKS_KEY));
+  const legacyLabels = safeParseArray(localStorage.getItem(LEGACY_LABELS_KEY));
+
+  const hadLegacy = Boolean(legacyColumns || legacyTasks || legacyLabels);
+
+  // Always create the default board metadata.
+  const boards = [{ id: DEFAULT_BOARD_ID, name: 'Default Board', createdAt: nowIso() }];
+  saveBoards(boards);
+  localStorage.setItem(ACTIVE_BOARD_KEY, DEFAULT_BOARD_ID);
+
+  // Prefer legacy data if present; otherwise initialize defaults.
+  localStorage.setItem(keyFor(DEFAULT_BOARD_ID, 'columns'), JSON.stringify(legacyColumns || defaultColumns()));
+  localStorage.setItem(keyFor(DEFAULT_BOARD_ID, 'tasks'), JSON.stringify(legacyTasks || defaultTasks()));
+  localStorage.setItem(keyFor(DEFAULT_BOARD_ID, 'labels'), JSON.stringify(legacyLabels || defaultLabels()));
+
+  return hadLegacy;
+}
+
+export function ensureBoardsInitialized() {
+  const boards = listBoards();
+  if (boards.length > 0) {
+    // Ensure active board is valid
+    if (!getActiveBoardId()) setActiveBoardId(boards[0].id);
+    return;
+  }
+
+  migrateLegacySingleBoardIntoDefault();
+}
+
+export function createBoard(name) {
+  ensureBoardsInitialized();
+
+  const trimmed = typeof name === 'string' ? name.trim() : '';
+  const boardName = trimmed || 'Untitled board';
+  const boards = listBoards();
+
+  const id = `board-${generateUUID()}`;
+  const board = { id, name: boardName, createdAt: nowIso() };
+  saveBoards([...boards, board]);
+
+  localStorage.setItem(keyFor(id, 'columns'), JSON.stringify(defaultColumns()));
+  localStorage.setItem(keyFor(id, 'tasks'), JSON.stringify([]));
+  localStorage.setItem(keyFor(id, 'labels'), JSON.stringify(defaultLabels()));
+
+  localStorage.setItem(ACTIVE_BOARD_KEY, id);
+  return board;
+}
+
+export function renameBoard(boardId, newName) {
+  ensureBoardsInitialized();
+  const id = typeof boardId === 'string' ? boardId : '';
+  const name = typeof newName === 'string' ? newName.trim() : '';
+  if (!id || !name) return false;
+
+  const boards = listBoards();
+  if (!boards.some((b) => b.id === id)) return false;
+
+  const updated = boards.map((b) => (b.id === id ? { ...b, name } : b));
+  saveBoards(updated);
+  return true;
+}
+
+export function deleteBoard(boardId) {
+  ensureBoardsInitialized();
+  const id = typeof boardId === 'string' ? boardId : '';
+  if (!id) return false;
+
+  const boards = listBoards();
+  if (!boards.some((b) => b.id === id)) return false;
+  if (boards.length <= 1) return false; // never delete the last board
+
+  const remaining = boards.filter((b) => b.id !== id);
+  saveBoards(remaining);
+
+  // Remove per-board data
+  localStorage.removeItem(keyFor(id, 'columns'));
+  localStorage.removeItem(keyFor(id, 'tasks'));
+  localStorage.removeItem(keyFor(id, 'labels'));
+  taskCacheByBoard.delete(id);
+
+  // If the active board was deleted, switch to first remaining
+  const active = localStorage.getItem(ACTIVE_BOARD_KEY);
+  if (active === id) {
+    localStorage.setItem(ACTIVE_BOARD_KEY, remaining[0].id);
+  }
+
+  return true;
+}
+
+function isHexColor(value) {
+  return typeof value === 'string' && /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(value.trim());
+}
+
+function defaultColumnColor(id) {
+  if (id === 'todo') return '#3b82f6';
+  if (id === 'inprogress') return '#f59e0b';
+  if (id === 'done') return '#16a34a';
+  return '#3b82f6';
+}
+
+function normalizeColumn(c) {
+  const color = isHexColor(c?.color) ? c.color.trim() : defaultColumnColor(c?.id);
+  return { ...c, color };
+}
+
+// Load columns from localStorage
+export function loadColumns() {
+  ensureBoardsInitialized();
+  const boardId = getActiveBoardId() || DEFAULT_BOARD_ID;
+  const stored = localStorage.getItem(keyFor(boardId, 'columns'));
+  const parsed = safeParseArray(stored);
+  if (parsed) return parsed.map(normalizeColumn);
+
+  // Safety fallback
+  return defaultColumns().map(normalizeColumn);
+}
+
+// Save columns to localStorage
+export function saveColumns(columns) {
+  ensureBoardsInitialized();
+  const boardId = getActiveBoardId() || DEFAULT_BOARD_ID;
+  localStorage.setItem(keyFor(boardId, 'columns'), JSON.stringify(columns));
+}
+
+// Load tasks from localStorage
+export function loadTasks() {
+  ensureBoardsInitialized();
+  const boardId = getActiveBoardId() || DEFAULT_BOARD_ID;
+  const stored = localStorage.getItem(keyFor(boardId, 'tasks'));
+  const parsed = safeParseArray(stored);
+  if (parsed) {
+    taskCacheByBoard.set(boardId, parsed);
+    return parsed;
+  }
+
+  // If localStorage is empty, keep a stable in-memory default set for this session.
+  const cached = taskCacheByBoard.get(boardId);
+  if (Array.isArray(cached)) return cached;
+
+  const defaults = defaultTasks();
+  taskCacheByBoard.set(boardId, defaults);
+  return defaults;
+}
+
+// Save tasks to localStorage
+export function saveTasks(tasks) {
+  ensureBoardsInitialized();
+  const boardId = getActiveBoardId() || DEFAULT_BOARD_ID;
+  localStorage.setItem(keyFor(boardId, 'tasks'), JSON.stringify(tasks));
+  taskCacheByBoard.set(boardId, tasks);
+}
+
+// Load labels from localStorage
+export function loadLabels() {
+  ensureBoardsInitialized();
+  const boardId = getActiveBoardId() || DEFAULT_BOARD_ID;
+  const stored = localStorage.getItem(keyFor(boardId, 'labels'));
+  const parsed = safeParseArray(stored);
+  if (parsed) return parsed;
+
+  return defaultLabels();
+}
+
+// Save labels to localStorage
+export function saveLabels(labels) {
+  ensureBoardsInitialized();
+  const boardId = getActiveBoardId() || DEFAULT_BOARD_ID;
+  localStorage.setItem(keyFor(boardId, 'labels'), JSON.stringify(labels));
+}

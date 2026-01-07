@@ -1,0 +1,14 @@
+{
+  "name": "personal-kanban",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "A local-first personal kanban board",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
+}
