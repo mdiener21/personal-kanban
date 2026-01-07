@@ -6,14 +6,25 @@
 - Single external dependency: Lucide icons (CDN)
 - Storage: browser localStorage only
 - Data persistence: JSON import/export to local disk
-- No server, no frameworks, no build process
+- No server, no frameworks
+- Build tooling: Vite (ES modules)
 
 ## AI LLM Rules
 
-- Always update the specification upon comnpleting a new tasks to keep the specification up to date.
+- Always update the specification upon completing new tasks to keep the specification up to date.
 - Always follow the Technology Rules and Principles section in the document
 
 ## Core Data Structures
+
+### Board Model
+
+```javascript
+{
+  id: "board-uuid",
+  name: "Board Name",
+  createdAt: "YYYY-MM-DDTHH:MM:SSZ"
+}
+```
 
 ### Task Model
 
@@ -54,10 +65,16 @@
 
 ## Storage
 
-- **localStorage keys**: `kanbanTasks`, `kanbanColumns`, `kanbanLabels`
-- All CRUD operations save/load from localStorage
-- Export: JSON file with all three data types
-- Import: Supports legacy (tasks only) and full format (tasks + columns + labels)
+- **Boards registry**:
+  - `kanbanBoards`: array of Board metadata
+  - `kanbanActiveBoardId`: last active board id (restored on page load)
+- **Per-board data (namespaced)**:
+  - `kanbanBoard:<boardId>:tasks`
+  - `kanbanBoard:<boardId>:columns`
+  - `kanbanBoard:<boardId>:labels`
+- Legacy storage (`kanbanTasks`, `kanbanColumns`, `kanbanLabels`) is migrated into a default board on first run.
+- All CRUD operations load/save against the currently active board.
+- Export/Import operates on the active board.
 
 ## UI Components
 
@@ -109,11 +126,18 @@
 
 ### Controls Bar
 
+- Board selector dropdown (shows all boards)
+- New Board button (prompt for name)
+- Manage Boards button (opens boards management modal)
 - Help button (opens help modal)
 - Manage Labels button
 - Add Column button
 - Export button (downloads JSON)
 - Import button (file picker for JSON)
+
+### Branding
+
+- Brand text displays the active board name (no static title text).
 
 ## Key Behaviors
 
@@ -138,9 +162,24 @@
 - Task modal (add/edit)
 - Column modal (add/edit)
 - Labels management modal
+- Boards management modal
 - Label add/edit modal
 - Help modal
 - Close on Escape key or backdrop click
+
+### Boards
+
+- **Select active board**: via the board dropdown; selection persists and is restored on next page load.
+- **Create board**: via New Board button (prompt for name). New boards start with default columns + labels, and empty tasks.
+- **Manage boards**: via Manage Boards modal:
+  - List boards
+  - Open a board (sets active and renders)
+  - Rename a board
+  - Delete a board (always confirms: “Do you really want to delete…?”)
+  - The last remaining board cannot be deleted
+- **Mobile UX**:
+  - Board selector is full-width with a larger tap target.
+  - The mobile menu does not auto-close when interacting with the dropdown.
 
 #### Task Modal Details
 
@@ -187,15 +226,15 @@
 ## Technology Constraints
 
 - Pure JavaScript (no frameworks)
-- No build process
+- Vite build/dev tooling (ES modules)
 - Lucide icons CDN
 - localStorage only (no server, no database)
-- Single HTML file + CSS file + JS file
+- Single HTML entry + CSS + JS modules
 
 ## Export/Import Logic
 
-- **Export**: Combines tasks, columns, labels into single JSON object
-- **Import**: Validates structure, supports backward compatibility
+- **Export**: Combines active board's tasks, columns, labels into single JSON object
+- **Import**: Imports into the active board (tasks + columns + labels), supports backward compatibility
 - **Filename**: `kanban-board-YYYY-MM-DD.json`
 
 ## CSS Architecture

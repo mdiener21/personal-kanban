@@ -1,9 +1,7 @@
 /data
-*.json
 *.env
 .env
+.venv
 node_modules
 *.log
 .DS_Store
-package-lock.json
-
