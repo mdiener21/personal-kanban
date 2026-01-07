@@ -1,5 +1,7 @@
 import { generateUUID } from './utils.js';
 
+let taskCache = null;
+
 function isHexColor(value) {
   return typeof value === 'string' && /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(value.trim());
 }
@@ -46,13 +48,19 @@ export function loadTasks() {
   if (stored) {
     try {
       const parsed = JSON.parse(stored);
-      if (Array.isArray(parsed)) return parsed;
+      if (Array.isArray(parsed)) {
+        taskCache = parsed;
+        return parsed;
+      }
     } catch {
       // ignore malformed localStorage
     }
   }
+  // If localStorage is empty, keep a stable in-memory default set for this session.
+  // This avoids IDs changing between renders and click handlers on first load.
+  if (Array.isArray(taskCache)) return taskCache;
   // Default tasks if none exist
-  return [
+  taskCache = [
     {
       id: generateUUID(),
       title: 'Find out where the Soul Stone is',
@@ -114,11 +122,14 @@ export function loadTasks() {
       creationDate: new Date().toISOString()
     }
   ];
+
+  return taskCache;
 }
 
 // Save tasks to localStorage
 export function saveTasks(tasks) {
   localStorage.setItem('kanbanTasks', JSON.stringify(tasks));
+  taskCache = tasks;
 }
 
 // Load labels from localStorage

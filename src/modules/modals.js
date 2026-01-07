@@ -283,8 +283,10 @@ function renderLabelsList() {
     labelItem.appendChild(actionsDiv);
     container.appendChild(labelItem);
   });
-  
-  lucide.createIcons();
+
+  if (window.lucide && typeof window.lucide.createIcons === 'function') {
+    window.lucide.createIcons();
+  }
 }
 
 function updateTaskLabelsSelection() {

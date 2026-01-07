@@ -321,7 +321,11 @@ export function renderBoard() {
   attachColumnListeners();
   attachColumnDragListeners();
   updateColumnSelect();
-  lucide.createIcons();
+
+  // Lucide is loaded via CDN; guard so a slow/blocked load doesn't break the app.
+  if (window.lucide && typeof window.lucide.createIcons === 'function') {
+    window.lucide.createIcons();
+  }
 
   if (!columnMenuCloseHandlerAttached) {
     columnMenuCloseHandlerAttached = true;
