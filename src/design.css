@@ -147,9 +147,42 @@ body {
 
 /* Controls actions container (Buttons) */
 .controls-actions {
+  display: none; /* Hidden by default; toggled by the menu button */
+  position: absolute;
+  top: 100%;
+  right: 10px;
+  flex-direction: column;
+  background: var(--surface);
+  padding: 8px;
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  z-index: 200;
+  min-width: 220px;
+  gap: 4px;
+  animation: menu-appear 0.15s ease-out;
+}
+
+.controls-actions.show {
   display: flex;
-  gap: 10px;
-  align-items: center;
+}
+
+/* Menu items style in dropdown */
+.controls-actions .control-btn {
+  width: 100%;
+  justify-content: flex-start;
+  background: none;
+  color: var(--text);
+  padding: 10px 12px;
+}
+
+.controls-actions .control-btn:hover {
+  background-color: var(--surface-muted);
+}
+
+@keyframes menu-appear {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* Toolbar select (board picker) */
@@ -170,9 +203,9 @@ body {
   box-shadow: 0 0 0 3px var(--input-focus-ring);
 }
 
-/* Mobile Menu Button - Hidden by default */
-#mobile-menu-btn {
-  display: none;
+/* Menu Button */
+#desktop-menu-btn {
+  display: flex;
 }
 
 /* Board container */
@@ -1071,48 +1104,6 @@ fieldset.form-group legend {
    ========================================================================== */
 
 @media (max-width: 768px) {
-  /* Hide the desktop button text, though we will override this in the dropdown */
-  .control-btn span:not([data-lucide]) {
-    display: none;
-  }
-  
-  /* Show mobile menu toggle */
-  #mobile-menu-btn {
-    display: flex;
-  }
-
-  /* Transform controls actions into a dropdown menu */
-  .controls-actions {
-    display: none; /* Hidden by default */
-    position: absolute;
-    top: 100%;
-    right: 10px;
-    flex-direction: column;
-    background: var(--surface);
-    padding: 8px;
-    border: 1px solid var(--border);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    border-radius: 8px;
-    z-index: 200;
-    min-width: 200px;
-    gap: 4px;
-    animation: menu-appear 0.15s ease-out;
-  }
-  
-  /* Show menu when active */
-  .controls-actions.show {
-    display: flex;
-  }
-
-  /* Menu items style in dropdown */
-  .controls-actions .control-btn {
-    width: 100%;
-    justify-content: flex-start;
-    background: none;
-    color: var(--text);
-    padding: 10px 12px;
-  }
-
   /* Board picker should be easy to tap and use */
   .controls-actions .control-select {
     width: 100%;
@@ -1120,20 +1111,6 @@ fieldset.form-group legend {
     min-height: 44px;
     font-size: 16px; /* avoids iOS zoom + improves readability */
     padding: 10px 12px;
-  }
-  
-  .controls-actions .control-btn:hover {
-    background-color: var(--surface-muted);
-  }
-
-  /* Force text display in the mobile menu */
-  .controls-actions .control-btn span:not([data-lucide]) {
-    display: inline-block !important;
-  }
-  
-  @keyframes menu-appear {
-    from { opacity: 0; transform: translateY(-5px); }
-    to { opacity: 1; transform: translateY(0); }
   }
 }
 

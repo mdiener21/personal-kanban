@@ -11,12 +11,14 @@ import {
   renameBoard,
   deleteBoard as deleteBoardById
 } from './storage.js';
+import { confirmDialog, alertDialog } from './dialog.js';
 
 // Modal state
 let currentColumn = 'todo';
 let editingTaskId = null;
 let editingColumnId = null;
 let editingLabelId = null;
+let editingBoardId = null;
 let selectedTaskLabels = [];
 
 function getTaskLabelSearchQuery() {
@@ -277,7 +279,12 @@ function renderLabelsList() {
     deleteBtn.appendChild(deleteIcon);
     deleteBtn.title = 'Delete label';
     deleteBtn.addEventListener('click', async () => {
-      if (confirm(`Delete label "${label.name}"? This will remove it from all tasks.`)) {
+      const ok = await confirmDialog({
+        title: 'Delete Label',
+        message: `Delete label "${label.name}"? This will remove it from all tasks.`,
+        confirmText: 'Delete'
+      });
+      if (ok) {
         deleteLabel(label.id);
         renderLabelsList();
         const { renderBoard } = await import('./render.js');
@@ -376,24 +383,7 @@ function renderBoardsList() {
     editIcon.dataset.lucide = 'pencil';
     editBtn.appendChild(editIcon);
     editBtn.title = 'Rename board';
-    editBtn.addEventListener('click', async () => {
-      const next = window.prompt('Rename board:', board.name);
-      if (next === null) return;
-      const trimmed = next.trim();
-      if (!trimmed) {
-        alert('Board name cannot be empty.');
-        return;
-      }
-      if (!renameBoard(board.id, trimmed)) {
-        alert('Unable to rename board.');
-        return;
-      }
-      renderBoardsSelect();
-      renderBoardsList();
-      if (window.lucide && typeof window.lucide.createIcons === 'function') {
-        window.lucide.createIcons();
-      }
-    });
+    editBtn.addEventListener('click', () => showBoardRenameModal(board.id));
 
     const deleteBtn = document.createElement('button');
     deleteBtn.classList.add('btn-small', 'btn-danger');
@@ -402,11 +392,18 @@ function renderBoardsList() {
     deleteBtn.appendChild(deleteIcon);
     deleteBtn.title = 'Delete board';
     deleteBtn.addEventListener('click', async () => {
-      const ok = confirm(`Do you really want to delete the board "${board.name}"? This cannot be undone.`);
+      const ok = await confirmDialog({
+        title: 'Delete Board',
+        message: `Do you really want to delete the board "${board.name}"? This cannot be undone.`,
+        confirmText: 'Delete'
+      });
       if (!ok) return;
       const deleted = deleteBoardById(board.id);
       if (!deleted) {
-        alert('Unable to delete board (you may be trying to delete the last board).');
+        await alertDialog({
+          title: 'Unable to Delete',
+          message: 'Unable to delete board (you may be trying to delete the last board).'
+        });
         return;
       }
       renderBoardsSelect();
@@ -441,6 +438,31 @@ function showBoardsModal() {
 function hideBoardsModal() {
   const modal = document.getElementById('boards-modal');
   modal?.classList.add('hidden');
+}
+
+function showBoardRenameModal(boardId) {
+  ensureBoardsInitialized();
+  const board = listBoards().find((b) => b.id === boardId);
+  if (!board) return;
+
+  editingBoardId = boardId;
+  const modal = document.getElementById('board-rename-modal');
+  const input = document.getElementById('board-rename-name');
+  const title = document.getElementById('board-rename-modal-title');
+  const submitBtn = document.getElementById('board-rename-submit-btn');
+
+  if (title) title.textContent = 'Rename Board';
+  if (submitBtn) submitBtn.textContent = 'Save';
+  if (input) input.value = (board.name || '').toString();
+
+  modal?.classList.remove('hidden');
+  input?.focus();
+}
+
+function hideBoardRenameModal() {
+  const modal = document.getElementById('board-rename-modal');
+  modal?.classList.add('hidden');
+  editingBoardId = null;
 }
 
 function updateTaskLabelsSelection() {
@@ -569,6 +591,34 @@ export function initializeModalHandlers() {
   document.getElementById('boards-close-btn')?.addEventListener('click', hideBoardsModal);
   document.querySelector('#boards-modal .modal-backdrop')?.addEventListener('click', hideBoardsModal);
 
+  // Board rename modal
+  document.getElementById('board-rename-form')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (!editingBoardId) return;
+
+    const input = document.getElementById('board-rename-name');
+    const name = (input?.value || '').trim();
+    if (!name) {
+      alert('Board name cannot be empty.');
+      return;
+    }
+
+    if (!renameBoard(editingBoardId, name)) {
+      alert('Unable to rename board.');
+      return;
+    }
+
+    hideBoardRenameModal();
+    renderBoardsSelect();
+    renderBoardsList();
+    if (window.lucide && typeof window.lucide.createIcons === 'function') {
+      window.lucide.createIcons();
+    }
+  });
+
+  document.getElementById('cancel-board-rename-btn')?.addEventListener('click', hideBoardRenameModal);
+  document.querySelector('#board-rename-modal .modal-backdrop')?.addEventListener('click', hideBoardRenameModal);
+
   // Help modal
   document.getElementById('help-btn').addEventListener('click', showHelpModal);
   document.getElementById('help-close-btn').addEventListener('click', hideHelpModal);
@@ -585,6 +635,7 @@ export function initializeModalHandlers() {
       hideLabelsModal();
       hideLabelModal();
       hideBoardsModal();
+      hideBoardRenameModal();
       hideHelpModal();
     }
   });

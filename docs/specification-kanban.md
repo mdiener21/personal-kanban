@@ -126,14 +126,15 @@
 
 ### Controls Bar
 
-- Board selector dropdown (shows all boards)
-- New Board button (prompt for name)
-- Manage Boards button (opens boards management modal)
-- Help button (opens help modal)
-- Manage Labels button
-- Add Column button
-- Export button (downloads JSON)
-- Import button (file picker for JSON)
+- Single menu button (ellipsis) that opens a dropdown containing:
+  - Board selector dropdown (shows all boards)
+  - New Board button (prompt for name)
+  - Manage Boards button (opens boards management modal)
+  - Help button (opens help modal)
+  - Manage Labels button
+  - Add Column button
+  - Export button (downloads JSON)
+  - Import button (file picker for JSON)
 
 ### Branding
 
@@ -179,7 +180,7 @@
   - The last remaining board cannot be deleted
 - **Mobile UX**:
   - Board selector is full-width with a larger tap target.
-  - The mobile menu does not auto-close when interacting with the dropdown.
+  - The controls dropdown does not auto-close when interacting with the selector.
 
 #### Task Modal Details
 
@@ -266,3 +267,5 @@
 - Import/export instructions
 - Feature overview
 - Keyboard shortcuts (Escape to close modals)
+
+The canonical Help modal copy lives in `docs/help-how-to.md`.

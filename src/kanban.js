@@ -31,17 +31,17 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Mobile Menu Logic
-  const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+  const menuBtn = document.getElementById('desktop-menu-btn');
   const controlsActions = document.getElementById('board-controls-menu');
 
-  if (mobileMenuBtn && controlsActions) {
-    mobileMenuBtn.addEventListener('click', (e) => {
+  if (menuBtn && controlsActions) {
+    menuBtn.addEventListener('click', (e) => {
       e.stopPropagation();
-      const isExpanded = mobileMenuBtn.getAttribute('aria-expanded') === 'true';
+      const isExpanded = menuBtn.getAttribute('aria-expanded') === 'true';
       
       // Toggle menu
       controlsActions.classList.toggle('show');
-      mobileMenuBtn.setAttribute('aria-expanded', !isExpanded);
+      menuBtn.setAttribute('aria-expanded', String(!isExpanded));
       
       // Close other menus if open (optional, but good practice)
       document.querySelectorAll('.column-menu').forEach(m => m.classList.add('hidden'));
@@ -50,21 +50,20 @@ document.addEventListener('DOMContentLoaded', () => {
     // Close menu when clicking action buttons inside it.
     // Don't close for form controls like the board <select>, otherwise it's impossible to change selection.
     controlsActions.addEventListener('click', (e) => {
-      if (window.innerWidth > 768) return;
       const isFormControl = e.target.closest('select, option, input, textarea, label');
       if (isFormControl) return;
       const isAction = e.target.closest('button, a, [role="menuitem"]');
       if (!isAction) return;
 
       controlsActions.classList.remove('show');
-      mobileMenuBtn.setAttribute('aria-expanded', 'false');
+      menuBtn.setAttribute('aria-expanded', 'false');
     });
 
     // Close menu when clicking outside
     document.addEventListener('click', (e) => {
-      if (!controlsActions.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
+      if (!controlsActions.contains(e.target) && !menuBtn.contains(e.target)) {
         controlsActions.classList.remove('show');
-        mobileMenuBtn.setAttribute('aria-expanded', 'false');
+        menuBtn.setAttribute('aria-expanded', 'false');
       }
     });
   }

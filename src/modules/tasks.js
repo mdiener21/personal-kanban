@@ -57,9 +57,6 @@ export function updateTask(taskId, title, description, priority, dueDate, column
 
 // Delete a task
 export function deleteTask(taskId) {
-  if (!confirm('Are you sure you want to delete this task?')) {
-    return false;
-  }
   const tasks = loadTasks();
   const filtered = tasks.filter(t => t.id !== taskId);
   saveTasks(filtered);

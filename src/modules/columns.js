@@ -38,24 +38,12 @@ export function updateColumn(columnId, name, color) {
 export function deleteColumn(columnId) {
   const columns = loadColumns();
   if (columns.length <= 1) {
-    alert('Cannot delete the last column!');
     return false;
   }
-
-  const column = columns.find(c => c.id === columnId);
-  const columnName = column?.name ? `"${column.name}"` : 'this column';
   
   const tasks = loadTasks();
   const tasksInColumn = tasks.filter(t => t.column === columnId);
 
-  const message = tasksInColumn.length > 0
-    ? `Delete ${columnName}? This will also delete ${tasksInColumn.length} task(s).`
-    : `Delete ${columnName}?`;
-
-  if (!confirm(message)) {
-    return false;
-  }
-  
   if (tasksInColumn.length > 0) {
     // Remove tasks in this column
     const filteredTasks = tasks.filter(t => t.column !== columnId);

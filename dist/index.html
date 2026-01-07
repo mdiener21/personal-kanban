@@ -7,8 +7,8 @@
   <title>Personal Kanban Board</title>
   <!-- Kanban favicon (inline SVG data URI) -->
   <link rel="icon" href="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='2' y='3' width='6' height='18' rx='1.5' fill='%233b82f6'/%3E%3Crect x='9' y='3' width='6' height='12' rx='1.5' fill='%2360a5fa'/%3E%3Crect x='16' y='3' width='6' height='8' rx='1.5' fill='%2393c5fd'/%3E%3C/svg%3E">
-  <script type="module" crossorigin src="/assets/index-HVL_jsTB.js"></script>
-  <link rel="stylesheet" crossorigin href="/assets/index-B1wn_Jix.css">
+  <script type="module" crossorigin src="/assets/index-V1i5__wm.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-CjcKfymQ.css">
 </head>
 <body>
   <!-- Skip link for accessibility -->
@@ -32,18 +32,13 @@
           <span data-lucide="settings" aria-hidden="true"></span>
           <span>Manage Boards</span>
         </button>
-
-        <button id="help-btn" class="control-btn" type="button" aria-haspopup="dialog">
-          <span data-lucide="help-circle" aria-hidden="true"></span>
-          <span>Help</span>
+        <button id="add-column-btn" class="control-btn" type="button" aria-haspopup="dialog">
+          <span data-lucide="columns" aria-hidden="true"></span>
+          <span>Add Column</span>
         </button>
         <button id="manage-labels-btn" class="control-btn" type="button" aria-haspopup="dialog">
           <span data-lucide="tag" aria-hidden="true"></span>
           <span>Manage Labels</span>
-        </button>
-        <button id="add-column-btn" class="control-btn" type="button" aria-haspopup="dialog">
-          <span data-lucide="columns" aria-hidden="true"></span>
-          <span>Add Column</span>
         </button>
         <button id="export-btn" class="control-btn" type="button">
           <span data-lucide="download" aria-hidden="true"></span>
@@ -57,9 +52,13 @@
           <span data-lucide="moon" aria-hidden="true"></span>
           <span>Dark</span>
         </button>
+        <button id="help-btn" class="control-btn" type="button" aria-haspopup="dialog">
+          <span data-lucide="help-circle" aria-hidden="true"></span>
+          <span>Help</span>
+        </button>
       </div>
       
-      <button id="mobile-menu-btn" class="control-btn icon-only" type="button" aria-label="Menu" aria-expanded="false" aria-controls="board-controls-menu">
+      <button id="desktop-menu-btn" class="control-btn icon-only" type="button" aria-label="Menu" aria-expanded="false" aria-controls="board-controls-menu">
         <span data-lucide="ellipsis-vertical" aria-hidden="true"></span>
       </button>
       
@@ -170,6 +169,37 @@
     </article>
   </div>
 
+  <!-- Board Rename Modal -->
+  <div id="board-rename-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="board-rename-modal-title">
+    <div class="modal-backdrop" data-close-modal></div>
+    <article class="modal-content">
+      <h3 id="board-rename-modal-title">Rename Board</h3>
+      <form id="board-rename-form" novalidate>
+        <div class="form-group">
+          <label for="board-rename-name">Board Name <span aria-hidden="true">*</span></label>
+          <input type="text" id="board-rename-name" required placeholder="Enter board name..." aria-required="true">
+        </div>
+        <div class="form-actions">
+          <button type="button" id="cancel-board-rename-btn" class="btn btn-secondary">Cancel</button>
+          <button type="submit" id="board-rename-submit-btn" class="btn btn-primary">Save</button>
+        </div>
+      </form>
+    </article>
+  </div>
+
+  <!-- Confirm / Alert Modal -->
+  <div id="dialog-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="dialog-modal-title">
+    <div class="modal-backdrop" data-close-modal></div>
+    <article class="modal-content">
+      <h3 id="dialog-modal-title">Confirm</h3>
+      <p id="dialog-modal-message"></p>
+      <div class="form-actions">
+        <button type="button" id="dialog-cancel-btn" class="btn btn-secondary">Cancel</button>
+        <button type="button" id="dialog-confirm-btn" class="btn btn-primary">OK</button>
+      </div>
+    </article>
+  </div>
+
   <!-- Label Edit Modal -->
   <div id="label-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="label-modal-title">
     <div class="modal-backdrop" data-close-modal></div>
@@ -200,55 +230,89 @@
       <div class="help-content">
         <section>
           <h4>About This Board</h4>
-          <p>This is a fully local personal kanban board. <strong>NO SERVER REQUIRED</strong> - all data is stored in your browser's localStorage.</p>
+          <p>This is a fully local personal Kanban board. <strong>NO SERVER REQUIRED</strong> — everything runs in your browser and data is stored in <code>localStorage</code>.</p>
+        </section>
+
+        <section>
+          <h4>Controls Menu</h4>
+          <ul>
+            <li><strong>Open the menu:</strong> Click the ellipsis (⋮) button in the header to open the controls dropdown.</li>
+            <li><strong>Boards:</strong> Switch boards, create a new board, or manage boards from the same menu.</li>
+            <li><strong>Other actions:</strong> Add Column, Manage Labels, Export, Import, Theme, and Help are all in this menu.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h4>Boards</h4>
+          <ul>
+            <li><strong>Switch boards:</strong> Use the board dropdown to change the active board.</li>
+            <li><strong>Remembered selection:</strong> The last active board is restored when you return.</li>
+            <li><strong>Manage Boards:</strong> Open, rename, or delete boards (deletes always require confirmation; the last board cannot be deleted).</li>
+          </ul>
         </section>
         
         <section>
-          <h4>Getting Started</h4>
+          <h4>Tasks</h4>
           <ul>
-            <li><strong>Create Columns:</strong> Click "Add Column" to create new workflow stages (e.g., To Do, In Progress, Done)</li>
-            <li><strong>Add Tasks:</strong> Click the plus icon in a column header to add a task to that column</li>
-            <li><strong>Edit Tasks:</strong> Click on task text to edit the task description, column, or assigned labels</li>
-            <li><strong>Move Tasks:</strong> Drag and drop tasks between columns to update their status</li>
-            <li><strong>Reorder Columns:</strong> Drag the grip icon on column headers to reorder columns</li>
+            <li><strong>Add:</strong> Click the plus icon in a column header to add a task.</li>
+            <li><strong>Edit:</strong> Click a task card to edit title, description, priority, due date, column, and labels.</li>
+            <li><strong>Move:</strong> Drag and drop tasks between columns to update status.</li>
+            <li><strong>Delete:</strong> Click the task trash button and confirm deletion.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h4>Columns</h4>
+          <ul>
+            <li><strong>Create:</strong> Use <strong>Add Column</strong> to create a new workflow stage.</li>
+            <li><strong>Edit/Delete:</strong> Use the column ellipsis menu.</li>
+            <li><strong>Reorder:</strong> Drag the grip icon on a column header to reorder columns.</li>
+            <li><strong>Deleting a column:</strong> If it contains tasks, you will be warned those tasks will also be deleted. The last column cannot be deleted.</li>
           </ul>
         </section>
         
         <section>
           <h4>Labels</h4>
           <ul>
-            <li><strong>Manage Labels:</strong> Click "Manage Labels" to create, edit, or delete labels</li>
-            <li><strong>Assign Labels:</strong> Click on a task to assign one or more labels to it</li>
-            <li><strong>Custom Colors:</strong> Each label can have its own color for visual organization</li>
+            <li><strong>Manage:</strong> Use <strong>Manage Labels</strong> to create, edit, or delete labels.</li>
+            <li><strong>Assign:</strong> Edit a task to assign one or more labels.</li>
+            <li><strong>Task editor UX:</strong> Selected labels appear as pills, and the label list includes a search box for quick filtering.</li>
+            <li><strong>Delete:</strong> Deleting a label removes it from all tasks (confirmation required).</li>
           </ul>
         </section>
         
         <section>
           <h4>Data Storage &amp; Persistence</h4>
           <ul>
-            <li><strong>Local Storage:</strong> All data (tasks, columns, labels) is stored in your browser's localStorage</li>
-            <li><strong>No Server:</strong> This board runs 100% locally - no internet connection required after loading</li>
-            <li><strong>Browser Specific:</strong> Data is stored only in this browser on this device</li>
+            <li><strong>Local Storage:</strong> All data is stored in your browser&rsquo;s <code>localStorage</code>.</li>
+            <li><strong>No Server:</strong> The board runs locally (after loading the page).</li>
+            <li><strong>Browser Specific:</strong> Data is stored only in this browser on this device.</li>
           </ul>
         </section>
         
         <section>
-          <h4>Saving Your Work</h4>
+          <h4>Import / Export (Backups)</h4>
           <ul>
-            <li><strong>IMPORTANT:</strong> To preserve your board permanently, you MUST export to a JSON file</li>
-            <li><strong>Export:</strong> Click "Export" to download your complete board as a JSON file to your computer</li>
-            <li><strong>Import:</strong> Click "Import" to load a previously exported JSON file back into the board</li>
-            <li><strong>Browser Data:</strong> Clearing browser cache, cookies, or using incognito mode will delete your localStorage data</li>
+            <li><strong>Export:</strong> Downloads the <strong>active board</strong> (columns + tasks + labels) as a JSON file.</li>
+            <li><strong>Import:</strong> Loads a JSON file into the <strong>active board</strong>.</li>
+            <li><strong>IMPORTANT:</strong> If you care about your data, export regularly (clearing site data or using private browsing can delete <code>localStorage</code>).</li>
+          </ul>
+        </section>
+
+        <section>
+          <h4>Keyboard Shortcuts</h4>
+          <ul>
+            <li><strong>Escape:</strong> Closes most modals.</li>
+            <li><strong>Backdrop click:</strong> Clicking outside the modal closes most modals.</li>
           </ul>
         </section>
         
         <section>
           <h4>Tips</h4>
           <ul>
-            <li>Delete tasks by clicking the X button and confirming deletion</li>
-            <li>Delete columns by clicking the trash icon in the column header</li>
-            <li>Export your board regularly to avoid data loss</li>
-            <li>You can export and import your board on different devices</li>
+            <li>Export on a schedule (end of day / end of week) to avoid data loss.</li>
+            <li>Use multiple boards to separate contexts (work, personal, projects).</li>
+            <li>Use labels to categorize across columns (e.g., Urgent, Feature, Task).</li>
           </ul>
         </section>
       </div>
@@ -259,7 +323,7 @@
   </div>
 
 <footer class="footer">
-  <p>📌 Data stored in browser localStorage only! <strong><br>Export your board to save to disk</strong></p>
+  <p>📌 Data stored in browser localStorage only! <strong><br>Export your board to save to disk</strong><a href="https://github.com/mdiener21/personal-kanban" target="_blank" rel="noopener noreferrer"> Learn more docs</a></p>
 </footer>
 
 <script src="https://unpkg.com/lucide@latest"></script>

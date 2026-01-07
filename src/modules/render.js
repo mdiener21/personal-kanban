@@ -3,6 +3,7 @@ import { deleteTask } from './tasks.js';
 import { deleteColumn } from './columns.js';
 import { showModal, showEditModal, showEditColumnModal } from './modals.js';
 import { attachTaskListeners, attachColumnListeners, attachColumnDragListeners } from './dragdrop.js';
+import { confirmDialog, alertDialog } from './dialog.js';
 
 let columnMenuCloseHandlerAttached = false;
 
@@ -71,9 +72,13 @@ function createTaskElement(task) {
   deleteBtn.appendChild(deleteIcon);
   deleteBtn.addEventListener('click', async (e) => {
     e.stopPropagation();
-    if (deleteTask(task.id)) {
-      renderBoard();
-    }
+    const ok = await confirmDialog({
+      title: 'Delete Task',
+      message: 'Are you sure you want to delete this task?',
+      confirmText: 'Delete'
+    });
+    if (!ok) return;
+    if (deleteTask(task.id)) renderBoard();
   });
 
   actions.appendChild(deleteBtn);
@@ -218,9 +223,24 @@ function createColumnElement(column) {
   deleteColBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     closeAllColumnMenus();
-    if (deleteColumn(column.id)) {
-      renderBoard();
-    }
+    (async () => {
+      const columns = loadColumns();
+      if (columns.length <= 1) {
+        await alertDialog({ title: 'Cannot Delete Column', message: 'Cannot delete the last column.' });
+        return;
+      }
+
+      const tasks = loadTasks();
+      const tasksInColumn = tasks.filter((t) => t.column === column.id);
+      const colName = column?.name ? `"${column.name}"` : 'this column';
+      const message = tasksInColumn.length > 0
+        ? `Delete ${colName}? This will also delete ${tasksInColumn.length} task(s).`
+        : `Delete ${colName}?`;
+
+      const ok = await confirmDialog({ title: 'Delete Column', message, confirmText: 'Delete' });
+      if (!ok) return;
+      if (deleteColumn(column.id)) renderBoard();
+    })();
   });
 
   menu.appendChild(editColBtn);

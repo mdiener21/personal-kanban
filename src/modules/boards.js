@@ -54,13 +54,11 @@ export function initializeBoardsUI() {
     refreshBrandText();
     renderBoard();
 
-    // On mobile, collapse the dropdown menu after a selection.
-    if (window.innerWidth <= 768) {
-      const controlsActions = document.getElementById('board-controls-menu');
-      const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-      controlsActions?.classList.remove('show');
-      mobileMenuBtn?.setAttribute('aria-expanded', 'false');
-    }
+    // Collapse the dropdown menu after a selection.
+    const controlsActions = document.getElementById('board-controls-menu');
+    const menuBtn = document.getElementById('desktop-menu-btn');
+    controlsActions?.classList.remove('show');
+    menuBtn?.setAttribute('aria-expanded', 'false');
   });
 
   newBtn.addEventListener('click', () => {
