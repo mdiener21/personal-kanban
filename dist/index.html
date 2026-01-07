@@ -7,8 +7,8 @@
   <title>Personal Kanban Board</title>
   <!-- Kanban favicon (inline SVG data URI) -->
   <link rel="icon" href="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='2' y='3' width='6' height='18' rx='1.5' fill='%233b82f6'/%3E%3Crect x='9' y='3' width='6' height='12' rx='1.5' fill='%2360a5fa'/%3E%3Crect x='16' y='3' width='6' height='8' rx='1.5' fill='%2393c5fd'/%3E%3C/svg%3E">
-  <script type="module" crossorigin src="/assets/index-Caduk04r.js"></script>
-  <link rel="stylesheet" crossorigin href="/assets/index-CRE8Hgbc.css">
+  <script type="module" crossorigin src="/assets/index-BqHgMQLS.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-CO54Lsj_.css">
 </head>
 <body>
   <!-- Skip link for accessibility -->
@@ -16,30 +16,42 @@
 
   <header>
     <nav class="controls" role="toolbar" aria-label="Board controls">
-      <button id="help-btn" class="control-btn" type="button" aria-haspopup="dialog">
-        <span data-lucide="help-circle" aria-hidden="true"></span>
-        <span>Help</span>
+      <div class="brand">
+        <span data-lucide="square-kanban" aria-hidden="true" class="brand-icon"></span>
+        <span class="brand-text">Personal Kanban</span>
+      </div>
+      
+      <div id="board-controls-menu" class="controls-actions">
+        <button id="help-btn" class="control-btn" type="button" aria-haspopup="dialog">
+          <span data-lucide="help-circle" aria-hidden="true"></span>
+          <span>Help</span>
+        </button>
+        <button id="manage-labels-btn" class="control-btn" type="button" aria-haspopup="dialog">
+          <span data-lucide="tag" aria-hidden="true"></span>
+          <span>Manage Labels</span>
+        </button>
+        <button id="add-column-btn" class="control-btn" type="button" aria-haspopup="dialog">
+          <span data-lucide="columns" aria-hidden="true"></span>
+          <span>Add Column</span>
+        </button>
+        <button id="export-btn" class="control-btn" type="button">
+          <span data-lucide="download" aria-hidden="true"></span>
+          <span>Export</span>
+        </button>
+        <button id="import-btn" class="control-btn" type="button">
+          <span data-lucide="upload" aria-hidden="true"></span>
+          <span>Import</span>
+        </button>
+        <button id="theme-toggle-btn" class="control-btn" type="button" aria-pressed="false" aria-label="Toggle dark mode">
+          <span data-lucide="moon" aria-hidden="true"></span>
+          <span>Dark</span>
+        </button>
+      </div>
+      
+      <button id="mobile-menu-btn" class="control-btn icon-only" type="button" aria-label="Menu" aria-expanded="false" aria-controls="board-controls-menu">
+        <span data-lucide="ellipsis-vertical" aria-hidden="true"></span>
       </button>
-      <button id="manage-labels-btn" class="control-btn" type="button" aria-haspopup="dialog">
-        <span data-lucide="tag" aria-hidden="true"></span>
-        <span>Manage Labels</span>
-      </button>
-      <button id="add-column-btn" class="control-btn" type="button" aria-haspopup="dialog">
-        <span data-lucide="columns" aria-hidden="true"></span>
-        <span>Add Column</span>
-      </button>
-      <button id="export-btn" class="control-btn" type="button">
-        <span data-lucide="download" aria-hidden="true"></span>
-        <span>Export</span>
-      </button>
-      <button id="import-btn" class="control-btn" type="button">
-        <span data-lucide="upload" aria-hidden="true"></span>
-        <span>Import</span>
-      </button>
-      <button id="theme-toggle-btn" class="control-btn" type="button" aria-pressed="false" aria-label="Toggle dark mode">
-        <span data-lucide="moon" aria-hidden="true"></span>
-        <span>Dark</span>
-      </button>
+      
       <input type="file" id="import-file" accept="application/json" class="sr-only" aria-label="Import board file">
     </nav>
   </header>
