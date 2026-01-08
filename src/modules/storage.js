@@ -30,6 +30,16 @@ function safeParseArray(value) {
   }
 }
 
+function safeParseObject(value) {
+  if (!value) return null;
+  try {
+    const parsed = JSON.parse(value);
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
 export function listBoards() {
   const boards = safeParseArray(localStorage.getItem(BOARDS_KEY));
   if (!boards) return [];
@@ -92,6 +102,7 @@ function defaultLabels() {
 }
 
 function defaultTasks() {
+  const created = nowIso();
   return [
     {
       id: generateUUID(),
@@ -101,7 +112,8 @@ function defaultTasks() {
       dueDate: '',
       column: 'todo',
       labels: ['urgent'],
-      creationDate: nowIso()
+      creationDate: created,
+      changeDate: created
     },
     {
       id: generateUUID(),
@@ -111,7 +123,8 @@ function defaultTasks() {
       dueDate: '',
       column: 'inprogress',
       labels: ['feature'],
-      creationDate: nowIso()
+      creationDate: created,
+      changeDate: created
     },
     {
       id: generateUUID(),
@@ -121,7 +134,8 @@ function defaultTasks() {
       dueDate: '',
       column: 'inprogress',
       labels: [],
-      creationDate: nowIso()
+      creationDate: created,
+      changeDate: created
     },
     {
       id: generateUUID(),
@@ -131,7 +145,8 @@ function defaultTasks() {
       dueDate: '',
       column: 'inprogress',
       labels: ['task'],
-      creationDate: nowIso()
+      creationDate: created,
+      changeDate: created
     },
     {
       id: generateUUID(),
@@ -141,7 +156,8 @@ function defaultTasks() {
       dueDate: '',
       column: 'done',
       labels: ['urgent', 'feature'],
-      creationDate: nowIso()
+      creationDate: created,
+      changeDate: created
     },
     {
       id: generateUUID(),
@@ -151,9 +167,22 @@ function defaultTasks() {
       dueDate: '',
       column: 'done',
       labels: [],
-      creationDate: nowIso()
+      creationDate: created,
+      changeDate: created
     }
   ];
+}
+
+function defaultSettings() {
+  const locale = (typeof navigator !== 'undefined' && typeof navigator.language === 'string')
+    ? navigator.language
+    : 'en-US';
+
+  return {
+    showAge: true,
+    showChangeDate: true,
+    locale
+  };
 }
 
 function migrateLegacySingleBoardIntoDefault() {
@@ -172,6 +201,7 @@ function migrateLegacySingleBoardIntoDefault() {
   localStorage.setItem(keyFor(DEFAULT_BOARD_ID, 'columns'), JSON.stringify(legacyColumns || defaultColumns()));
   localStorage.setItem(keyFor(DEFAULT_BOARD_ID, 'tasks'), JSON.stringify(legacyTasks || defaultTasks()));
   localStorage.setItem(keyFor(DEFAULT_BOARD_ID, 'labels'), JSON.stringify(legacyLabels || defaultLabels()));
+  localStorage.setItem(keyFor(DEFAULT_BOARD_ID, 'settings'), JSON.stringify(defaultSettings()));
 
   return hadLegacy;
 }
@@ -201,6 +231,7 @@ export function createBoard(name) {
   localStorage.setItem(keyFor(id, 'columns'), JSON.stringify(defaultColumns()));
   localStorage.setItem(keyFor(id, 'tasks'), JSON.stringify([]));
   localStorage.setItem(keyFor(id, 'labels'), JSON.stringify(defaultLabels()));
+  localStorage.setItem(keyFor(id, 'settings'), JSON.stringify(defaultSettings()));
 
   localStorage.setItem(ACTIVE_BOARD_KEY, id);
   return board;
@@ -236,6 +267,7 @@ export function deleteBoard(boardId) {
   localStorage.removeItem(keyFor(id, 'columns'));
   localStorage.removeItem(keyFor(id, 'tasks'));
   localStorage.removeItem(keyFor(id, 'labels'));
+  localStorage.removeItem(keyFor(id, 'settings'));
   taskCacheByBoard.delete(id);
 
   // If the active board was deleted, switch to first remaining
@@ -326,4 +358,31 @@ export function saveLabels(labels) {
   ensureBoardsInitialized();
   const boardId = getActiveBoardId() || DEFAULT_BOARD_ID;
   localStorage.setItem(keyFor(boardId, 'labels'), JSON.stringify(labels));
+}
+
+function normalizeSettings(raw) {
+  const obj = raw && typeof raw === 'object' ? raw : {};
+  const locale = typeof obj.locale === 'string' && obj.locale.trim() ? obj.locale.trim() : defaultSettings().locale;
+  const showAge = obj.showAge !== false;
+  const showChangeDate = obj.showChangeDate !== false;
+  return { showAge, showChangeDate, locale };
+}
+
+export function loadSettings() {
+  ensureBoardsInitialized();
+  const boardId = getActiveBoardId() || DEFAULT_BOARD_ID;
+  const stored = localStorage.getItem(keyFor(boardId, 'settings'));
+  const parsed = safeParseObject(stored);
+  if (parsed) return normalizeSettings(parsed);
+
+  const defaults = defaultSettings();
+  localStorage.setItem(keyFor(boardId, 'settings'), JSON.stringify(defaults));
+  return defaults;
+}
+
+export function saveSettings(settings) {
+  ensureBoardsInitialized();
+  const boardId = getActiveBoardId() || DEFAULT_BOARD_ID;
+  const normalized = normalizeSettings(settings);
+  localStorage.setItem(keyFor(boardId, 'settings'), JSON.stringify(normalized));
 }

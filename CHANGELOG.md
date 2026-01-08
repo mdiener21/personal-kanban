@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - dark and light theme
 - AI agent guidance via `.github/copilot-instructions.md`
 - Board-level task search filter (matches label name, task title, or description)
+- Settings modal (toggle age/updated timestamp, select locale; included in export/import)
 
 ### Changed
 
@@ -24,3 +25,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Board-level task search also matches task priority text (low/medium/high)
 - Task model now includes `changeDate`, updated on task save (edit, move)
 - Task cards display `changeDate` as localized date+time and computed age (e.g. `0d`, `3d`, `2M`)
+- Import/export JSON now includes `boardName` and import applies it to the active board

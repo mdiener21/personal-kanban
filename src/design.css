@@ -1096,6 +1096,20 @@ fieldset.form-group legend {
   margin-bottom: 8px;
 }
 
+/* Checkbox group (e.g., Settings modal) */
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.checkbox-group input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+}
+
 .labels-empty {
   padding: 8px;
   font-size: 13px;

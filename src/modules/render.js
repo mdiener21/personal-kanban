@@ -1,4 +1,4 @@
-import { loadColumns, loadTasks, loadLabels } from './storage.js';
+import { loadColumns, loadTasks, loadLabels, loadSettings } from './storage.js';
 import { deleteTask } from './tasks.js';
 import { deleteColumn } from './columns.js';
 import { showModal, showEditModal, showEditColumnModal } from './modals.js';
@@ -41,21 +41,21 @@ function closeAllColumnMenus(exceptMenu = null) {
   });
 }
 
-function formatDisplayDate(value) {
+function formatDisplayDate(value, locale) {
   const raw = (value || '').toString().trim();
   if (!raw) return '';
 
   const dateForParse = raw.includes('T') ? raw : `${raw}T00:00:00`;
   const parsed = new Date(dateForParse);
-  return Number.isNaN(parsed.getTime()) ? raw : parsed.toLocaleDateString();
+  return Number.isNaN(parsed.getTime()) ? raw : parsed.toLocaleDateString(locale || undefined);
 }
 
-function formatDisplayDateTime(value) {
+function formatDisplayDateTime(value, locale) {
   const raw = (value || '').toString().trim();
   if (!raw) return '';
 
   const parsed = new Date(raw);
-  return Number.isNaN(parsed.getTime()) ? raw : parsed.toLocaleString();
+  return Number.isNaN(parsed.getTime()) ? raw : parsed.toLocaleString(locale || undefined);
 }
 
 function formatTaskAge(task) {
@@ -77,7 +77,7 @@ function formatTaskAge(task) {
 }
 
 // Create a task element
-function createTaskElement(task) {
+function createTaskElement(task, settings) {
   const li = document.createElement('li');
   li.classList.add('task');
   li.draggable = true;
@@ -169,7 +169,7 @@ function createTaskElement(task) {
   if (!dueDateRaw) {
     dueDateEl.textContent = 'No due date';
   } else {
-    dueDateEl.textContent = formatDisplayDate(dueDateRaw);
+    dueDateEl.textContent = formatDisplayDate(dueDateRaw, settings?.locale);
   }
 
   meta.appendChild(priorityEl);
@@ -180,25 +180,31 @@ function createTaskElement(task) {
   li.appendChild(labelsContainer);
   li.appendChild(meta);
 
+  const showChangeDate = settings?.showChangeDate !== false;
+  const showAge = settings?.showAge !== false;
+  const locale = settings?.locale;
+
   const footer = document.createElement('div');
   footer.classList.add('task-footer');
 
-  const changeDateEl = document.createElement('span');
-  changeDateEl.classList.add('task-change-date');
-  const changeDisplay = formatDisplayDateTime(task?.changeDate);
-  changeDateEl.textContent = changeDisplay ? `Updated ${changeDisplay}` : '';
-
-  const ageEl = document.createElement('span');
-  ageEl.classList.add('task-age');
-  const ageText = formatTaskAge(task);
-  ageEl.textContent = ageText ? `Age ${ageText}` : '';
-
-  // Only show the footer if we have at least one value.
-  if (changeDateEl.textContent || ageEl.textContent) {
+  if (showChangeDate) {
+    const changeDateEl = document.createElement('span');
+    changeDateEl.classList.add('task-change-date');
+    const changeDisplay = formatDisplayDateTime(task?.changeDate, locale);
+    changeDateEl.textContent = changeDisplay ? `Updated ${changeDisplay}` : '';
     footer.appendChild(changeDateEl);
-    footer.appendChild(ageEl);
-    li.appendChild(footer);
   }
+
+  if (showAge) {
+    const ageEl = document.createElement('span');
+    ageEl.classList.add('task-age');
+    const ageText = formatTaskAge(task);
+    ageEl.textContent = ageText ? `Age ${ageText}` : '';
+    footer.appendChild(ageEl);
+  }
+
+  const hasFooterContent = Array.from(footer.childNodes).some((n) => (n.textContent || '').trim() !== '');
+  if (hasFooterContent) li.appendChild(footer);
   
   return li;
 }
@@ -378,6 +384,7 @@ export function renderBoard() {
   const columns = loadColumns();
   const tasks = loadTasks();
   const labels = loadLabels();
+  const settings = loadSettings();
   const labelsById = new Map(labels.map((l) => [l.id, (l.name || '').toString().trim().toLowerCase()]));
   const queryLower = (boardFilterQuery || '').toString().trim().toLowerCase();
   const visibleTasks = queryLower
@@ -399,7 +406,7 @@ export function renderBoard() {
     const columnTasks = visibleTasks.filter(t => t.column === column.id)
       .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
     columnTasks.forEach(task => {
-      tasksList.appendChild(createTaskElement(task));
+      tasksList.appendChild(createTaskElement(task, settings));
     });
     
     // Update task counter

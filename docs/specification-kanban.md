@@ -39,7 +39,7 @@
   order: number,
   labels: ["label-id-1", "label-id-2"],
   creationDate: "YYYY-MM-DDTHH:MM:SSZ",
-  changeDate: "YYYY-MM-DDTHH:MM:SSZ" // updated on task save (edit, move)
+  changeDate: "YYYY-MM-DDTHH:MM:SSZ" // updated on task save (create, edit, change column)
 }
 ```
 
@@ -73,6 +73,7 @@
   - `kanbanBoard:<boardId>:tasks`
   - `kanbanBoard:<boardId>:columns`
   - `kanbanBoard:<boardId>:labels`
+  - `kanbanBoard:<boardId>:settings`
 - Legacy storage (`kanbanTasks`, `kanbanColumns`, `kanbanLabels`) is migrated into a default board on first run.
 - All CRUD operations load/save against the currently active board.
 - Export/Import operates on the active board.
@@ -111,8 +112,8 @@
 - **Delete**: Click X button, confirm deletion
 - **Move**: Drag between columns, auto-saves new column and order
 - **Display**: Title (clickable), optional description (clamped to ~2 lines), labels (colored badges), meta row (priority + due date), delete button
-- **Footer**: Shows `changeDate` ("Updated …") and task age ("Age …")
-  - `changeDate` is displayed using the browser locale/timezone (via `toLocaleString()`)
+- **Footer**: Can show `changeDate` ("Updated …") and task age ("Age …") depending on Settings toggles.
+  - `changeDate` is displayed using the user-selected locale (via `toLocaleString(locale)`)
   - Age is based on `creationDate` and displayed as `0d` for < 1 day, `Nd` for days, and `NM` for months (30 days per month, floor)
 - **Label selection UX (modal)**:
   - Selected labels are shown as a single horizontal row of colored label pills
@@ -140,9 +141,19 @@
   - Manage Boards button (opens boards management modal)
   - Help button (opens help modal)
   - Manage Labels button
+  - Settings button (opens Settings modal)
   - Add Column button
   - Export button (downloads JSON)
   - Import button (file picker for JSON)
+
+### Settings
+
+- Settings are **per active board** and stored in localStorage (`kanbanBoard:<boardId>:settings`).
+- Settings modal allows:
+  - Toggle to show/hide task age
+  - Toggle to show/hide task updated date/time (`changeDate`)
+  - Locale dropdown for formatting the updated timestamp
+- Default locale is initialized from the browser (e.g. `navigator.language`).
 
 ### Branding
 
@@ -242,9 +253,9 @@
 
 ## Export/Import Logic
 
-- **Export**: Combines active board's tasks, columns, labels into single JSON object
+- **Export**: Combines active board's `boardName`, tasks, columns, labels, and settings into a single JSON object
 - **Export warning**: Before exporting, the app warns that export only includes the active board (not all boards).
-- **Import**: Imports into the active board (tasks + columns + labels), supports backward compatibility
+- **Import**: Imports into the active board (tasks + columns + labels), restores settings when present, and applies `boardName` to the active board when provided; supports backward compatibility
 - **Import warning**: Before importing, the app warns that the active board will be overwritten and recommends creating a new blank board first.
 - **Filename**: `kanban-board-YYYY-MM-DD.json`
 

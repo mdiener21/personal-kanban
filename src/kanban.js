@@ -4,10 +4,14 @@ import { exportTasks, importTasks } from './modules/importexport.js';
 import { initializeThemeToggle } from './modules/theme.js';
 import { initializeBoardsUI } from './modules/boards.js';
 import { confirmDialog } from './modules/dialog.js';
+import { initializeSettingsUI } from './modules/settings.js';
 
 // Add task button listeners
 document.addEventListener('DOMContentLoaded', () => {
   initializeThemeToggle();
+
+  // Settings (per-board)
+  initializeSettingsUI();
 
   // Board-level filter (labels, title, description)
   const boardSearchInput = document.getElementById('board-search-input');

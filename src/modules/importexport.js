@@ -1,4 +1,27 @@
-import { loadTasks, loadColumns, loadLabels, saveColumns, saveTasks, saveLabels } from './storage.js';
+import {
+  loadTasks,
+  loadColumns,
+  loadLabels,
+  loadSettings,
+  saveColumns,
+  saveTasks,
+  saveLabels,
+  saveSettings
+} from './storage.js';
+
+import { getActiveBoardId, getActiveBoardName, renameBoard } from './storage.js';
+
+function refreshBoardNameUI(boardId) {
+  const brandEl = document.getElementById('brand-text') || document.querySelector('.brand-text');
+  if (!brandEl) return;
+  brandEl.textContent = getActiveBoardName();
+
+  const selectEl = document.getElementById('board-select');
+  if (!selectEl || !boardId) return;
+
+  const option = Array.from(selectEl.options).find((o) => o.value === boardId);
+  if (option) option.textContent = getActiveBoardName();
+}
 
 function isHexColor(value) {
   return typeof value === 'string' && /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(value.trim());
@@ -116,6 +139,19 @@ function normalizeImportedLabels(labels) {
   return isValid ? normalized : null;
 }
 
+function normalizeImportedSettings(settings) {
+  if (!settings || typeof settings !== 'object' || Array.isArray(settings)) return null;
+
+  const showAge = settings.showAge !== false;
+  const showChangeDate = settings.showChangeDate !== false;
+  const locale = typeof settings.locale === 'string' && settings.locale.trim() ? settings.locale.trim() : undefined;
+  return {
+    showAge,
+    showChangeDate,
+    ...(locale ? { locale } : {})
+  };
+}
+
 // Export tasks and columns to JSON file
 export function exportTasks() {
   const tasks = loadTasks().map(normalizeTaskForExport);
@@ -124,7 +160,9 @@ export function exportTasks() {
     color: isHexColor(c?.color) ? c.color.trim() : '#3b82f6'
   }));
   const labels = loadLabels();
-  const exportData = { columns, tasks, labels };
+  const settings = loadSettings();
+  const boardName = getActiveBoardName();
+  const exportData = { boardName, columns, tasks, labels, settings };
   const dataStr = JSON.stringify(exportData, null, 2);
   const blob = new Blob([dataStr], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
@@ -146,18 +184,22 @@ export function importTasks(file) {
       const data = JSON.parse(e.target.result);
       
       // Support multiple formats for backward compatibility
-      let tasks, columns, labels;
+      let tasks, columns, labels, settings, boardName;
       
       if (Array.isArray(data)) {
         // Old format: just tasks array
         tasks = data;
         columns = loadColumns(); // Keep existing columns
         labels = loadLabels(); // Keep existing labels
+        settings = null; // Keep existing settings
+        boardName = null; // Keep existing board name
       } else if (data.tasks && data.columns) {
         // New format: object with columns and tasks (and optionally labels)
         tasks = data.tasks;
         columns = data.columns;
         labels = data.labels || loadLabels(); // Use imported labels or keep existing
+        settings = data.settings ?? null;
+        boardName = typeof data.boardName === 'string' ? data.boardName.trim() : null;
       } else {
         alert('Invalid JSON file format');
         return;
@@ -166,8 +208,9 @@ export function importTasks(file) {
       const normalizedTasks = normalizeImportedTasks(tasks);
       const normalizedColumns = normalizeImportedColumns(columns);
       const normalizedLabels = labels ? normalizeImportedLabels(labels) : null;
+      const normalizedSettings = settings ? normalizeImportedSettings(settings) : null;
 
-      if (!normalizedTasks || !normalizedColumns || (labels && !normalizedLabels)) {
+      if (!normalizedTasks || !normalizedColumns || (labels && !normalizedLabels) || (settings && !normalizedSettings)) {
         alert('Invalid data structure');
         return;
       }
@@ -175,6 +218,19 @@ export function importTasks(file) {
       saveColumns(normalizedColumns);
       saveTasks(normalizedTasks);
       if (normalizedLabels) saveLabels(normalizedLabels);
+      if (normalizedSettings) {
+        // Merge with current defaults (e.g., locale)
+        const current = loadSettings();
+        saveSettings({ ...current, ...normalizedSettings });
+      }
+
+      if (boardName) {
+        const activeId = getActiveBoardId();
+        if (activeId) {
+          renameBoard(activeId, boardName);
+          refreshBoardNameUI(activeId);
+        }
+      }
       
       const { renderBoard } = await import('./render.js');
       renderBoard();
