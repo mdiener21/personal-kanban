@@ -1,13 +1,26 @@
-import { renderBoard } from './modules/render.js';
+import { renderBoard, setBoardFilterQuery } from './modules/render.js';
 import { initializeModalHandlers } from './modules/modals.js';
 import { exportTasks, importTasks } from './modules/importexport.js';
 import { initializeThemeToggle } from './modules/theme.js';
 import { initializeBoardsUI } from './modules/boards.js';
 import { confirmDialog } from './modules/dialog.js';
+import { initializeSettingsUI } from './modules/settings.js';
 
 // Add task button listeners
 document.addEventListener('DOMContentLoaded', () => {
   initializeThemeToggle();
+
+  // Settings (per-board)
+  initializeSettingsUI();
+
+  // Board-level filter (labels, title, description)
+  const boardSearchInput = document.getElementById('board-search-input');
+  if (boardSearchInput) {
+    boardSearchInput.addEventListener('input', () => {
+      setBoardFilterQuery(boardSearchInput.value);
+      renderBoard();
+    });
+  }
 
   // Boards (create/select + restore last active)
   initializeBoardsUI();
@@ -30,9 +43,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // Import button listener
   document.getElementById('import-btn').addEventListener('click', async () => {
     const ok = await confirmDialog({
-      title: 'Import Board (Overwrite)',
+      title: 'Import Board (New Board)',
       message:
-        'Import will OVERWRITE the current active board (tasks, columns, and labels).\n\nRecommended: Create a new blank board first, switch to it, then click Import.\n\nContinue with import?',
+        'Import will CREATE A NEW BOARD and switch to it. Your current active board will not be overwritten.\n\nContinue with import?',
       confirmText: 'Import'
     });
     if (!ok) return;

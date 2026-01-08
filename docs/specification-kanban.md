@@ -38,7 +38,8 @@
   column: "column-id",
   order: number,
   labels: ["label-id-1", "label-id-2"],
-  creationDate: "YYYY-MM-DDTHH:MM:SSZ"
+  creationDate: "YYYY-MM-DDTHH:MM:SSZ",
+  changeDate: "YYYY-MM-DDTHH:MM:SSZ" // updated on task save (create, edit, change column)
 }
 ```
 
@@ -72,6 +73,7 @@
   - `kanbanBoard:<boardId>:tasks`
   - `kanbanBoard:<boardId>:columns`
   - `kanbanBoard:<boardId>:labels`
+  - `kanbanBoard:<boardId>:settings`
 - Legacy storage (`kanbanTasks`, `kanbanColumns`, `kanbanLabels`) is migrated into a default board on first run.
 - All CRUD operations load/save against the currently active board.
 - Export/Import operates on the active board.
@@ -109,7 +111,10 @@
 - **Edit**: Click task title/description, modal pre-filled with current data
 - **Delete**: Click X button, confirm deletion
 - **Move**: Drag between columns, auto-saves new column and order
-- **Display**: Title (clickable), optional description, labels (colored badges), meta row (priority + due date), delete button
+- **Display**: Title (clickable), optional description (clamped to ~2 lines), labels (colored badges), meta row (priority + due date), delete button
+- **Footer**: Can show `changeDate` ("Updated …") and task age ("Age …") depending on Settings toggles.
+  - `changeDate` is displayed using the user-selected locale (via `toLocaleString(locale)`)
+  - Age is based on `creationDate` and displayed as `0d` for < 1 day, `Nd` for days, and `NM` for months (30 days per month, floor)
 - **Label selection UX (modal)**:
   - Selected labels are shown as a single horizontal row of colored label pills
   - Each selected label pill has a small **×** button to remove it from the task
@@ -126,15 +131,31 @@
 
 ### Controls Bar
 
+- Toolbar includes a **board-level task search** input (with a search icon) placed beside the brand area.
+  - Filtering is **in-memory** (no persistence) and applies to the currently rendered board.
+  - A task matches if the search string appears in **task title**, **task description**, **task priority** (low/medium/high), or the **label name** of any label assigned to the task (case-insensitive substring match).
+
 - Single menu button (ellipsis) that opens a dropdown containing:
   - Board selector dropdown (shows all boards)
   - New Board button (prompt for name)
   - Manage Boards button (opens boards management modal)
   - Help button (opens help modal)
   - Manage Labels button
+  - Settings button (opens Settings modal)
   - Add Column button
   - Export button (downloads JSON)
   - Import button (file picker for JSON)
+
+### Settings
+
+- Settings are **per active board** and stored in localStorage (`kanbanBoard:<boardId>:settings`).
+- Settings modal allows:
+  - Toggle to show/hide task age
+  - Toggle to show/hide task updated date/time (`changeDate`)
+  - Locale dropdown for formatting the updated timestamp
+  - Default task priority dropdown (low/medium/high) used when creating new tasks
+- Default locale is initialized from the browser (e.g. `navigator.language`).
+- Default priority is `low`.
 
 ### Branding
 
@@ -159,7 +180,7 @@
 
 ### Modals
 
-- **Mobile Behavior**: Full-screen modals with scrollable form and sticky footer. "Manage Labels" list expands to fill the screen. "Edit Task" label selection shows full list.
+- **Mobile Behavior**: Full-screen modals with scrollable form and sticky footer. "Manage Labels" list expands to fill the screen. Task editor label list is height-capped with a scrollbar.
 - Task modal (add/edit)
 - Column modal (add/edit)
 - Labels management modal
@@ -234,10 +255,10 @@
 
 ## Export/Import Logic
 
-- **Export**: Combines active board's tasks, columns, labels into single JSON object
+- **Export**: Combines active board's `boardName`, tasks, columns, labels, and settings into a single JSON object
 - **Export warning**: Before exporting, the app warns that export only includes the active board (not all boards).
-- **Import**: Imports into the active board (tasks + columns + labels), supports backward compatibility
-- **Import warning**: Before importing, the app warns that the active board will be overwritten and recommends creating a new blank board first.
+- **Import**: Imports from JSON by creating a **new board** (tasks + columns + labels), restores settings when present, and uses `boardName` for the new board when provided; supports backward compatibility
+- **Import warning**: Before importing, the app warns that a new board will be created and the UI will switch to it.
 - **Filename**: `kanban-board-YYYY-MM-DD.json`
 
 ## CSS Architecture

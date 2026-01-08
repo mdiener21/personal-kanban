@@ -1,4 +1,4 @@
-import { loadLabels, loadColumns, loadTasks } from './storage.js';
+import { loadLabels, loadColumns, loadTasks, loadSettings } from './storage.js';
 import { addTask, updateTask, deleteTask } from './tasks.js';
 import { addColumn, updateColumn, deleteColumn } from './columns.js';
 import { addLabel, updateLabel, deleteLabel } from './labels.js';
@@ -89,7 +89,10 @@ export function showModal(columnName) {
   columnSelect.value = currentColumn;
   taskTitle.value = '';
   taskDescription.value = '';
-  if (taskPriority) taskPriority.value = 'medium';
+  if (taskPriority) {
+    const settings = loadSettings();
+    taskPriority.value = settings.defaultPriority || 'low';
+  }
   if (taskDueDate) taskDueDate.value = '';
 
   const labelSearch = document.getElementById('task-label-search');

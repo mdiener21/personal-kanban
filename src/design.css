@@ -138,6 +138,47 @@ body {
   margin-right: auto;
 }
 
+/* Board-level task search (toolbar) */
+.board-search {
+  flex: 1 1 320px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background-color: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.board-search svg {
+  width: 16px;
+  height: 16px;
+  stroke: var(--text-muted);
+  stroke-width: 2;
+}
+
+.board-search input {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.board-search input::placeholder {
+  color: var(--text-muted);
+}
+
+.board-search input:focus {
+  outline: none;
+}
+
+.board-search:focus-within {
+  box-shadow: 0 0 0 3px var(--input-focus-ring);
+}
+
 .brand-icon {
   width: 24px;
   height: 24px;
@@ -694,6 +735,15 @@ body {
   cursor: pointer;
   word-wrap: break-word;
   overflow-wrap: break-word;
+
+  /* Prevent very long descriptions from making cards huge. */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  max-height: 2.9em; /* 2 lines × 1.45 line-height */
 }
 
 .task-description:hover {
@@ -709,6 +759,21 @@ body {
   font-size: 12px;
   color: var(--text-muted);
   margin-top: 4px;
+}
+
+/* Task footer (changeDate + age) */
+.task-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.task-change-date,
+.task-age {
+  white-space: nowrap;
 }
 
 .task-date { white-space: nowrap; }
@@ -1031,6 +1096,20 @@ fieldset.form-group legend {
   margin-bottom: 8px;
 }
 
+/* Checkbox group (e.g., Settings modal) */
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.checkbox-group input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+}
+
 .labels-empty {
   padding: 8px;
   font-size: 13px;
@@ -1172,8 +1251,9 @@ fieldset.form-group legend {
       padding-bottom: 24px; /* Extra padding for touch targets/safe area */
   }
 
-  /* Expand the task label selector to show all labels on mobile */
-  #task-labels-selection {
-      max-height: none !important;
-  }
+    /* Keep the label list scrollable on mobile (don’t let it stretch the modal). */
+    #task-labels-selection {
+      max-height: 150px !important;
+      overflow-y: auto;
+    }
 }
