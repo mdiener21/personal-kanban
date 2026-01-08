@@ -23,13 +23,20 @@ function normalizeTaskForExport(task) {
   const title = typeof task?.title === 'string' ? task.title : legacyTitle;
   const description = typeof task?.description === 'string' ? task.description : '';
   const dueDate = normalizeDueDate(task?.dueDate ?? task?.['due-date']);
+  const changeDate =
+    typeof task?.changeDate === 'string'
+      ? task.changeDate
+      : (typeof task?.changedDate === 'string' ? task.changedDate : undefined);
 
   return {
     ...task,
     title: title.toString().trim(),
     description: description.toString().trim(),
     priority: normalizePriority(task?.priority),
-    dueDate
+    dueDate,
+    ...(typeof changeDate === 'string' ? { changeDate: changeDate.toString().trim() } : {}),
+    // Avoid exporting the legacy field name.
+    changedDate: undefined
   };
 }
 
@@ -52,6 +59,10 @@ function normalizeImportedTasks(tasks) {
     const labels = Array.isArray(t?.labels) ? t.labels.map((l) => (typeof l === 'string' ? l : String(l))) : [];
     const order = Number.isFinite(t?.order) ? t.order : undefined;
     const creationDate = typeof t?.creationDate === 'string' ? t.creationDate : undefined;
+    const changeDate =
+      typeof t?.changeDate === 'string'
+        ? t.changeDate
+        : (typeof t?.changedDate === 'string' ? t.changedDate : undefined);
 
     return {
       id: id.trim(),
@@ -62,6 +73,7 @@ function normalizeImportedTasks(tasks) {
       column: column.trim(),
       ...(order !== undefined ? { order } : {}),
       ...(creationDate ? { creationDate } : {}),
+      ...(typeof changeDate === 'string' && changeDate.trim() ? { changeDate: changeDate.trim() } : {}),
       labels
     };
   });

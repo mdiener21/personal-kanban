@@ -1,4 +1,4 @@
-import { renderBoard } from './modules/render.js';
+import { renderBoard, setBoardFilterQuery } from './modules/render.js';
 import { initializeModalHandlers } from './modules/modals.js';
 import { exportTasks, importTasks } from './modules/importexport.js';
 import { initializeThemeToggle } from './modules/theme.js';
@@ -8,6 +8,15 @@ import { confirmDialog } from './modules/dialog.js';
 // Add task button listeners
 document.addEventListener('DOMContentLoaded', () => {
   initializeThemeToggle();
+
+  // Board-level filter (labels, title, description)
+  const boardSearchInput = document.getElementById('board-search-input');
+  if (boardSearchInput) {
+    boardSearchInput.addEventListener('input', () => {
+      setBoardFilterQuery(boardSearchInput.value);
+      renderBoard();
+    });
+  }
 
   // Boards (create/select + restore last active)
   initializeBoardsUI();

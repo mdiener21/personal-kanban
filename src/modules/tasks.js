@@ -23,6 +23,7 @@ export function addTask(title, description, priority, dueDate, columnName, label
   const columnTasks = tasks.filter(t => t.column === columnName);
   const maxOrder = columnTasks.reduce((max, t) => Math.max(max, t.order ?? 0), 0);
   
+  const nowIso = new Date().toISOString();
   const newTask = {
     id: generateUUID(),
     title: title.trim(),
@@ -32,7 +33,8 @@ export function addTask(title, description, priority, dueDate, columnName, label
     column: columnName,
     order: maxOrder + 1,
     labels: [...labels],
-    creationDate: new Date().toISOString()
+    creationDate: nowIso,
+    changeDate: nowIso
   };
   tasks.push(newTask);
   saveTasks(tasks);
@@ -51,6 +53,7 @@ export function updateTask(taskId, title, description, priority, dueDate, column
     tasks[taskIndex].dueDate = normalizeDueDate(dueDate);
     tasks[taskIndex].column = columnName;
     tasks[taskIndex].labels = [...labels];
+    tasks[taskIndex].changeDate = new Date().toISOString();
     saveTasks(tasks);
   }
 }
@@ -82,6 +85,7 @@ export function getCurrentTaskOrder() {
 export function updateTaskPositions() {
   const currentOrder = getCurrentTaskOrder();
   const tasks = loadTasks();
+  const nowIso = new Date().toISOString();
   
   // Update each task with new column and order based on DOM position
   const updatedTasks = tasks.map(task => {
@@ -90,7 +94,15 @@ export function updateTaskPositions() {
       const current = currentOrder[currentIndex];
       // Calculate order within column
       const tasksInSameColumn = currentOrder.filter((t, i) => t.column === current.column && i <= currentIndex);
-      return { ...task, column: current.column, order: tasksInSameColumn.length };
+      const nextColumn = current.column;
+      const nextOrder = tasksInSameColumn.length;
+      const didMove = task.column !== nextColumn;
+      return {
+        ...task,
+        column: nextColumn,
+        order: nextOrder,
+        ...(didMove ? { changeDate: nowIso } : {})
+      };
     }
     return task;
   });

@@ -38,7 +38,8 @@
   column: "column-id",
   order: number,
   labels: ["label-id-1", "label-id-2"],
-  creationDate: "YYYY-MM-DDTHH:MM:SSZ"
+  creationDate: "YYYY-MM-DDTHH:MM:SSZ",
+  changeDate: "YYYY-MM-DDTHH:MM:SSZ" // updated on task save (edit, move)
 }
 ```
 
@@ -109,7 +110,10 @@
 - **Edit**: Click task title/description, modal pre-filled with current data
 - **Delete**: Click X button, confirm deletion
 - **Move**: Drag between columns, auto-saves new column and order
-- **Display**: Title (clickable), optional description, labels (colored badges), meta row (priority + due date), delete button
+- **Display**: Title (clickable), optional description (clamped to ~2 lines), labels (colored badges), meta row (priority + due date), delete button
+- **Footer**: Shows `changeDate` ("Updated …") and task age ("Age …")
+  - `changeDate` is displayed using the browser locale/timezone (via `toLocaleString()`)
+  - Age is based on `creationDate` and displayed as `0d` for < 1 day, `Nd` for days, and `NM` for months (30 days per month, floor)
 - **Label selection UX (modal)**:
   - Selected labels are shown as a single horizontal row of colored label pills
   - Each selected label pill has a small **×** button to remove it from the task
@@ -125,6 +129,10 @@
 - **Display**: Colored badges with label names on tasks
 
 ### Controls Bar
+
+- Toolbar includes a **board-level task search** input (with a search icon) placed beside the brand area.
+  - Filtering is **in-memory** (no persistence) and applies to the currently rendered board.
+  - A task matches if the search string appears in **task title**, **task description**, **task priority** (low/medium/high), or the **label name** of any label assigned to the task (case-insensitive substring match).
 
 - Single menu button (ellipsis) that opens a dropdown containing:
   - Board selector dropdown (shows all boards)
@@ -159,7 +167,7 @@
 
 ### Modals
 
-- **Mobile Behavior**: Full-screen modals with scrollable form and sticky footer. "Manage Labels" list expands to fill the screen. "Edit Task" label selection shows full list.
+- **Mobile Behavior**: Full-screen modals with scrollable form and sticky footer. "Manage Labels" list expands to fill the screen. Task editor label list is height-capped with a scrollbar.
 - Task modal (add/edit)
 - Column modal (add/edit)
 - Labels management modal

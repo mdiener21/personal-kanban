@@ -19,6 +19,19 @@
         <span data-lucide="square-kanban" aria-hidden="true" class="brand-icon"></span>
         <span id="brand-text" class="brand-text"></span>
       </div>
+
+      <div class="board-search" role="search" aria-label="Filter tasks">
+        <label class="sr-only" for="board-search-input">Search tasks</label>
+        <span data-lucide="search" aria-hidden="true"></span>
+        <input
+          id="board-search-input"
+          type="search"
+          inputmode="search"
+          placeholder="Search tasks…"
+          autocomplete="off"
+          aria-label="Search tasks by label, title, or description"
+        >
+      </div>
       
       <div id="board-controls-menu" class="controls-actions">
         <label class="sr-only" for="board-select">Select board</label>

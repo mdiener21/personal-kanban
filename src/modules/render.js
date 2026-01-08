@@ -7,11 +7,73 @@ import { confirmDialog, alertDialog } from './dialog.js';
 
 let columnMenuCloseHandlerAttached = false;
 
+let boardFilterQuery = '';
+
+export function setBoardFilterQuery(query) {
+  boardFilterQuery = (query || '').toString();
+}
+
+function taskMatchesFilter(task, queryLower, labelsById) {
+  if (!queryLower) return true;
+
+  const legacyTitle = typeof task?.text === 'string' ? task.text : '';
+  const title = (typeof task?.title === 'string' && task.title.trim() !== '') ? task.title : legacyTitle;
+  const description = typeof task?.description === 'string' ? task.description : '';
+  const priority = typeof task?.priority === 'string' ? task.priority : '';
+
+  if (title.toLowerCase().includes(queryLower)) return true;
+  if (description.toLowerCase().includes(queryLower)) return true;
+  if (priority.toLowerCase().includes(queryLower)) return true;
+
+  const labelIds = Array.isArray(task?.labels) ? task.labels : [];
+  for (const id of labelIds) {
+    const name = labelsById.get(id);
+    if (name && name.includes(queryLower)) return true;
+  }
+
+  return false;
+}
+
 function closeAllColumnMenus(exceptMenu = null) {
   document.querySelectorAll('.column-menu').forEach((menu) => {
     if (exceptMenu && menu === exceptMenu) return;
     menu.classList.add('hidden');
   });
+}
+
+function formatDisplayDate(value) {
+  const raw = (value || '').toString().trim();
+  if (!raw) return '';
+
+  const dateForParse = raw.includes('T') ? raw : `${raw}T00:00:00`;
+  const parsed = new Date(dateForParse);
+  return Number.isNaN(parsed.getTime()) ? raw : parsed.toLocaleDateString();
+}
+
+function formatDisplayDateTime(value) {
+  const raw = (value || '').toString().trim();
+  if (!raw) return '';
+
+  const parsed = new Date(raw);
+  return Number.isNaN(parsed.getTime()) ? raw : parsed.toLocaleString();
+}
+
+function formatTaskAge(task) {
+  const createdRaw = (task?.creationDate || '').toString().trim();
+  if (!createdRaw) return '';
+
+  const created = new Date(createdRaw);
+  if (Number.isNaN(created.getTime())) return '';
+
+  const ageMs = Date.now() - created.getTime();
+  const ageDays = Math.max(0, Math.floor(ageMs / (24 * 60 * 60 * 1000)));
+
+  if (ageDays >= 30) {
+    const months = Math.max(1, Math.floor(ageDays / 30));
+    return `${months}M`;
+  }
+
+  return `${ageDays}d`;
 }
 
 // Create a task element
@@ -107,9 +169,7 @@ function createTaskElement(task) {
   if (!dueDateRaw) {
     dueDateEl.textContent = 'No due date';
   } else {
-    const dateForParse = dueDateRaw.includes('T') ? dueDateRaw : `${dueDateRaw}T00:00:00`;
-    const parsed = new Date(dateForParse);
-    dueDateEl.textContent = Number.isNaN(parsed.getTime()) ? dueDateRaw : parsed.toLocaleDateString();
+    dueDateEl.textContent = formatDisplayDate(dueDateRaw);
   }
 
   meta.appendChild(priorityEl);
@@ -119,6 +179,26 @@ function createTaskElement(task) {
   li.appendChild(descriptionEl);
   li.appendChild(labelsContainer);
   li.appendChild(meta);
+
+  const footer = document.createElement('div');
+  footer.classList.add('task-footer');
+
+  const changeDateEl = document.createElement('span');
+  changeDateEl.classList.add('task-change-date');
+  const changeDisplay = formatDisplayDateTime(task?.changeDate);
+  changeDateEl.textContent = changeDisplay ? `Updated ${changeDisplay}` : '';
+
+  const ageEl = document.createElement('span');
+  ageEl.classList.add('task-age');
+  const ageText = formatTaskAge(task);
+  ageEl.textContent = ageText ? `Age ${ageText}` : '';
+
+  // Only show the footer if we have at least one value.
+  if (changeDateEl.textContent || ageEl.textContent) {
+    footer.appendChild(changeDateEl);
+    footer.appendChild(ageEl);
+    li.appendChild(footer);
+  }
   
   return li;
 }
@@ -297,6 +377,12 @@ function updateColumnSelect() {
 export function renderBoard() {
   const columns = loadColumns();
   const tasks = loadTasks();
+  const labels = loadLabels();
+  const labelsById = new Map(labels.map((l) => [l.id, (l.name || '').toString().trim().toLowerCase()]));
+  const queryLower = (boardFilterQuery || '').toString().trim().toLowerCase();
+  const visibleTasks = queryLower
+    ? tasks.filter((t) => taskMatchesFilter(t, queryLower, labelsById))
+    : tasks;
   const container = document.getElementById('board-container');
   container.innerHTML = '';
   
@@ -310,7 +396,7 @@ export function renderBoard() {
     const tasksList = columnEl.querySelector('.tasks');
     const taskCounter = columnEl.querySelector('.task-counter');
     // Sort tasks by order within each column
-    const columnTasks = tasks.filter(t => t.column === column.id)
+    const columnTasks = visibleTasks.filter(t => t.column === column.id)
       .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
     columnTasks.forEach(task => {
       tasksList.appendChild(createTaskElement(task));

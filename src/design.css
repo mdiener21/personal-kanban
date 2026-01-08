@@ -138,6 +138,47 @@ body {
   margin-right: auto;
 }
 
+/* Board-level task search (toolbar) */
+.board-search {
+  flex: 1 1 320px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background-color: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.board-search svg {
+  width: 16px;
+  height: 16px;
+  stroke: var(--text-muted);
+  stroke-width: 2;
+}
+
+.board-search input {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.board-search input::placeholder {
+  color: var(--text-muted);
+}
+
+.board-search input:focus {
+  outline: none;
+}
+
+.board-search:focus-within {
+  box-shadow: 0 0 0 3px var(--input-focus-ring);
+}
+
 .brand-icon {
   width: 24px;
   height: 24px;
@@ -718,6 +759,21 @@ body {
   font-size: 12px;
   color: var(--text-muted);
   margin-top: 4px;
+}
+
+/* Task footer (changeDate + age) */
+.task-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.task-change-date,
+.task-age {
+  white-space: nowrap;
 }
 
 .task-date { white-space: nowrap; }
