@@ -12,6 +12,24 @@ A fully local, no-server-required personal kanban board with localStorage persis
 - 💾 Export/Import to JSON
 - 📱 Responsive design
 
+## Super Quick Start Host Yourself
+
+The repo includes the built static site already to deploy, simply copy and then upload/publish the `dist/` directory to your host.
+
+1. Hetzner: https://www.hetzner.com/de/webhosting
+
+
+## Deploy (Static Site)
+
+This app builds to a static site. Deploy the contents of `dist/` to any static host.
+
+```bash
+npm ci
+npm run build
+```
+
+- Upload/publish the `dist/` directory.
+
 ## Quick Start
 
 From the repository root:
@@ -60,17 +78,6 @@ The built files will be in the `dist` directory.
 npm run preview
 ```
 
-## Deploy (Static Site)
-
-This app builds to a static site. Deploy the contents of `dist/` to any static host.
-
-```bash
-npm ci
-npm run build
-```
-
-- Upload/publish the `dist/` directory.
-- If deploying under a sub-path (for example GitHub Pages), set `base` in `vite.config.js` so asset URLs work.
 
 ## Project Structure
 
