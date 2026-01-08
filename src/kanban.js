@@ -43,9 +43,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // Import button listener
   document.getElementById('import-btn').addEventListener('click', async () => {
     const ok = await confirmDialog({
-      title: 'Import Board (Overwrite)',
+      title: 'Import Board (New Board)',
       message:
-        'Import will OVERWRITE the current active board (tasks, columns, and labels).\n\nRecommended: Create a new blank board first, switch to it, then click Import.\n\nContinue with import?',
+        'Import will CREATE A NEW BOARD and switch to it. Your current active board will not be overwritten.\n\nContinue with import?',
       confirmText: 'Import'
     });
     if (!ok) return;

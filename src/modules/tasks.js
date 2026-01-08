@@ -5,7 +5,7 @@ const ALLOWED_PRIORITIES = new Set(['low', 'medium', 'high']);
 
 function normalizePriority(priority) {
   const value = (priority || '').toString().trim().toLowerCase();
-  return ALLOWED_PRIORITIES.has(value) ? value : 'medium';
+  return ALLOWED_PRIORITIES.has(value) ? value : 'low';
 }
 
 function normalizeDueDate(value) {

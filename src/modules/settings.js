@@ -53,8 +53,9 @@ export function initializeSettingsUI() {
   const showAgeEl = document.getElementById('settings-show-age');
   const showChangeDateEl = document.getElementById('settings-show-change-date');
   const localeEl = document.getElementById('settings-locale');
+  const defaultPriorityEl = document.getElementById('settings-default-priority');
 
-  if (!openBtn || !closeBtn || !showAgeEl || !showChangeDateEl || !localeEl) return;
+  if (!openBtn || !closeBtn || !showAgeEl || !showChangeDateEl || !localeEl || !defaultPriorityEl) return;
 
   function syncFormFromSettings() {
     const settings = loadSettings();
@@ -72,6 +73,8 @@ export function initializeSettingsUI() {
 
     // Ensure selection is set even if user stored something unusual.
     localeEl.value = settings.locale;
+
+    defaultPriorityEl.value = settings.defaultPriority || 'low';
   }
 
   openBtn.addEventListener('click', () => {
@@ -101,5 +104,10 @@ export function initializeSettingsUI() {
   localeEl.addEventListener('change', async () => {
     const current = loadSettings();
     await applyAndRerender({ ...current, locale: localeEl.value });
+  });
+
+  defaultPriorityEl.addEventListener('change', async () => {
+    const current = loadSettings();
+    await applyAndRerender({ ...current, defaultPriority: defaultPriorityEl.value });
   });
 }

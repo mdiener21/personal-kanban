@@ -26,3 +26,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Task model now includes `changeDate`, updated on task save (edit, move)
 - Task cards display `changeDate` as localized date+time and computed age (e.g. `0d`, `3d`, `2M`)
 - Import/export JSON now includes `boardName` and import applies it to the active board
+- Import now creates a new board (no overwrite)
+- Default task priority is now `low` (configurable per board in Settings)

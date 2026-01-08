@@ -153,7 +153,9 @@
   - Toggle to show/hide task age
   - Toggle to show/hide task updated date/time (`changeDate`)
   - Locale dropdown for formatting the updated timestamp
+  - Default task priority dropdown (low/medium/high) used when creating new tasks
 - Default locale is initialized from the browser (e.g. `navigator.language`).
+- Default priority is `low`.
 
 ### Branding
 
@@ -255,8 +257,8 @@
 
 - **Export**: Combines active board's `boardName`, tasks, columns, labels, and settings into a single JSON object
 - **Export warning**: Before exporting, the app warns that export only includes the active board (not all boards).
-- **Import**: Imports into the active board (tasks + columns + labels), restores settings when present, and applies `boardName` to the active board when provided; supports backward compatibility
-- **Import warning**: Before importing, the app warns that the active board will be overwritten and recommends creating a new blank board first.
+- **Import**: Imports from JSON by creating a **new board** (tasks + columns + labels), restores settings when present, and uses `boardName` for the new board when provided; supports backward compatibility
+- **Import warning**: Before importing, the app warns that a new board will be created and the UI will switch to it.
 - **Filename**: `kanban-board-YYYY-MM-DD.json`
 
 ## CSS Architecture

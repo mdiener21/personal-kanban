@@ -181,7 +181,8 @@ function defaultSettings() {
   return {
     showAge: true,
     showChangeDate: true,
-    locale
+    locale,
+    defaultPriority: 'low'
   };
 }
 
@@ -365,7 +366,9 @@ function normalizeSettings(raw) {
   const locale = typeof obj.locale === 'string' && obj.locale.trim() ? obj.locale.trim() : defaultSettings().locale;
   const showAge = obj.showAge !== false;
   const showChangeDate = obj.showChangeDate !== false;
-  return { showAge, showChangeDate, locale };
+  const priority = (obj.defaultPriority || '').toString().trim().toLowerCase();
+  const defaultPriority = (priority === 'low' || priority === 'medium' || priority === 'high') ? priority : 'low';
+  return { showAge, showChangeDate, locale, defaultPriority };
 }
 
 export function loadSettings() {

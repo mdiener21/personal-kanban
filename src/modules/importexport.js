@@ -9,18 +9,37 @@ import {
   saveSettings
 } from './storage.js';
 
-import { getActiveBoardId, getActiveBoardName, renameBoard } from './storage.js';
+import { createBoard, getActiveBoardName, listBoards, setActiveBoardId } from './storage.js';
 
-function refreshBoardNameUI(boardId) {
+function boardDisplayName(board) {
+  const name = typeof board?.name === 'string' ? board.name.trim() : '';
+  return name || 'Untitled board';
+}
+
+function refreshBoardsUI(activeBoardId) {
   const brandEl = document.getElementById('brand-text') || document.querySelector('.brand-text');
-  if (!brandEl) return;
-  brandEl.textContent = getActiveBoardName();
+  if (brandEl) brandEl.textContent = getActiveBoardName();
 
   const selectEl = document.getElementById('board-select');
-  if (!selectEl || !boardId) return;
+  if (!selectEl) return;
 
-  const option = Array.from(selectEl.options).find((o) => o.value === boardId);
-  if (option) option.textContent = getActiveBoardName();
+  const boards = listBoards();
+  selectEl.innerHTML = '';
+
+  boards.forEach((b) => {
+    const option = document.createElement('option');
+    option.value = b.id;
+    option.textContent = boardDisplayName(b);
+    selectEl.appendChild(option);
+  });
+
+  if (activeBoardId) selectEl.value = activeBoardId;
+}
+
+function boardNameFromFile(file) {
+  const name = typeof file?.name === 'string' ? file.name.trim() : '';
+  if (!name) return '';
+  return name.replace(/\.[^.]+$/, '').trim();
 }
 
 function isHexColor(value) {
@@ -31,7 +50,7 @@ const allowedPriorities = new Set(['low', 'medium', 'high']);
 
 function normalizePriority(value) {
   const v = (value || '').toString().trim().toLowerCase();
-  return allowedPriorities.has(v) ? v : 'medium';
+  return allowedPriorities.has(v) ? v : 'low';
 }
 
 function normalizeDueDate(value) {
@@ -145,10 +164,13 @@ function normalizeImportedSettings(settings) {
   const showAge = settings.showAge !== false;
   const showChangeDate = settings.showChangeDate !== false;
   const locale = typeof settings.locale === 'string' && settings.locale.trim() ? settings.locale.trim() : undefined;
+  const defaultPriorityRaw = typeof settings.defaultPriority === 'string' ? settings.defaultPriority : undefined;
+  const defaultPriority = defaultPriorityRaw ? normalizePriority(defaultPriorityRaw) : undefined;
   return {
     showAge,
     showChangeDate,
     ...(locale ? { locale } : {})
+    ,...(defaultPriority ? { defaultPriority } : {})
   };
 }
 
@@ -189,16 +211,16 @@ export function importTasks(file) {
       if (Array.isArray(data)) {
         // Old format: just tasks array
         tasks = data;
-        columns = loadColumns(); // Keep existing columns
-        labels = loadLabels(); // Keep existing labels
-        settings = null; // Keep existing settings
-        boardName = null; // Keep existing board name
+        columns = null;
+        labels = null;
+        settings = null;
+        boardName = null;
       } else if (data.tasks && data.columns) {
         // New format: object with columns and tasks (and optionally labels)
         tasks = data.tasks;
         columns = data.columns;
-        labels = data.labels || loadLabels(); // Use imported labels or keep existing
-        settings = data.settings ?? null;
+        labels = Object.prototype.hasOwnProperty.call(data, 'labels') ? data.labels : null;
+        settings = Object.prototype.hasOwnProperty.call(data, 'settings') ? data.settings : null;
         boardName = typeof data.boardName === 'string' ? data.boardName.trim() : null;
       } else {
         alert('Invalid JSON file format');
@@ -206,16 +228,20 @@ export function importTasks(file) {
       }
 
       const normalizedTasks = normalizeImportedTasks(tasks);
-      const normalizedColumns = normalizeImportedColumns(columns);
+      const normalizedColumns = columns ? normalizeImportedColumns(columns) : null;
       const normalizedLabels = labels ? normalizeImportedLabels(labels) : null;
       const normalizedSettings = settings ? normalizeImportedSettings(settings) : null;
 
-      if (!normalizedTasks || !normalizedColumns || (labels && !normalizedLabels) || (settings && !normalizedSettings)) {
+      if (!normalizedTasks || (columns && !normalizedColumns) || (labels && !normalizedLabels) || (settings && !normalizedSettings)) {
         alert('Invalid data structure');
         return;
       }
 
-      saveColumns(normalizedColumns);
+      const importedName = boardName || boardNameFromFile(file) || 'Imported board';
+      const newBoard = createBoard(importedName);
+      if (newBoard?.id) setActiveBoardId(newBoard.id);
+
+      if (normalizedColumns) saveColumns(normalizedColumns);
       saveTasks(normalizedTasks);
       if (normalizedLabels) saveLabels(normalizedLabels);
       if (normalizedSettings) {
@@ -224,13 +250,7 @@ export function importTasks(file) {
         saveSettings({ ...current, ...normalizedSettings });
       }
 
-      if (boardName) {
-        const activeId = getActiveBoardId();
-        if (activeId) {
-          renameBoard(activeId, boardName);
-          refreshBoardNameUI(activeId);
-        }
-      }
+      refreshBoardsUI(newBoard?.id);
       
       const { renderBoard } = await import('./render.js');
       renderBoard();

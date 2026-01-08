@@ -19,14 +19,16 @@
   - After creating/changing elements that use Lucide icons (`span[data-lucide]`), call `window.lucide.createIcons()` **guarded** (see `renderBoard()` and `theme.js`).
 - Mutations generally follow: **load → modify → save → `renderBoard()`**.
   - Many modules call `renderBoard()` via `await import('./render.js')` to avoid tight coupling/circular imports (see `dragdrop.js`, `modals.js`, `importexport.js`). Prefer that pattern when adding callbacks inside those modules.
-- Import/Export is **active-board scoped only** (see `src/kanban.js` + `src/modules/importexport.js`).
+- Import/Export is **per-board scoped** (see `src/kanban.js` + `src/modules/importexport.js`).
+  - Export saves the **active board** only.
+  - Import creates a **new board** from the JSON and switches to it.
   - If you change any persisted shape (board/tasks/columns/labels), you MUST update `importexport.js` normalization/back-compat so exports still round-trip and imports still accept legacy fields.
 
 
 ## Persistence model (critical)
 - Multi-board storage is in `src/modules/storage.js`.
   - Boards list key: `kanbanBoards`; active board key: `kanbanActiveBoardId`.
-  - Per-board keys are `kanbanBoard:${boardId}:columns|tasks|labels`.
+  - Per-board keys are `kanbanBoard:${boardId}:columns|tasks|labels|settings`.
   - Always go through `ensureBoardsInitialized()` / `loadColumns()` / `loadTasks()` / `loadLabels()` rather than reading localStorage directly.
   - Legacy migration exists for single-board keys (`kanbanColumns`, `kanbanTasks`, `kanbanLabels`). Keep backward-compat fields like `task.text` and `task['due-date']` supported where relevant.
 
