@@ -694,6 +694,15 @@ body {
   cursor: pointer;
   word-wrap: break-word;
   overflow-wrap: break-word;
+
+  /* Prevent very long descriptions from making cards huge. */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  max-height: 2.9em; /* 2 lines × 1.45 line-height */
 }
 
 .task-description:hover {
@@ -1172,8 +1181,9 @@ fieldset.form-group legend {
       padding-bottom: 24px; /* Extra padding for touch targets/safe area */
   }
 
-  /* Expand the task label selector to show all labels on mobile */
-  #task-labels-selection {
-      max-height: none !important;
-  }
+    /* Keep the label list scrollable on mobile (don’t let it stretch the modal). */
+    #task-labels-selection {
+      max-height: 150px !important;
+      overflow-y: auto;
+    }
 }
