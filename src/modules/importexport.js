@@ -1,4 +1,46 @@
-import { loadTasks, loadColumns, loadLabels, saveColumns, saveTasks, saveLabels } from './storage.js';
+import {
+  loadTasks,
+  loadColumns,
+  loadLabels,
+  loadSettings,
+  saveColumns,
+  saveTasks,
+  saveLabels,
+  saveSettings
+} from './storage.js';
+
+import { createBoard, getActiveBoardName, listBoards, setActiveBoardId } from './storage.js';
+
+function boardDisplayName(board) {
+  const name = typeof board?.name === 'string' ? board.name.trim() : '';
+  return name || 'Untitled board';
+}
+
+function refreshBoardsUI(activeBoardId) {
+  const brandEl = document.getElementById('brand-text') || document.querySelector('.brand-text');
+  if (brandEl) brandEl.textContent = getActiveBoardName();
+
+  const selectEl = document.getElementById('board-select');
+  if (!selectEl) return;
+
+  const boards = listBoards();
+  selectEl.innerHTML = '';
+
+  boards.forEach((b) => {
+    const option = document.createElement('option');
+    option.value = b.id;
+    option.textContent = boardDisplayName(b);
+    selectEl.appendChild(option);
+  });
+
+  if (activeBoardId) selectEl.value = activeBoardId;
+}
+
+function boardNameFromFile(file) {
+  const name = typeof file?.name === 'string' ? file.name.trim() : '';
+  if (!name) return '';
+  return name.replace(/\.[^.]+$/, '').trim();
+}
 
 function isHexColor(value) {
   return typeof value === 'string' && /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(value.trim());
@@ -8,7 +50,7 @@ const allowedPriorities = new Set(['low', 'medium', 'high']);
 
 function normalizePriority(value) {
   const v = (value || '').toString().trim().toLowerCase();
-  return allowedPriorities.has(v) ? v : 'medium';
+  return allowedPriorities.has(v) ? v : 'low';
 }
 
 function normalizeDueDate(value) {
@@ -23,13 +65,20 @@ function normalizeTaskForExport(task) {
   const title = typeof task?.title === 'string' ? task.title : legacyTitle;
   const description = typeof task?.description === 'string' ? task.description : '';
   const dueDate = normalizeDueDate(task?.dueDate ?? task?.['due-date']);
+  const changeDate =
+    typeof task?.changeDate === 'string'
+      ? task.changeDate
+      : (typeof task?.changedDate === 'string' ? task.changedDate : undefined);
 
   return {
     ...task,
     title: title.toString().trim(),
     description: description.toString().trim(),
     priority: normalizePriority(task?.priority),
-    dueDate
+    dueDate,
+    ...(typeof changeDate === 'string' ? { changeDate: changeDate.toString().trim() } : {}),
+    // Avoid exporting the legacy field name.
+    changedDate: undefined
   };
 }
 
@@ -52,6 +101,10 @@ function normalizeImportedTasks(tasks) {
     const labels = Array.isArray(t?.labels) ? t.labels.map((l) => (typeof l === 'string' ? l : String(l))) : [];
     const order = Number.isFinite(t?.order) ? t.order : undefined;
     const creationDate = typeof t?.creationDate === 'string' ? t.creationDate : undefined;
+    const changeDate =
+      typeof t?.changeDate === 'string'
+        ? t.changeDate
+        : (typeof t?.changedDate === 'string' ? t.changedDate : undefined);
 
     return {
       id: id.trim(),
@@ -62,6 +115,7 @@ function normalizeImportedTasks(tasks) {
       column: column.trim(),
       ...(order !== undefined ? { order } : {}),
       ...(creationDate ? { creationDate } : {}),
+      ...(typeof changeDate === 'string' && changeDate.trim() ? { changeDate: changeDate.trim() } : {}),
       labels
     };
   });
@@ -104,6 +158,22 @@ function normalizeImportedLabels(labels) {
   return isValid ? normalized : null;
 }
 
+function normalizeImportedSettings(settings) {
+  if (!settings || typeof settings !== 'object' || Array.isArray(settings)) return null;
+
+  const showAge = settings.showAge !== false;
+  const showChangeDate = settings.showChangeDate !== false;
+  const locale = typeof settings.locale === 'string' && settings.locale.trim() ? settings.locale.trim() : undefined;
+  const defaultPriorityRaw = typeof settings.defaultPriority === 'string' ? settings.defaultPriority : undefined;
+  const defaultPriority = defaultPriorityRaw ? normalizePriority(defaultPriorityRaw) : undefined;
+  return {
+    showAge,
+    showChangeDate,
+    ...(locale ? { locale } : {})
+    ,...(defaultPriority ? { defaultPriority } : {})
+  };
+}
+
 // Export tasks and columns to JSON file
 export function exportTasks() {
   const tasks = loadTasks().map(normalizeTaskForExport);
@@ -112,7 +182,9 @@ export function exportTasks() {
     color: isHexColor(c?.color) ? c.color.trim() : '#3b82f6'
   }));
   const labels = loadLabels();
-  const exportData = { columns, tasks, labels };
+  const settings = loadSettings();
+  const boardName = getActiveBoardName();
+  const exportData = { boardName, columns, tasks, labels, settings };
   const dataStr = JSON.stringify(exportData, null, 2);
   const blob = new Blob([dataStr], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
@@ -134,35 +206,51 @@ export function importTasks(file) {
       const data = JSON.parse(e.target.result);
       
       // Support multiple formats for backward compatibility
-      let tasks, columns, labels;
+      let tasks, columns, labels, settings, boardName;
       
       if (Array.isArray(data)) {
         // Old format: just tasks array
         tasks = data;
-        columns = loadColumns(); // Keep existing columns
-        labels = loadLabels(); // Keep existing labels
+        columns = null;
+        labels = null;
+        settings = null;
+        boardName = null;
       } else if (data.tasks && data.columns) {
         // New format: object with columns and tasks (and optionally labels)
         tasks = data.tasks;
         columns = data.columns;
-        labels = data.labels || loadLabels(); // Use imported labels or keep existing
+        labels = Object.prototype.hasOwnProperty.call(data, 'labels') ? data.labels : null;
+        settings = Object.prototype.hasOwnProperty.call(data, 'settings') ? data.settings : null;
+        boardName = typeof data.boardName === 'string' ? data.boardName.trim() : null;
       } else {
         alert('Invalid JSON file format');
         return;
       }
 
       const normalizedTasks = normalizeImportedTasks(tasks);
-      const normalizedColumns = normalizeImportedColumns(columns);
+      const normalizedColumns = columns ? normalizeImportedColumns(columns) : null;
       const normalizedLabels = labels ? normalizeImportedLabels(labels) : null;
+      const normalizedSettings = settings ? normalizeImportedSettings(settings) : null;
 
-      if (!normalizedTasks || !normalizedColumns || (labels && !normalizedLabels)) {
+      if (!normalizedTasks || (columns && !normalizedColumns) || (labels && !normalizedLabels) || (settings && !normalizedSettings)) {
         alert('Invalid data structure');
         return;
       }
 
-      saveColumns(normalizedColumns);
+      const importedName = boardName || boardNameFromFile(file) || 'Imported board';
+      const newBoard = createBoard(importedName);
+      if (newBoard?.id) setActiveBoardId(newBoard.id);
+
+      if (normalizedColumns) saveColumns(normalizedColumns);
       saveTasks(normalizedTasks);
       if (normalizedLabels) saveLabels(normalizedLabels);
+      if (normalizedSettings) {
+        // Merge with current defaults (e.g., locale)
+        const current = loadSettings();
+        saveSettings({ ...current, ...normalizedSettings });
+      }
+
+      refreshBoardsUI(newBoard?.id);
       
       const { renderBoard } = await import('./render.js');
       renderBoard();

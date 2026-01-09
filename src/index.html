@@ -19,6 +19,19 @@
         <span data-lucide="square-kanban" aria-hidden="true" class="brand-icon"></span>
         <span id="brand-text" class="brand-text"></span>
       </div>
+
+      <div class="board-search" role="search" aria-label="Filter tasks">
+        <label class="sr-only" for="board-search-input">Search tasks</label>
+        <span data-lucide="search" aria-hidden="true"></span>
+        <input
+          id="board-search-input"
+          type="search"
+          inputmode="search"
+          placeholder="Search tasks…"
+          autocomplete="off"
+          aria-label="Search tasks by label, title, or description"
+        >
+      </div>
       
       <div id="board-controls-menu" class="controls-actions">
         <label class="sr-only" for="board-select">Select board</label>
@@ -38,6 +51,10 @@
         <button id="manage-labels-btn" class="control-btn" type="button" aria-haspopup="dialog">
           <span data-lucide="tag" aria-hidden="true"></span>
           <span>Manage Labels</span>
+        </button>
+        <button id="settings-btn" class="control-btn" type="button" aria-haspopup="dialog">
+          <span data-lucide="sliders-horizontal" aria-hidden="true"></span>
+          <span>Settings</span>
         </button>
         <button id="export-btn" class="control-btn" type="button">
           <span data-lucide="download" aria-hidden="true"></span>
@@ -165,6 +182,43 @@
       <div class="form-actions">
         <button type="button" id="boards-close-btn" class="btn btn-primary">Close</button>
       </div>
+    </article>
+  </div>
+
+  <!-- Settings Modal -->
+  <div id="settings-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="settings-modal-title">
+    <div class="modal-backdrop" data-close-modal></div>
+    <article class="modal-content">
+      <h3 id="settings-modal-title">Settings</h3>
+      <form id="settings-form" novalidate>
+        <div class="form-group checkbox-group">
+          <label>
+            <input id="settings-show-age" type="checkbox">
+            Show task age
+          </label>
+        </div>
+        <div class="form-group checkbox-group">
+          <label>
+            <input id="settings-show-change-date" type="checkbox">
+            Show updated date/time
+          </label>
+        </div>
+        <div class="form-group">
+          <label for="settings-locale">Locale</label>
+          <select id="settings-locale" aria-label="Select locale"></select>
+        </div>
+        <div class="form-group">
+          <label for="settings-default-priority">Default task priority</label>
+          <select id="settings-default-priority" aria-label="Select default task priority">
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+          </select>
+        </div>
+        <div class="form-actions">
+          <button type="button" id="settings-close-btn" class="btn btn-primary">Close</button>
+        </div>
+      </form>
     </article>
   </div>
 
@@ -324,7 +378,7 @@
   </div>
 
 <footer class="footer">
-  <p>📌 Data stored in browser localStorage only! <strong><br>Export your board to save to disk</strong><a href="https://github.com/mdiener21/personal-kanban" target="_blank" rel="noopener noreferrer"> Learn more docs</a></p>
+  <p>📌 Data stored in browser localStorage only! <strong>Export your board to save to disk</strong><a href="https://github.com/mdiener21/personal-kanban" target="_blank" rel="noopener noreferrer"> Learn more docs</a></p>
 </footer>
 
 <script src="https://unpkg.com/lucide@latest"></script>

@@ -1,14 +1,42 @@
 # Personal Kanban Board
 
-A fully local, no-server-required personal kanban board with localStorage persistence.
+Live Demo-Site make it yours:  https://mdiener21.github.io/personal-kanban/
+
+No backend. No tracking. No cloud, fully local in your own browser, no-server-required personal kanban board with localStorage persistence.
+
+The board data is stored only in your browser (ex. Chrome, Edge, Safari). The data is persistent from session to session even 
+if you delete all your cache the data is safe in your localStorage in the browser itself.  Safest is it use the simple export button
+that saves the board to a local file you can backup where you like.
+
+## Data Persistence
+
+All data is stored in browser localStorage. **Remember to export regularly** to avoid data loss when clearing browser data.
 
 ## Features
 
-- ✅ Local-first (no server needed)
+- ✅ Local-first (no server, no backend, no cloud involved)
 - 🎨 Drag & drop tasks and columns
-- 🏷️ Custom labels with colors
-- 💾 Export/Import to JSON
-- 📱 Responsive design
+- 🏷️ Custom labels and columns with colors
+- 💾 Export/Import to local file (format: JSON)
+- 📱 Responsive design Mobile and Desktop
+
+## Super Quick Start Host Yourself
+
+The repo includes the built static site already to deploy, simply copy and then upload/publish the `dist/` directory to your webhost.
+
+1. Hetzner: https://www.hetzner.com/de/webhosting
+
+
+## Deploy (Static Site)
+
+This app builds to a static site. Deploy the contents of `dist/` to any static host.
+
+```bash
+npm ci
+npm run build
+```
+
+- Upload/publish the `dist/` directory.
 
 ## Quick Start
 
@@ -58,17 +86,6 @@ The built files will be in the `dist` directory.
 npm run preview
 ```
 
-## Deploy (Static Site)
-
-This app builds to a static site. Deploy the contents of `dist/` to any static host.
-
-```bash
-npm ci
-npm run build
-```
-
-- Upload/publish the `dist/` directory.
-- If deploying under a sub-path (for example GitHub Pages), set `base` in `vite.config.js` so asset URLs work.
 
 ## Project Structure
 
@@ -104,6 +121,4 @@ personal-kanban/
 - **Export Data**: Click "Export" to save your board as JSON
 - **Import Data**: Click "Import" to load a previously exported board
 
-## Data Persistence
 
-All data is stored in browser localStorage. **Remember to export regularly** to avoid data loss when clearing browser data.
