@@ -118,7 +118,6 @@ export function attachColumnDragListeners() {
 function makePlaceholder(draggedTask) {
   const placeholder = document.createElement("li");
   placeholder.classList.add("placeholder");
-  placeholder.style.height = `${draggedTask.offsetHeight}px`;
   return placeholder;
 }
 
@@ -163,8 +162,6 @@ function movePlaceholder(event) {
 function makeColumnPlaceholder(draggedColumn) {
   const placeholder = document.createElement("div");
   placeholder.classList.add("column-placeholder");
-  placeholder.style.width = `${draggedColumn.offsetWidth}px`;
-  placeholder.style.height = `${draggedColumn.offsetHeight}px`;
   return placeholder;
 }
 
