@@ -438,6 +438,7 @@ body {
 /* Column drag handle */
 .column-drag-handle {
   opacity: 0.5;
+  touch-action: none; /* Enable smooth touch dragging */
 }
 
 .column-drag-handle:active {
@@ -665,6 +666,7 @@ body {
   gap: 8px;
   flex: 0 0 auto;
   min-height: 84px;
+  touch-action: none; /* Enable smooth touch dragging */
   transition:
     transform var(--transition-normal),
     box-shadow var(--transition-normal),
