@@ -39,6 +39,7 @@
 - Label shape (see `src/modules/labels.js`): `id`, `name`, `color` (hex).
 
 ## UI conventions
+- Mobile first design: the board interactions must all be mobile friendly drag and drop moves and design is for small screens first.
 - Modal UX is centralized in `src/modules/modals.js`:
   - Uses modal DOM ids from `src/index.html` and closes via **Escape** and backdrop clicks.
   - Use `confirmDialog()` / `alertDialog()` from `src/modules/dialog.js` for confirmations instead of `window.confirm`.

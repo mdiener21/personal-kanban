@@ -438,7 +438,6 @@ body {
 /* Column drag handle */
 .column-drag-handle {
   opacity: 0.5;
-  touch-action: none; /* Enable smooth touch dragging */
 }
 
 .column-drag-handle:active {
@@ -666,7 +665,6 @@ body {
   gap: 8px;
   flex: 0 0 auto;
   min-height: 84px;
-  touch-action: none; /* Enable smooth touch dragging */
   transition:
     transform var(--transition-normal),
     box-shadow var(--transition-normal),
@@ -1134,10 +1132,70 @@ fieldset.form-group legend {
 }
 
 /* ==========================================================================
-   10. Drag & Drop States
+   10. Drag & Drop States (SortableJS)
    ========================================================================== */
 
-/* Dragging states */
+/* Task being dragged (ghost) */
+.task-ghost {
+  opacity: 0.4;
+  background-color: var(--primary-light);
+}
+
+/* Task that was picked up */
+.task-chosen {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+/* Task while dragging */
+.task-drag {
+  opacity: 1;
+}
+
+/* Fallback clone for touch dragging */
+.task-fallback {
+  opacity: 0.9;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+  transform: rotate(2deg);
+  cursor: grabbing;
+}
+
+/* Column being dragged (ghost) */
+.column-ghost {
+  opacity: 0.4;
+}
+
+/* Column that was picked up */
+.column-chosen {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+}
+
+/* Column while dragging */
+.column-drag {
+  opacity: 1;
+}
+
+/* Body state while dragging tasks */
+body.dragging .task-column {
+  /* Subtle highlight to show drop zones */
+}
+
+body.dragging .tasks {
+  min-height: 100px;
+  /* Ensure drop zones are always targetable */
+  pointer-events: auto !important;
+}
+
+/* Ensure columns don't clip drop detection */
+body.dragging .task-column {
+  overflow: visible;
+}
+
+/* Body state while dragging columns */
+body.dragging-column #board-container {
+  /* Visual feedback during column drag */
+}
+
+/* Legacy dragging states (kept for compatibility) */
 [data-dragging="true"],
 #dragged-task {
   opacity: 0.3;
@@ -1147,8 +1205,9 @@ fieldset.form-group legend {
   opacity: 0.4;
 }
 
-/* Placeholders */
-.placeholder {
+/* Placeholders - SortableJS creates these automatically but we style them */
+.placeholder,
+.sortable-ghost {
   /* Task reordering placeholder: a thin insertion line (not a full box). */
   list-style: none;
   width: 100%;
@@ -1217,6 +1276,16 @@ fieldset.form-group legend {
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     padding-bottom: 12px;
+  }
+  
+  /* Disable snap during drag so tasks can move between columns */
+  body.dragging .board-container,
+  body.dragging .container {
+    scroll-snap-type: none;
+  }
+  
+  body.dragging .task-column {
+    scroll-snap-align: unset;
   }
   
   /* Columns take full width (minus margins) and snap */

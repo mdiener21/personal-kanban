@@ -2,7 +2,7 @@ import { loadColumns, loadTasks, loadLabels, loadSettings } from './storage.js';
 import { deleteTask } from './tasks.js';
 import { deleteColumn } from './columns.js';
 import { showModal, showEditModal, showEditColumnModal } from './modals.js';
-import { attachTaskListeners, attachColumnListeners, attachColumnDragListeners } from './dragdrop.js';
+import { initDragDrop } from './dragdrop.js';
 import { confirmDialog, alertDialog } from './dialog.js';
 
 let columnMenuCloseHandlerAttached = false;
@@ -430,9 +430,7 @@ export function renderBoard() {
     }
   });
   
-  attachTaskListeners();
-  attachColumnListeners();
-  attachColumnDragListeners();
+  initDragDrop();
   updateColumnSelect();
 
   // Lucide is loaded via CDN; guard so a slow/blocked load doesn't break the app.
