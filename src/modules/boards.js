@@ -8,6 +8,7 @@ import {
   setActiveBoardId,
   getActiveBoardName
 } from './storage.js';
+import { alertDialog } from './dialog.js';
 
 function boardDisplayName(board) {
   const name = typeof board?.name === 'string' ? board.name.trim() : '';
@@ -36,6 +37,22 @@ function refreshBrandText() {
   brandEl.textContent = getActiveBoardName();
 }
 
+// Board Create Modal helpers
+function showBoardCreateModal() {
+  const modal = document.getElementById('board-create-modal');
+  const nameInput = document.getElementById('board-create-name');
+  if (!modal || !nameInput) return;
+
+  nameInput.value = '';
+  modal.classList.remove('hidden');
+  nameInput.focus();
+}
+
+function hideBoardCreateModal() {
+  const modal = document.getElementById('board-create-modal');
+  if (modal) modal.classList.add('hidden');
+}
+
 export function initializeBoardsUI() {
   ensureBoardsInitialized();
 
@@ -61,20 +78,50 @@ export function initializeBoardsUI() {
     menuBtn?.setAttribute('aria-expanded', 'false');
   });
 
+  // New Board button opens modal
   newBtn.addEventListener('click', () => {
-    const name = window.prompt('New board name:');
-    if (name === null) return; // cancelled
-
-    const trimmed = name.trim();
-    if (!trimmed) {
-      alert('Board name cannot be empty.');
-      return;
-    }
-
-    const board = createBoard(trimmed);
-    setActiveBoardId(board.id);
-    refreshBoardSelect(selectEl);
-    refreshBrandText();
-    renderBoard();
+    showBoardCreateModal();
   });
+
+  // Board Create Modal handlers
+  const createModal = document.getElementById('board-create-modal');
+  const createForm = document.getElementById('board-create-form');
+  const cancelCreateBtn = document.getElementById('cancel-board-create-btn');
+
+  if (createModal) {
+    // Backdrop click closes modal
+    const backdrop = createModal.querySelector('.modal-backdrop');
+    backdrop?.addEventListener('click', hideBoardCreateModal);
+
+    // Escape key closes modal
+    createModal.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') hideBoardCreateModal();
+    });
+  }
+
+  if (cancelCreateBtn) {
+    cancelCreateBtn.addEventListener('click', hideBoardCreateModal);
+  }
+
+  if (createForm) {
+    createForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const nameInput = document.getElementById('board-create-name');
+      const trimmed = (nameInput?.value || '').trim();
+
+      if (!trimmed) {
+        await alertDialog({ title: 'Error', message: 'Board name cannot be empty.' });
+        nameInput?.focus();
+        return;
+      }
+
+      const board = createBoard(trimmed);
+      setActiveBoardId(board.id);
+      refreshBoardSelect(selectEl);
+      refreshBrandText();
+      renderBoard();
+      hideBoardCreateModal();
+    });
+  }
 }

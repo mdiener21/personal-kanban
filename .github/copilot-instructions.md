@@ -16,7 +16,10 @@
 - Entry point is `src/kanban.js`: wires UI handlers (boards, modals, import/export, theme) then calls `renderBoard()`.
 - Rendering is centralized in `src/modules/render.js`:
   - `renderBoard()` clears `#board-container`, re-creates columns/tasks, then re-attaches drag/drop listeners.
-  - After creating/changing elements that use Lucide icons (`span[data-lucide]`), call `window.lucide.createIcons()` **guarded** (see `renderBoard()` and `theme.js`).
+  - After creating/changing elements that use Lucide icons (`span[data-lucide]`), call `renderIcons()` from `src/modules/icons.js`.
+- **Icons**: Lucide icons are tree-shaken via `src/modules/icons.js`. To add a new icon:
+  1. Import it from `lucide` in `icons.js`
+  2. Add it to the `icons` object with its kebab-case name (e.g., `'arrow-right': ArrowRight`)
 - Mutations generally follow: **load → modify → save → `renderBoard()`**.
   - Many modules call `renderBoard()` via `await import('./render.js')` to avoid tight coupling/circular imports (see `dragdrop.js`, `modals.js`, `importexport.js`). Prefer that pattern when adding callbacks inside those modules.
 - Import/Export is **per-board scoped** (see `src/kanban.js` + `src/modules/importexport.js`).

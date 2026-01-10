@@ -12,6 +12,7 @@ import {
   deleteBoard as deleteBoardById
 } from './storage.js';
 import { confirmDialog, alertDialog } from './dialog.js';
+import { renderIcons } from './icons.js';
 
 // Modal state
 let currentColumn = 'todo';
@@ -303,9 +304,7 @@ function renderLabelsList() {
     container.appendChild(labelItem);
   });
 
-  if (window.lucide && typeof window.lucide.createIcons === 'function') {
-    window.lucide.createIcons();
-  }
+  renderIcons();
 }
 
 function renderBoardsSelect() {
@@ -413,9 +412,6 @@ function renderBoardsList() {
       renderBoardsList();
       const { renderBoard } = await import('./render.js');
       renderBoard();
-      if (window.lucide && typeof window.lucide.createIcons === 'function') {
-        window.lucide.createIcons();
-      }
     });
 
     actions.appendChild(switchBtn);
@@ -427,9 +423,7 @@ function renderBoardsList() {
     container.appendChild(item);
   });
 
-  if (window.lucide && typeof window.lucide.createIcons === 'function') {
-    window.lucide.createIcons();
-  }
+  renderIcons();
 }
 
 function showBoardsModal() {
