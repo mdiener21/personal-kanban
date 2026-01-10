@@ -1,3 +1,6 @@
+// Initialize icons early for initial HTML elements
+import './modules/icons.js';
+
 import { renderBoard, setBoardFilterQuery } from './modules/render.js';
 import { initializeModalHandlers } from './modules/modals.js';
 import { exportTasks, importTasks } from './modules/importexport.js';

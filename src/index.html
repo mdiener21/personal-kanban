@@ -37,16 +37,16 @@
         <label class="sr-only" for="board-select">Select board</label>
         <select id="board-select" class="control-select" aria-label="Select board"></select>
         <button id="new-board-btn" class="control-btn" type="button">
-          <span data-lucide="plus" aria-hidden="true"></span>
-          <span>New Board</span>
+          <span data-lucide="kanban" aria-hidden="true"></span>
+          <span style="color:green">New Board</span>
+        </button>
+        <button id="add-column-btn" class="control-btn" type="button" aria-haspopup="dialog">
+          <span data-lucide="columns-3" aria-hidden="true"></span>
+          <span style="color:green;">Add Column</span>
         </button>
         <button id="manage-boards-btn" class="control-btn" type="button" aria-haspopup="dialog">
           <span data-lucide="settings" aria-hidden="true"></span>
           <span>Manage Boards</span>
-        </button>
-        <button id="add-column-btn" class="control-btn" type="button" aria-haspopup="dialog">
-          <span data-lucide="columns" aria-hidden="true"></span>
-          <span>Add Column</span>
         </button>
         <button id="manage-labels-btn" class="control-btn" type="button" aria-haspopup="dialog">
           <span data-lucide="tag" aria-hidden="true"></span>
@@ -240,6 +240,24 @@
     </article>
   </div>
 
+  <!-- Board Create Modal -->
+  <div id="board-create-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="board-create-modal-title">
+    <div class="modal-backdrop" data-close-modal></div>
+    <article class="modal-content">
+      <h3 id="board-create-modal-title">Create New Board</h3>
+      <form id="board-create-form" novalidate>
+        <div class="form-group">
+          <label for="board-create-name">Board Name <span aria-hidden="true">*</span></label>
+          <input type="text" id="board-create-name" required placeholder="Enter board name..." aria-required="true">
+        </div>
+        <div class="form-actions">
+          <button type="button" id="cancel-board-create-btn" class="btn btn-secondary">Cancel</button>
+          <button type="submit" id="board-create-submit-btn" class="btn btn-primary">Create Board</button>
+        </div>
+      </form>
+    </article>
+  </div>
+
   <!-- Confirm / Alert Modal -->
   <div id="dialog-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="dialog-modal-title">
     <div class="modal-backdrop" data-close-modal></div>
@@ -381,10 +399,6 @@
   <p>📌 Data stored in browser localStorage only! <strong>Export your board to save to disk</strong><a href="https://github.com/mdiener21/personal-kanban" target="_blank" rel="noopener noreferrer"> Learn more docs</a></p>
 </footer>
 
-<script src="https://unpkg.com/lucide@latest"></script>
-<script>
-  lucide.createIcons();
-</script>
 <script type="module" src="kanban.js"></script>
 </body>
 </html>

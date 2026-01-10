@@ -1,3 +1,5 @@
+import { renderIcons } from './icons.js';
+
 const STORAGE_KEY = 'kanban-theme';
 
 function getPreferredTheme() {
@@ -36,10 +38,8 @@ function updateThemeToggleButton(theme) {
   for (const n of existingTextNodes) n.remove();
   btn.appendChild(document.createTextNode(` ${nextLabel}`));
 
-  // Re-render lucide icons if available (needed when we swap data-lucide)
-  if (window.lucide && typeof window.lucide.createIcons === 'function') {
-    window.lucide.createIcons();
-  }
+  // Re-render icons for the swapped icon
+  renderIcons();
 }
 
 export function initializeThemeToggle() {
