@@ -1269,6 +1269,43 @@ body.dragging-column #board-container {
 }
 
 @media (max-width: 600px) {
+  /* Mobile header: brand left, menu button right, search below */
+  .controls {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
+    gap: 8px;
+    padding: 8px;
+    flex-wrap: nowrap;
+  }
+
+  .brand {
+    grid-column: 1;
+    grid-row: 1;
+    margin-right: 0;
+    font-size: 16px;
+    overflow: hidden;
+  }
+
+  .brand-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 200px;
+  }
+
+  #desktop-menu-btn {
+    grid-column: 2;
+    grid-row: 1;
+    margin-left: auto;
+  }
+
+  .board-search {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    flex: none;
+  }
+
   /* Scrollable columns horizontally with snap */
   .container,
   .board-container {
@@ -1295,7 +1332,7 @@ body.dragging-column #board-container {
     margin: 0 8px; /* Use horizontal margin for spacing */
     scroll-snap-align: center;
     /* Ensure column fits on screen vertically so internal scroll works */
-    height: calc(100vh - 140px);
+    height: calc(100vh - 180px);
     display: flex;
     flex-direction: column;
     flex: 0 0 auto;
