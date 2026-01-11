@@ -530,7 +530,7 @@ body {
 .column-header h2 {
   margin: 0;
   flex: 1;
-  font-size: 16px;
+  font-size: 20px;
   font-weight: 600;
   text-align: center;
 }
@@ -628,29 +628,6 @@ body {
 .tasks::-webkit-scrollbar-track { background: var(--scrollbar-track); border-radius: 3px; }
 .tasks::-webkit-scrollbar-thumb { background: var(--column-accent); border-radius: 3px; }
 .tasks::-webkit-scrollbar-thumb:hover { background: var(--column-accent-hover); }
-
-/* Show all tasks button */
-.show-all-tasks-btn {
-  width: 100%;
-  padding: 8px;
-  margin-top: 8px;
-  background-color: var(--surface-muted);
-  border: 1px solid var(--border-subtle);
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 13px;
-  color: var(--text-muted);
-  transition: all var(--transition-normal);
-  display: none;
-}
-
-.task-column.has-hidden-tasks .show-all-tasks-btn { display: block; }
-
-.show-all-tasks-btn:hover {
-  background-color: var(--btn-secondary-bg);
-  border-color: var(--border);
-  color: var(--text);
-}
 
 /* --- Task Card --- */
 

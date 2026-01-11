@@ -89,6 +89,7 @@ function createTaskElement(task, settings) {
   // Labels container
   const labelsContainer = document.createElement('div');
   labelsContainer.classList.add('task-labels');
+  labelsContainer.setAttribute('role', 'list');
   labelsContainer.setAttribute('aria-label', 'Task labels');
   
   const labels = loadLabels();
@@ -98,6 +99,7 @@ function createTaskElement(task, settings) {
       if (label) {
         const labelEl = document.createElement('span');
         labelEl.classList.add('task-label');
+        labelEl.setAttribute('role', 'listitem');
         labelEl.style.backgroundColor = label.color;
         labelEl.textContent = label.name;
         labelsContainer.appendChild(labelEl);
@@ -413,22 +415,6 @@ export function renderBoard() {
     // Update task counter
     taskCounter.textContent = columnTasks.length;
     
-    // Check if column has more than 12 tasks
-    if (columnTasks.length > 12) {
-      columnEl.classList.add('has-hidden-tasks');
-      const showAllBtn = document.createElement('button');
-      showAllBtn.classList.add('show-all-tasks-btn');
-      showAllBtn.type = 'button';
-      const totalTasksCount = columnTasks.length;
-      showAllBtn.textContent = `Show all tasks (${totalTasksCount})`;
-      showAllBtn.addEventListener('click', () => {
-        tasksList.classList.toggle('expanded');
-        showAllBtn.textContent = tasksList.classList.contains('expanded') 
-          ? 'Hide extra tasks' 
-          : `Show all tasks (${totalTasksCount})`;
-      });
-      columnEl.appendChild(showAllBtn);
-    }
   });
   
   initDragDrop();
