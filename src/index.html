@@ -36,10 +36,6 @@
       <div id="board-controls-menu" class="controls-actions">
         <label class="sr-only" for="board-select">Select board</label>
         <select id="board-select" class="control-select" aria-label="Select board"></select>
-        <button id="new-board-btn" class="control-btn" type="button">
-          <span data-lucide="kanban" aria-hidden="true"></span>
-          <span style="color:green">New Board</span>
-        </button>
         <button id="add-column-btn" class="control-btn" type="button" aria-haspopup="dialog">
           <span data-lucide="columns-3" aria-hidden="true"></span>
           <span style="color:green;">Add Column</span>
@@ -180,7 +176,11 @@
       <h3 id="boards-modal-title">Manage Boards</h3>
       <div id="boards-list" class="labels-list" aria-label="Boards list"></div>
       <div class="form-actions">
-        <button type="button" id="boards-close-btn" class="btn btn-primary">Close</button>
+        <button id="add-board-btn" type="button" class="btn btn-primary">
+          <span data-lucide="kanban" aria-hidden="true"></span>
+          <span> Add Board</span>
+        </button>
+        <button type="button" id="boards-close-btn" class="btn btn-secondary">Close</button>
       </div>
     </article>
   </div>
