@@ -19,9 +19,23 @@ export function addTask(title, description, priority, dueDate, columnName, label
   if (!title || title.trim() === '') return;
   
   const tasks = loadTasks();
-  // Get max order for tasks in this column
-  const columnTasks = tasks.filter(t => t.column === columnName);
-  const maxOrder = columnTasks.reduce((max, t) => Math.max(max, t.order ?? 0), 0);
+  // Insert new tasks at the top of the column.
+  // Normalize the column's existing task orders so they start at 2 (leaving 1 for the new task).
+  const columnTasks = tasks
+    .filter((t) => t.column === columnName)
+    .slice()
+    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
+  const nextOrderById = new Map();
+  columnTasks.forEach((task, index) => {
+    nextOrderById.set(task.id, index + 2);
+  });
+
+  const updatedTasks = tasks.map((task) => {
+    if (task.column !== columnName) return task;
+    const nextOrder = nextOrderById.get(task.id);
+    return typeof nextOrder === 'number' ? { ...task, order: nextOrder } : task;
+  });
   
   const nowIso = new Date().toISOString();
   const newTask = {
@@ -31,13 +45,14 @@ export function addTask(title, description, priority, dueDate, columnName, label
     priority: normalizePriority(priority),
     dueDate: normalizeDueDate(dueDate),
     column: columnName,
-    order: maxOrder + 1,
+    order: 1,
     labels: [...labels],
     creationDate: nowIso,
     changeDate: nowIso
   };
-  tasks.push(newTask);
-  saveTasks(tasks);
+
+  updatedTasks.push(newTask);
+  saveTasks(updatedTasks);
 }
 
 // Update an existing task
