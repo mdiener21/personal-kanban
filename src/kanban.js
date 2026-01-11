@@ -1,3 +1,6 @@
+// Initialize icons early for initial HTML elements
+import './modules/icons.js';
+
 import { renderBoard, setBoardFilterQuery } from './modules/render.js';
 import { initializeModalHandlers } from './modules/modals.js';
 import { exportTasks, importTasks } from './modules/importexport.js';
@@ -97,14 +100,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
-
-  // Warn user before closing tab
-  window.addEventListener('beforeunload', (e) => {
-    const message = 'Your board data is stored in browser localStorage. Please export to a JSON file to save your work before closing.';
-    e.preventDefault();
-    e.returnValue = message;
-    return message;
-  });
 
   // Initial render
   renderBoard();

@@ -2,28 +2,23 @@
 name: Deploy static content to Pages
 
 on:
-  # Runs on pushes targeting the default branch
   push:
     branches: ["main"]
-
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
 concurrency:
   group: "pages"
   cancel-in-progress: false
 
 jobs:
-  # Single deploy job since we're just deploying
   deploy:
+    # Prevent the version-bump commit (pushed by the bot) from triggering another bump.
+    if: github.actor != 'github-actions[bot]'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -31,13 +26,46 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node (for npm version bump)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Bump patch version (package.json), tag, and push
+        run: |
+          test -f package.json || (echo "package.json not found; decide where the version should live." && exit 1)
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Bumps 1.0.0 -> 1.0.1 (updates package.json and usually package-lock.json)
+          npm version patch --no-git-tag-version
+
+          # Commit only if something changed
+          if [ -n "$(git status --porcelain)" ]; then
+            git add package.json package-lock.json 2>/dev/null || true
+            git commit -m "chore: bump version [skip ci]" || true
+            git push
+
+            VERSION="$(node -p "require('./package.json').version")"
+            DATE_UTC="$(date -u +%Y-%m-%d)"
+            TAG="v${VERSION}-${DATE_UTC}"
+
+            git tag -a "$TAG" -m "Release $TAG"
+            git push origin "$TAG"
+          fi
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Upload entire repository
           path: dist
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4

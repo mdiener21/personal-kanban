@@ -3,7 +3,9 @@
 ## Technology Rules and Principles
 
 - Only vanilla CSS, JavaScript, and HTML
-- Single external dependency: Lucide icons (CDN)
+- Minimal dependencies:
+  - **Lucide icons**: Tree-shaken ES module import (not CDN) via `src/modules/icons.js`
+  - **SortableJS**: Drag-and-drop library for tasks and columns
 - Storage: browser localStorage only
 - Data persistence: JSON import/export to local disk
 - No server, no frameworks
@@ -137,7 +139,6 @@
 
 - Single menu button (ellipsis) that opens a dropdown containing:
   - Board selector dropdown (shows all boards)
-  - New Board button (prompt for name)
   - Manage Boards button (opens boards management modal)
   - Help button (opens help modal)
   - Manage Labels button
@@ -161,6 +162,16 @@
 
 - Brand text displays the active board name (no static title text).
 
+### Icons
+
+- Lucide icons are tree-shaken via `src/modules/icons.js` to minimize bundle size.
+- Only icons used in the app are imported and registered.
+- Icons used: `SquareKanban`, `Search`, `Plus`, `Settings`, `Columns3`, `Tag`, `SlidersHorizontal`, `Download`, `Upload`, `Moon`, `Sun`, `HelpCircle`, `EllipsisVertical`, `Trash2`, `GripVertical`, `Pencil`
+- To add a new icon:
+  1. Import it from `lucide` in `icons.js`
+  2. Add it to the `icons` object (PascalCase key)
+- Call `renderIcons()` after dynamically adding elements with `data-lucide` attributes.
+
 ## Key Behaviors
 
 ### Drag and Drop
@@ -176,7 +187,7 @@
 - Sorts columns by order property
 - Sorts tasks within each column by order property
 - Called after every data modification
-- Reinitializes Lucide icons after render
+- Reinitializes Lucide icons via `renderIcons()` after render
 
 ### Modals
 
@@ -185,19 +196,24 @@
 - Column modal (add/edit)
 - Labels management modal
 - Boards management modal
+- Board create modal
+- Board rename modal
 - Label add/edit modal
+- Settings modal
 - Help modal
+- Confirm/Alert dialog modal
 - Close on Escape key or backdrop click
 
 ### Boards
 
 - **Select active board**: via the board dropdown; selection persists and is restored on next page load.
-- **Create board**: via New Board button (prompt for name). New boards start with default columns + labels, and empty tasks.
+- **Create board**: via Manage Boards modal → "Add Board" button → opens a modal form with board name input. New boards start with default columns + labels, and empty tasks.
 - **Manage boards**: via Manage Boards modal:
   - List boards
   - Open a board (sets active and renders)
-  - Rename a board
-  - Delete a board (always confirms: “Do you really want to delete…?”)
+  - Rename a board (pencil icon → rename modal)
+  - Delete a board (trash icon, always confirms: "Do you really want to delete…?")
+  - Add a board ("Add Board" button → opens the Create New Board modal)
   - The last remaining board cannot be deleted
 - **Mobile UX**:
   - Board selector is full-width with a larger tap target.
@@ -249,7 +265,8 @@
 
 - Pure JavaScript (no frameworks)
 - Vite build/dev tooling (ES modules)
-- Lucide icons CDN
+- Lucide icons: tree-shaken npm package (`lucide`), icons registered in `src/modules/icons.js`
+- SortableJS: npm package (`sortablejs`) for drag-and-drop
 - localStorage only (no server, no database)
 - Single HTML entry + CSS + JS modules
 
@@ -276,7 +293,7 @@
 2. Update localStorage data
 3. Call `renderBoard()` to refresh UI
 4. Reattach event listeners (drag, click)
-5. Reinitialize Lucide icons
+5. Reinitialize Lucide icons via `renderIcons()` from `src/modules/icons.js`
 
 ## Footer
 

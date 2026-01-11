@@ -12,6 +12,7 @@ import {
   deleteBoard as deleteBoardById
 } from './storage.js';
 import { confirmDialog, alertDialog } from './dialog.js';
+import { renderIcons } from './icons.js';
 
 // Modal state
 let currentColumn = 'todo';
@@ -303,9 +304,7 @@ function renderLabelsList() {
     container.appendChild(labelItem);
   });
 
-  if (window.lucide && typeof window.lucide.createIcons === 'function') {
-    window.lucide.createIcons();
-  }
+  renderIcons();
 }
 
 function renderBoardsSelect() {
@@ -413,9 +412,6 @@ function renderBoardsList() {
       renderBoardsList();
       const { renderBoard } = await import('./render.js');
       renderBoard();
-      if (window.lucide && typeof window.lucide.createIcons === 'function') {
-        window.lucide.createIcons();
-      }
     });
 
     actions.appendChild(switchBtn);
@@ -427,9 +423,7 @@ function renderBoardsList() {
     container.appendChild(item);
   });
 
-  if (window.lucide && typeof window.lucide.createIcons === 'function') {
-    window.lucide.createIcons();
-  }
+  renderIcons();
 }
 
 function showBoardsModal() {
@@ -441,6 +435,12 @@ function showBoardsModal() {
 function hideBoardsModal() {
   const modal = document.getElementById('boards-modal');
   modal?.classList.add('hidden');
+}
+
+export function refreshBoardsModalList() {
+  const modal = document.getElementById('boards-modal');
+  if (!modal || modal.classList.contains('hidden')) return;
+  renderBoardsList();
 }
 
 function showBoardRenameModal(boardId) {
@@ -520,6 +520,10 @@ function updateTaskLabelsSelection() {
 }
 
 export function initializeModalHandlers() {
+  document.addEventListener('kanban:boards-changed', () => {
+    refreshBoardsModalList();
+  });
+
   const taskLabelSearch = document.getElementById('task-label-search');
   taskLabelSearch?.addEventListener('input', updateTaskLabelsSelection);
 
@@ -591,6 +595,9 @@ export function initializeModalHandlers() {
 
   // Boards modal
   document.getElementById('manage-boards-btn')?.addEventListener('click', showBoardsModal);
+  document.getElementById('add-board-btn')?.addEventListener('click', async () => {
+    document.dispatchEvent(new CustomEvent('kanban:open-board-create'));
+  });
   document.getElementById('boards-close-btn')?.addEventListener('click', hideBoardsModal);
   document.querySelector('#boards-modal .modal-backdrop')?.addEventListener('click', hideBoardsModal);
 

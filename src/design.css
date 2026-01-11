@@ -270,7 +270,7 @@ body {
   text-align: center;
   font-size: 13px;
   color: var(--text-muted);
-  line-height: 1.5;
+  line-height: 0.9;
 }
 
 .footer p {
@@ -289,6 +289,8 @@ body {
   font-size: 14px;
   font-family: inherit;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
   transition: background-color var(--transition-normal), transform var(--transition-fast);
 }
 
@@ -300,6 +302,7 @@ body {
 .btn-primary {
   background-color: var(--color-primary);
   color: white;
+  align-items: center;
 }
 
 .btn-primary:hover {
@@ -1132,10 +1135,70 @@ fieldset.form-group legend {
 }
 
 /* ==========================================================================
-   10. Drag & Drop States
+   10. Drag & Drop States (SortableJS)
    ========================================================================== */
 
-/* Dragging states */
+/* Task being dragged (ghost) */
+.task-ghost {
+  opacity: 0.4;
+  background-color: var(--primary-light);
+}
+
+/* Task that was picked up */
+.task-chosen {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+/* Task while dragging */
+.task-drag {
+  opacity: 1;
+}
+
+/* Fallback clone for touch dragging */
+.task-fallback {
+  opacity: 0.9;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+  transform: rotate(2deg);
+  cursor: grabbing;
+}
+
+/* Column being dragged (ghost) */
+.column-ghost {
+  opacity: 0.4;
+}
+
+/* Column that was picked up */
+.column-chosen {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+}
+
+/* Column while dragging */
+.column-drag {
+  opacity: 1;
+}
+
+/* Body state while dragging tasks */
+body.dragging .task-column {
+  /* Subtle highlight to show drop zones */
+}
+
+body.dragging .tasks {
+  min-height: 100px;
+  /* Ensure drop zones are always targetable */
+  pointer-events: auto !important;
+}
+
+/* Ensure columns don't clip drop detection */
+body.dragging .task-column {
+  overflow: visible;
+}
+
+/* Body state while dragging columns */
+body.dragging-column #board-container {
+  /* Visual feedback during column drag */
+}
+
+/* Legacy dragging states (kept for compatibility) */
 [data-dragging="true"],
 #dragged-task {
   opacity: 0.3;
@@ -1145,19 +1208,34 @@ fieldset.form-group legend {
   opacity: 0.4;
 }
 
-/* Placeholders */
-.placeholder {
-  border: 2px dashed var(--border);
-  border-radius: 6px;
-  background-color: var(--surface-muted);
+/* Placeholders - SortableJS creates these automatically but we style them */
+.placeholder,
+.sortable-ghost {
+  /* Task reordering placeholder: a thin insertion line (not a full box). */
+  list-style: none;
+  width: 100%;
+  height: 10px;
+  min-height: 10px;
+  margin: 4px 0;
+  border: none;
+  border-radius: 999px;
+  background-color: var(--border);
+  background-color: color-mix(in srgb, var(--column-accent) 35%, var(--border) 65%);
+  opacity: 0.95;
 }
 
 .column-placeholder {
-  border: 2px dashed var(--color-primary);
-  border-radius: 8px;
-  margin: 10px;
-  background-color: rgba(59, 130, 246, 0.05);
-  flex-shrink: 0;
+  /* Column reordering placeholder: a thin vertical insertion line. */
+  width: 10px;
+  min-width: 10px;
+  flex: 0 0 10px;
+  align-self: stretch;
+  margin: 10px 6px;
+  border: none;
+  border-radius: 999px;
+  background-color: color-mix(in srgb, var(--color-primary) 35%, var(--border) 65%);
+  opacity: 0.95;
+  pointer-events: none;
 }
 
 /* ==========================================================================
@@ -1194,6 +1272,43 @@ fieldset.form-group legend {
 }
 
 @media (max-width: 600px) {
+  /* Mobile header: brand left, menu button right, search below */
+  .controls {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
+    gap: 8px;
+    padding: 8px;
+    flex-wrap: nowrap;
+  }
+
+  .brand {
+    grid-column: 1;
+    grid-row: 1;
+    margin-right: 0;
+    font-size: 16px;
+    overflow: hidden;
+  }
+
+  .brand-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 200px;
+  }
+
+  #desktop-menu-btn {
+    grid-column: 2;
+    grid-row: 1;
+    margin-left: auto;
+  }
+
+  .board-search {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    flex: none;
+  }
+
   /* Scrollable columns horizontally with snap */
   .container,
   .board-container {
@@ -1203,6 +1318,16 @@ fieldset.form-group legend {
     padding-bottom: 12px;
   }
   
+  /* Disable snap during drag so tasks can move between columns */
+  body.dragging .board-container,
+  body.dragging .container {
+    scroll-snap-type: none;
+  }
+  
+  body.dragging .task-column {
+    scroll-snap-align: unset;
+  }
+  
   /* Columns take full width (minus margins) and snap */
   .task-column {
     min-width: 85vw;
@@ -1210,7 +1335,7 @@ fieldset.form-group legend {
     margin: 0 8px; /* Use horizontal margin for spacing */
     scroll-snap-align: center;
     /* Ensure column fits on screen vertically so internal scroll works */
-    height: calc(100vh - 140px);
+    height: calc(100vh - 180px);
     display: flex;
     flex-direction: column;
     flex: 0 0 auto;
