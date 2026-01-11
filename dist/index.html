@@ -7,8 +7,8 @@
   <title>Personal Kanban Board</title>
   <!-- Kanban favicon (inline SVG data URI) -->
   <link rel="icon" href="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='2' y='3' width='6' height='18' rx='1.5' fill='%233b82f6'/%3E%3Crect x='9' y='3' width='6' height='12' rx='1.5' fill='%2360a5fa'/%3E%3Crect x='16' y='3' width='6' height='8' rx='1.5' fill='%2393c5fd'/%3E%3C/svg%3E">
-  <script type="module" crossorigin src="/personal-kanban/assets/index-C8HNmOsi.js"></script>
-  <link rel="stylesheet" crossorigin href="/personal-kanban/assets/index-B6-DDvGK.css">
+  <script type="module" crossorigin src="/personal-kanban/assets/index-DrA3DMRJ.js"></script>
+  <link rel="stylesheet" crossorigin href="/personal-kanban/assets/index-yYFkC6zQ.css">
 </head>
 <body>
   <!-- Skip link for accessibility -->
@@ -37,10 +37,6 @@
       <div id="board-controls-menu" class="controls-actions">
         <label class="sr-only" for="board-select">Select board</label>
         <select id="board-select" class="control-select" aria-label="Select board"></select>
-        <button id="new-board-btn" class="control-btn" type="button">
-          <span data-lucide="kanban" aria-hidden="true"></span>
-          <span style="color:green">New Board</span>
-        </button>
         <button id="add-column-btn" class="control-btn" type="button" aria-haspopup="dialog">
           <span data-lucide="columns-3" aria-hidden="true"></span>
           <span style="color:green;">Add Column</span>
@@ -181,7 +177,11 @@
       <h3 id="boards-modal-title">Manage Boards</h3>
       <div id="boards-list" class="labels-list" aria-label="Boards list"></div>
       <div class="form-actions">
-        <button type="button" id="boards-close-btn" class="btn btn-primary">Close</button>
+        <button id="add-board-btn" type="button" class="btn btn-primary">
+          <span data-lucide="kanban" aria-hidden="true"></span>
+          <span> Add Board</span>
+        </button>
+        <button type="button" id="boards-close-btn" class="btn btn-secondary">Close</button>
       </div>
     </article>
   </div>

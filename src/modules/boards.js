@@ -38,7 +38,7 @@ function refreshBrandText() {
 }
 
 // Board Create Modal helpers
-function showBoardCreateModal() {
+export function showBoardCreateModal() {
   const modal = document.getElementById('board-create-modal');
   const nameInput = document.getElementById('board-create-name');
   if (!modal || !nameInput) return;
@@ -57,12 +57,15 @@ export function initializeBoardsUI() {
   ensureBoardsInitialized();
 
   const selectEl = document.getElementById('board-select');
-  const newBtn = document.getElementById('new-board-btn');
 
-  if (!selectEl || !newBtn) return;
+  if (!selectEl) return;
 
   refreshBoardSelect(selectEl);
   refreshBrandText();
+
+  document.addEventListener('kanban:open-board-create', () => {
+    showBoardCreateModal();
+  });
 
   selectEl.addEventListener('change', () => {
     const id = selectEl.value;
@@ -76,11 +79,6 @@ export function initializeBoardsUI() {
     const menuBtn = document.getElementById('desktop-menu-btn');
     controlsActions?.classList.remove('show');
     menuBtn?.setAttribute('aria-expanded', 'false');
-  });
-
-  // New Board button opens modal
-  newBtn.addEventListener('click', () => {
-    showBoardCreateModal();
   });
 
   // Board Create Modal handlers
@@ -122,6 +120,10 @@ export function initializeBoardsUI() {
       refreshBrandText();
       renderBoard();
       hideBoardCreateModal();
+
+      // Let other UI modules (e.g., Manage Boards modal) react without introducing
+      // cross-module imports that can complicate bundling/chunking.
+      document.dispatchEvent(new CustomEvent('kanban:boards-changed'));
     });
   }
 }

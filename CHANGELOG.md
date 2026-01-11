@@ -5,7 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [ Unreleased]
+
+## Added
+
+## Changed
+
+## Removed
+
+
+## [1.0.0 - 2026-01-11]
+
+First public release. No backend. No tracking. No cloud, fully local in your own browser, no-server-required personal kanban board with localStorage persistence. Backup with a single click Export to JSON.
+
+## Added
+
+- Settings modal (toggle age/updated timestamp, select locale; included in export/import)
+- Manage Boards modal now includes an "Add Board" button (opens the Create New Board modal)
+
+## Changed
+
+- Creating a board while the Manage Boards modal is open immediately refreshes the boards list to show the new active board
+- Board creation entry point moved from the controls dropdown into Manage Boards
+
+### Removed
+
+- Page refresh/leave warning (`beforeunload`) prompt
+- "New Board" button from the controls dropdown menu
+
+## [0.0.1 - 2026-01-05]
 
 ### Added
 
@@ -13,7 +41,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - dark and light theme
 - AI agent guidance via `.github/copilot-instructions.md`
 - Board-level task search filter (matches label name, task title, or description)
-- Settings modal (toggle age/updated timestamp, select locale; included in export/import)
 
 ### Changed
 
@@ -28,3 +55,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Import/export JSON now includes `boardName` and import applies it to the active board
 - Import now creates a new board (no overwrite)
 - Default task priority is now `low` (configurable per board in Settings)
+
+
+

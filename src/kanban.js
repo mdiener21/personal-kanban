@@ -101,14 +101,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Warn user before closing tab
-  window.addEventListener('beforeunload', (e) => {
-    const message = 'Your board data is stored in browser localStorage. Please export to a JSON file to save your work before closing.';
-    e.preventDefault();
-    e.returnValue = message;
-    return message;
-  });
-
   // Initial render
   renderBoard();
 });

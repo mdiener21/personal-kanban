@@ -139,7 +139,6 @@
 
 - Single menu button (ellipsis) that opens a dropdown containing:
   - Board selector dropdown (shows all boards)
-  - New Board button (prompt for name)
   - Manage Boards button (opens boards management modal)
   - Help button (opens help modal)
   - Manage Labels button
@@ -208,12 +207,13 @@
 ### Boards
 
 - **Select active board**: via the board dropdown; selection persists and is restored on next page load.
-- **Create board**: via New Board button → opens a modal form with board name input. New boards start with default columns + labels, and empty tasks.
+- **Create board**: via Manage Boards modal → "Add Board" button → opens a modal form with board name input. New boards start with default columns + labels, and empty tasks.
 - **Manage boards**: via Manage Boards modal:
   - List boards
   - Open a board (sets active and renders)
   - Rename a board (pencil icon → rename modal)
   - Delete a board (trash icon, always confirms: "Do you really want to delete…?")
+  - Add a board ("Add Board" button → opens the Create New Board modal)
   - The last remaining board cannot be deleted
 - **Mobile UX**:
   - Board selector is full-width with a larger tap target.

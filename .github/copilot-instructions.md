@@ -4,7 +4,8 @@
 - This is a **local-first, no-backend** kanban app: all state lives in **browser `localStorage`** and the UI is plain DOM.
 - Build tooling is **Vite** with **`src/` as the Vite root** and output to `dist/`.
   - Edit source files in `src/` (do **not** hand-edit `dist/`).
-- Specification is in `docs/specification-kanban.md` (keep it updated as features change).
+- Specification is in `docs/specification-kanban.md` (**always keep it updated** as features change).
+- Changelog is in `CHANGELOG.md` (**always update** the **[Unreleased]** section following **Keep a Changelog** whenever behavior/UI/data changes).
 
 ## Dev workflows
 - Dev server: `npm run dev` (Vite opens `http://localhost:3000`).
@@ -26,7 +27,6 @@
   - Export saves the **active board** only.
   - Import creates a **new board** from the JSON and switches to it.
   - If you change any persisted shape (board/tasks/columns/labels), you MUST update `importexport.js` normalization/back-compat so exports still round-trip and imports still accept legacy fields.
-
 
 ## Persistence model (critical)
 - Multi-board storage is in `src/modules/storage.js`.

@@ -437,6 +437,12 @@ function hideBoardsModal() {
   modal?.classList.add('hidden');
 }
 
+export function refreshBoardsModalList() {
+  const modal = document.getElementById('boards-modal');
+  if (!modal || modal.classList.contains('hidden')) return;
+  renderBoardsList();
+}
+
 function showBoardRenameModal(boardId) {
   ensureBoardsInitialized();
   const board = listBoards().find((b) => b.id === boardId);
@@ -514,6 +520,10 @@ function updateTaskLabelsSelection() {
 }
 
 export function initializeModalHandlers() {
+  document.addEventListener('kanban:boards-changed', () => {
+    refreshBoardsModalList();
+  });
+
   const taskLabelSearch = document.getElementById('task-label-search');
   taskLabelSearch?.addEventListener('input', updateTaskLabelsSelection);
 
@@ -585,6 +595,9 @@ export function initializeModalHandlers() {
 
   // Boards modal
   document.getElementById('manage-boards-btn')?.addEventListener('click', showBoardsModal);
+  document.getElementById('add-board-btn')?.addEventListener('click', async () => {
+    document.dispatchEvent(new CustomEvent('kanban:open-board-create'));
+  });
   document.getElementById('boards-close-btn')?.addEventListener('click', hideBoardsModal);
   document.querySelector('#boards-modal .modal-backdrop')?.addEventListener('click', hideBoardsModal);
 
