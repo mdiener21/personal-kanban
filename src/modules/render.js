@@ -160,28 +160,34 @@ function createTaskElement(task, settings) {
   const meta = document.createElement('div');
   meta.classList.add('task-meta');
 
-  const priority = typeof task.priority === 'string' ? task.priority : 'medium';
-  const priorityEl = document.createElement('span');
-  priorityEl.classList.add('task-priority', `priority-${priority}`);
-  priorityEl.textContent = priority;
-  priorityEl.setAttribute('aria-label', `Priority: ${priority}`);
+  const showPriority = settings?.showPriority !== false;
+  const showDueDate = settings?.showDueDate !== false;
 
-  const dueDateRaw = typeof task.dueDate === 'string' ? task.dueDate.trim() : '';
-  const dueDateEl = document.createElement('span');
-  dueDateEl.classList.add('task-date');
-  if (!dueDateRaw) {
-    dueDateEl.textContent = 'No due date';
-  } else {
-    dueDateEl.textContent = formatDisplayDate(dueDateRaw, settings?.locale);
+  if (showPriority) {
+    const priority = typeof task.priority === 'string' ? task.priority : 'medium';
+    const priorityEl = document.createElement('span');
+    priorityEl.classList.add('task-priority', `priority-${priority}`);
+    priorityEl.textContent = priority;
+    priorityEl.setAttribute('aria-label', `Priority: ${priority}`);
+    meta.appendChild(priorityEl);
   }
 
-  meta.appendChild(priorityEl);
-  meta.appendChild(dueDateEl);
+  if (showDueDate) {
+    const dueDateRaw = typeof task.dueDate === 'string' ? task.dueDate.trim() : '';
+    const dueDateEl = document.createElement('span');
+    dueDateEl.classList.add('task-date');
+    if (!dueDateRaw) {
+      dueDateEl.textContent = 'No due date';
+    } else {
+      dueDateEl.textContent = formatDisplayDate(dueDateRaw, settings?.locale);
+    }
+    meta.appendChild(dueDateEl);
+  }
 
   li.appendChild(header);
   li.appendChild(descriptionEl);
   li.appendChild(labelsContainer);
-  li.appendChild(meta);
+  if (meta.childNodes.length > 0) li.appendChild(meta);
 
   const showChangeDate = settings?.showChangeDate !== false;
   const showAge = settings?.showAge !== false;

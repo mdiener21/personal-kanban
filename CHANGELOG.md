@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added (Unreleased)
 
 - Manage Boards modal now includes an "Add Board" button (opens the Create New Board modal)
+- Settings toggles to show/hide task priority and show/hide task due date
 
 ### Changed (Unreleased)
 

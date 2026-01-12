@@ -179,6 +179,8 @@ function defaultSettings() {
     : 'en-US';
 
   return {
+    showPriority: true,
+    showDueDate: true,
     showAge: true,
     showChangeDate: true,
     locale,
@@ -364,11 +366,13 @@ export function saveLabels(labels) {
 function normalizeSettings(raw) {
   const obj = raw && typeof raw === 'object' ? raw : {};
   const locale = typeof obj.locale === 'string' && obj.locale.trim() ? obj.locale.trim() : defaultSettings().locale;
+  const showPriority = obj.showPriority !== false;
+  const showDueDate = obj.showDueDate !== false;
   const showAge = obj.showAge !== false;
   const showChangeDate = obj.showChangeDate !== false;
   const priority = (obj.defaultPriority || '').toString().trim().toLowerCase();
   const defaultPriority = (priority === 'low' || priority === 'medium' || priority === 'high') ? priority : 'low';
-  return { showAge, showChangeDate, locale, defaultPriority };
+  return { showPriority, showDueDate, showAge, showChangeDate, locale, defaultPriority };
 }
 
 export function loadSettings() {

@@ -50,15 +50,19 @@ export function initializeSettingsUI() {
   const closeBtn = document.getElementById('settings-close-btn');
   const backdrop = document.querySelector('#settings-modal .modal-backdrop');
 
+  const showPriorityEl = document.getElementById('settings-show-priority');
+  const showDueDateEl = document.getElementById('settings-show-due-date');
   const showAgeEl = document.getElementById('settings-show-age');
   const showChangeDateEl = document.getElementById('settings-show-change-date');
   const localeEl = document.getElementById('settings-locale');
   const defaultPriorityEl = document.getElementById('settings-default-priority');
 
-  if (!openBtn || !closeBtn || !showAgeEl || !showChangeDateEl || !localeEl || !defaultPriorityEl) return;
+  if (!openBtn || !closeBtn || !showPriorityEl || !showDueDateEl || !showAgeEl || !showChangeDateEl || !localeEl || !defaultPriorityEl) return;
 
   function syncFormFromSettings() {
     const settings = loadSettings();
+    showPriorityEl.checked = settings.showPriority !== false;
+    showDueDateEl.checked = settings.showDueDate !== false;
     showAgeEl.checked = settings.showAge !== false;
     showChangeDateEl.checked = settings.showChangeDate !== false;
 
@@ -99,6 +103,16 @@ export function initializeSettingsUI() {
   showChangeDateEl.addEventListener('change', async () => {
     const current = loadSettings();
     await applyAndRerender({ ...current, showChangeDate: Boolean(showChangeDateEl.checked) });
+  });
+
+  showPriorityEl.addEventListener('change', async () => {
+    const current = loadSettings();
+    await applyAndRerender({ ...current, showPriority: Boolean(showPriorityEl.checked) });
+  });
+
+  showDueDateEl.addEventListener('change', async () => {
+    const current = loadSettings();
+    await applyAndRerender({ ...current, showDueDate: Boolean(showDueDateEl.checked) });
   });
 
   localeEl.addEventListener('change', async () => {

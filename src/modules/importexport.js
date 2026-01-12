@@ -161,12 +161,16 @@ function normalizeImportedLabels(labels) {
 function normalizeImportedSettings(settings) {
   if (!settings || typeof settings !== 'object' || Array.isArray(settings)) return null;
 
+  const showPriority = settings.showPriority !== false;
+  const showDueDate = settings.showDueDate !== false;
   const showAge = settings.showAge !== false;
   const showChangeDate = settings.showChangeDate !== false;
   const locale = typeof settings.locale === 'string' && settings.locale.trim() ? settings.locale.trim() : undefined;
   const defaultPriorityRaw = typeof settings.defaultPriority === 'string' ? settings.defaultPriority : undefined;
   const defaultPriority = defaultPriorityRaw ? normalizePriority(defaultPriorityRaw) : undefined;
   return {
+    showPriority,
+    showDueDate,
     showAge,
     showChangeDate,
     ...(locale ? { locale } : {})

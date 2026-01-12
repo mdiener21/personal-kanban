@@ -114,7 +114,7 @@
 - **Edit**: Click task title/description, modal pre-filled with current data
 - **Delete**: Click X button, confirm deletion
 - **Move**: Drag between columns, auto-saves new column and order
-- **Display**: Title (clickable), optional description (clamped to ~2 lines), labels (colored badges), meta row (priority + due date), delete button
+- **Display**: Title (clickable), optional description (clamped to ~2 lines), labels (colored badges), optional meta row (priority and/or due date depending on Settings), delete button
 - **Footer**: Can show `changeDate` ("Updated …") and task age ("Age …") depending on Settings toggles.
   - `changeDate` is displayed using the user-selected locale (via `toLocaleString(locale)`)
   - Age is based on `creationDate` and displayed as `0d` for < 1 day, `Nd` for days, and `NM` for months (30 days per month, floor)
@@ -152,6 +152,8 @@
 
 - Settings are **per active board** and stored in localStorage (`kanbanBoard:<boardId>:settings`).
 - Settings modal allows:
+  - Toggle to show/hide task priority
+  - Toggle to show/hide task due date
   - Toggle to show/hide task age
   - Toggle to show/hide task updated date/time (`changeDate`)
   - Locale dropdown for formatting the updated timestamp
