@@ -191,7 +191,7 @@ export function exportTasks() {
   
   const a = document.createElement('a');
   a.href = url;
-  a.download = `kanban-board-${new Date().toISOString()}.json`;
+  a.download = `${boardName.replaceAll(' ', '_').replaceAll('.', '_')}_board_${new Date().toISOString().replaceAll(':', '-').replaceAll('.', '-')}.json`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);

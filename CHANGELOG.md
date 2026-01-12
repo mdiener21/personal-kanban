@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Creating a board while the Manage Boards modal is open immediately refreshes the boards list to show the new active board
 - Board creation entry point moved from the controls dropdown into Manage Boards
 - New tasks are inserted at the top of the column (instead of appended to the bottom)
+- Export file name now includes board name replacing any spaces with _
 
 ### Removed (Unreleased)
 
