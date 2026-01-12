@@ -664,7 +664,7 @@ body {
   content: "";
   position: absolute;
   inset: 0 auto 0 0;
-  width: 4px;
+  width: 2px;
   background: var(--column-accent);
   opacity: 0.9;
 }
