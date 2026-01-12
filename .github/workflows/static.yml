@@ -4,51 +4,57 @@ name: Deploy static content to Pages
 on:
   push:
     branches: ["main"]
-  workflow_dispatch:
-
-permissions:
-  contents: write
-  pages: write
-  id-token: write
+  workflow_dispatch: {}
 
 concurrency:
   group: "pages"
   cancel-in-progress: false
 
+permissions:
+  contents: write   # needed because you push a bump commit/tag
+  pages: write
+  id-token: write
+
 jobs:
   deploy:
     # Prevent the version-bump commit (pushed by the bot) from triggering another bump.
     if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
+      - name: Checkout main (not detached)
         uses: actions/checkout@v4
         with:
+          ref: main
           fetch-depth: 0
+          persist-credentials: true
 
-      - name: Setup Node (for npm version bump)
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: npm
 
-      - name: Bump patch version (package.json), tag, and push
+      - name: Install deps
         run: |
-          test -f package.json || (echo "package.json not found; decide where the version should live." && exit 1)
+          test -f package.json || (echo "package.json not found" && exit 1)
+          npm ci
 
+      - name: Bump patch version (package.json), commit, tag, and push
+        run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Bumps 1.0.0 -> 1.0.1 (updates package.json and usually package-lock.json)
           npm version patch --no-git-tag-version
 
-          # Commit only if something changed
           if [ -n "$(git status --porcelain)" ]; then
-            git add package.json package-lock.json 2>/dev/null || true
-            git commit -m "chore: bump version [skip ci]" || true
-            git push
+            git add package.json package-lock.json
+            git commit -m "chore: bump version [skip ci]"
+            git push origin HEAD:main
 
             VERSION="$(node -p "require('./package.json').version")"
             DATE_UTC="$(date -u +%Y-%m-%d)"
@@ -58,13 +64,21 @@ jobs:
             git push origin "$TAG"
           fi
 
+      - name: Build site (must output ./dist)
+        run: npm run build
+
+      - name: Assert dist exists
+        run: |
+          test -d dist || (echo "dist/ not found. Ensure npm run build outputs dist/." && exit 1)
+          test -n "$(ls -A dist)" || (echo "dist/ is empty." && exit 1)
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          path: ./dist
 
       - name: Deploy to GitHub Pages
         id: deployment
