@@ -98,9 +98,11 @@
     }
   ],
   "settings": {
+    "showPriority": true,
+    "showDueDate": true,
     "showAge": true,
     "showChangeDate": true,
-    "locale": "en",
+    "locale": "en-US",
     "defaultPriority": "low"
   }
 }

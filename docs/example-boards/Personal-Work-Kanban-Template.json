@@ -102,5 +102,13 @@
       "name": "personal",
       "color": "#ffb300"
     }
-  ]
+  ],
+  "settings": {
+    "showPriority": true,
+    "showDueDate": true,
+    "showAge": true,
+    "showChangeDate": true,
+    "locale": "en-US",
+    "defaultPriority": "low"
+  }
 }
