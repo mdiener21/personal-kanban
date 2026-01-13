@@ -8,6 +8,11 @@ The board data is stored only in your browser (ex. Chrome, Edge, Safari). The da
 if you delete all your cache the data is safe in your localStorage in the browser itself.  Safest is it use the simple export button
 that saves the board to a local file you can backup where you like.
 
+<img width="2543" height="1267" alt="image" src="https://github.com/user-attachments/assets/7f3a1a83-84ef-41fa-a099-728e45ad3418" />
+
+<img width="2550" height="1270" alt="image" src="https://github.com/user-attachments/assets/9faa275b-16b0-4b38-b890-c4b503710e70" />
+
+
 ## Data Persistence
 
 All data is stored in browser localStorage. **Remember to export regularly** to avoid data loss when clearing browser data.
