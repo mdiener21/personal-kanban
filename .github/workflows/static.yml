@@ -4,6 +4,8 @@ name: Deploy static content to Pages
 on:
   push:
     branches: ["main"]
+  pull_request:
+    branches: ["main"]
   workflow_dispatch: {}
 
 concurrency:
@@ -11,27 +13,21 @@ concurrency:
   cancel-in-progress: false
 
 permissions:
-  contents: write   # needed because you push a bump commit/tag
+  contents: read
   pages: write
   id-token: write
 
 jobs:
-  deploy:
-    # Prevent the version-bump commit (pushed by the bot) from triggering another bump.
-    if: github.actor != 'github-actions[bot]'
+  build:
+    name: Build
     runs-on: ubuntu-latest
 
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-
     steps:
-      - name: Checkout main (not detached)
+      - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: main
-          fetch-depth: 0
-          persist-credentials: true
+          fetch-depth: 1
+          persist-credentials: false
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -43,26 +39,6 @@ jobs:
         run: |
           test -f package.json || (echo "package.json not found" && exit 1)
           npm ci
-
-      - name: Bump patch version (package.json), commit, tag, and push
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          npm version patch --no-git-tag-version
-
-          if [ -n "$(git status --porcelain)" ]; then
-            git add package.json package-lock.json
-            git commit -m "chore: bump version [skip ci]"
-            git push origin HEAD:main
-
-            VERSION="$(node -p "require('./package.json').version")"
-            DATE_UTC="$(date -u +%Y-%m-%d)"
-            TAG="v${VERSION}-${DATE_UTC}"
-
-            git tag -a "$TAG" -m "Release $TAG"
-            git push origin "$TAG"
-          fi
 
       - name: Build site (must output ./dist)
         run: npm run build
@@ -80,6 +56,17 @@ jobs:
         with:
           path: ./dist
 
+  deploy:
+    name: Deploy
+    needs: build
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
