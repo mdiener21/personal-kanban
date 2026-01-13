@@ -179,7 +179,7 @@ function createTaskElement(task, settings) {
     if (!dueDateRaw) {
       dueDateEl.textContent = 'No due date';
     } else {
-      dueDateEl.textContent = formatDisplayDate(dueDateRaw, settings?.locale);
+      dueDateEl.textContent = 'Due ' + formatDisplayDate(dueDateRaw, settings?.locale);
     }
     meta.appendChild(dueDateEl);
   }
