@@ -86,7 +86,12 @@
   <div id="task-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="task-modal-title">
     <div class="modal-backdrop" data-close-modal></div>
     <article class="modal-content">
-      <h3 id="task-modal-title">Add New Task</h3>
+      <header class="modal-header-row">
+        <h3 id="task-modal-title">Add New Task</h3>
+        <button id="task-fullpage-btn" type="button" class="btn-small hidden" aria-pressed="false" title="Open in full page">
+          <span data-lucide="fullscreen" aria-hidden="true"></span>
+        </button>
+      </header>
       <form id="task-form" novalidate>
         <div class="form-group">
           <label for="task-title">Title <span aria-hidden="true">*</span></label>

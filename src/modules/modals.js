@@ -25,6 +25,15 @@ let returnToTaskModalAfterLabelsManager = false;
 const MAX_LABEL_NAME_LENGTH = 40;
 let hasShownLabelMaxLengthAlert = false;
 
+function setTaskModalFullscreen(isFullscreen) {
+  const modal = document.getElementById('task-modal');
+  if (!modal) return;
+  modal.classList.toggle('fullscreen', !!isFullscreen);
+
+  const btn = document.getElementById('task-fullpage-btn');
+  btn?.setAttribute('aria-pressed', isFullscreen ? 'true' : 'false');
+}
+
 function isModalOpen(modalId) {
   const modal = document.getElementById(modalId);
   return !!modal && !modal.classList.contains('hidden');
@@ -100,6 +109,10 @@ export function showModal(columnName) {
   editingTaskId = null;
   selectedTaskLabels = [];
   returnToTaskModalAfterLabelsManager = false;
+
+  // Add task: keep the modal in its default size and hide full-page toggle.
+  setTaskModalFullscreen(false);
+  document.getElementById('task-fullpage-btn')?.classList.add('hidden');
   
   const modal = document.getElementById('task-modal');
   const columnSelect = document.getElementById('task-column');
@@ -137,6 +150,10 @@ export function showEditModal(taskId) {
   editingTaskId = taskId;
   selectedTaskLabels = task.labels || [];
   returnToTaskModalAfterLabelsManager = false;
+
+  // Edit task: allow user to toggle full-page mode.
+  setTaskModalFullscreen(false);
+  document.getElementById('task-fullpage-btn')?.classList.remove('hidden');
   
   const modal = document.getElementById('task-modal');
   const columnSelect = document.getElementById('task-column');
@@ -174,6 +191,9 @@ function hideModal() {
   modal.classList.add('hidden');
   editingTaskId = null;
   returnToTaskModalAfterLabelsManager = false;
+
+  setTaskModalFullscreen(false);
+  document.getElementById('task-fullpage-btn')?.classList.add('hidden');
 }
 
 export function showColumnModal() {
@@ -571,6 +591,13 @@ export function initializeModalHandlers() {
 
     showLabelsModal();
     document.getElementById('add-label-btn')?.focus();
+  });
+
+  const taskFullpageBtn = document.getElementById('task-fullpage-btn');
+  taskFullpageBtn?.addEventListener('click', () => {
+    const modal = document.getElementById('task-modal');
+    if (!modal) return;
+    setTaskModalFullscreen(!modal.classList.contains('fullscreen'));
   });
 
   // Task modal

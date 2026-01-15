@@ -112,6 +112,7 @@
 - **Create**: Click plus icon in column header, modal with Title, Description, Priority, Due Date, column select, label checkboxes
 - **New task placement**: Newly created tasks are inserted at the top of the selected column (order `1`).
 - **Edit**: Click task title/description, modal pre-filled with current data
+- **Edit (full page)**: In the Edit Task modal, an "Open in full page" button (fullscreen icon) expands the modal to full-screen size on larger screens
 - **Delete**: Click X button, confirm deletion
 - **Move**: Drag between columns, auto-saves new column and order
 - **Display**: Title (clickable), optional description (clamped to ~2 lines), labels (colored badges), optional meta row (priority and/or due date depending on Settings), delete button
@@ -170,7 +171,7 @@
 
 - Lucide icons are tree-shaken via `src/modules/icons.js` to minimize bundle size.
 - Only icons used in the app are imported and registered.
-- Icons used: `SquareKanban`, `Search`, `Plus`, `Settings`, `Columns3`, `Tag`, `SlidersHorizontal`, `Download`, `Upload`, `Moon`, `Sun`, `HelpCircle`, `EllipsisVertical`, `Trash2`, `GripVertical`, `Pencil`, `Kanban`
+- Icons used: `SquareKanban`, `Search`, `Plus`, `Fullscreen`, `Settings`, `Columns3`, `Tag`, `SlidersHorizontal`, `Download`, `Upload`, `Moon`, `Sun`, `HelpCircle`, `EllipsisVertical`, `Trash2`, `GripVertical`, `Pencil`, `Kanban`
 - To add a new icon:
   1. Import it from `lucide` in `icons.js`
   2. Add it to the `icons` object (PascalCase key)

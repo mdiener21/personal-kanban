@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Manage Boards modal now includes an "Add Board" button (opens the Create New Board modal)
 - Settings toggles to show/hide task priority and show/hide task due date
 - Task modal label picker now includes a + button to open Manage Labels and return to the open task
+- Edit Task modal now includes an "Open in full page" button (fullscreen icon)
 
 ### Changed (Unreleased)
 

@@ -7,8 +7,8 @@
   <title>Personal Kanban Board</title>
   <!-- Kanban favicon (inline SVG data URI) -->
   <link rel="icon" href="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='2' y='3' width='6' height='18' rx='1.5' fill='%233b82f6'/%3E%3Crect x='9' y='3' width='6' height='12' rx='1.5' fill='%2360a5fa'/%3E%3Crect x='16' y='3' width='6' height='8' rx='1.5' fill='%2393c5fd'/%3E%3C/svg%3E">
-  <script type="module" crossorigin src="./assets/index-DG5elIdU.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-BAV1qTzv.css">
+  <script type="module" crossorigin src="./assets/index-BqlsLj55.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-CsCggUN_.css">
 </head>
 <body>
   <!-- Skip link for accessibility -->
@@ -87,7 +87,12 @@
   <div id="task-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="task-modal-title">
     <div class="modal-backdrop" data-close-modal></div>
     <article class="modal-content">
-      <h3 id="task-modal-title">Add New Task</h3>
+      <header class="modal-header-row">
+        <h3 id="task-modal-title">Add New Task</h3>
+        <button id="task-fullpage-btn" type="button" class="btn-small hidden" aria-pressed="false" title="Open in full page">
+          <span data-lucide="fullscreen" aria-hidden="true"></span>
+        </button>
+      </header>
       <form id="task-form" novalidate>
         <div class="form-group">
           <label for="task-title">Title <span aria-hidden="true">*</span></label>
