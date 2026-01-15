@@ -21,6 +21,28 @@ let editingColumnId = null;
 let editingLabelId = null;
 let editingBoardId = null;
 let selectedTaskLabels = [];
+let returnToTaskModalAfterLabelsManager = false;
+
+function isModalOpen(modalId) {
+  const modal = document.getElementById(modalId);
+  return !!modal && !modal.classList.contains('hidden');
+}
+
+function temporarilyHideTaskModalForLabelsManager() {
+  const taskModal = document.getElementById('task-modal');
+  if (!taskModal) return;
+  taskModal.classList.add('hidden');
+}
+
+function restoreTaskModalAfterLabelsManager() {
+  const taskModal = document.getElementById('task-modal');
+  if (!taskModal) return;
+
+  taskModal.classList.remove('hidden');
+  updateTaskLabelsSelection();
+  document.getElementById('task-label-search')?.focus();
+  returnToTaskModalAfterLabelsManager = false;
+}
 
 function getTaskLabelSearchQuery() {
   const input = document.getElementById('task-label-search');
@@ -75,6 +97,7 @@ export function showModal(columnName) {
   currentColumn = columnName || loadColumns()[0]?.id || 'todo';
   editingTaskId = null;
   selectedTaskLabels = [];
+  returnToTaskModalAfterLabelsManager = false;
   
   const modal = document.getElementById('task-modal');
   const columnSelect = document.getElementById('task-column');
@@ -111,6 +134,7 @@ export function showEditModal(taskId) {
   
   editingTaskId = taskId;
   selectedTaskLabels = task.labels || [];
+  returnToTaskModalAfterLabelsManager = false;
   
   const modal = document.getElementById('task-modal');
   const columnSelect = document.getElementById('task-column');
@@ -147,6 +171,7 @@ function hideModal() {
   const modal = document.getElementById('task-modal');
   modal.classList.add('hidden');
   editingTaskId = null;
+  returnToTaskModalAfterLabelsManager = false;
 }
 
 export function showColumnModal() {
@@ -200,6 +225,10 @@ export function showLabelsModal() {
 function hideLabelsModal() {
   const modal = document.getElementById('labels-modal');
   modal.classList.add('hidden');
+
+  if (returnToTaskModalAfterLabelsManager) {
+    restoreTaskModalAfterLabelsManager();
+  }
 }
 
 export function showHelpModal() {
@@ -527,6 +556,20 @@ export function initializeModalHandlers() {
   const taskLabelSearch = document.getElementById('task-label-search');
   taskLabelSearch?.addEventListener('input', updateTaskLabelsSelection);
 
+  const taskAddLabelBtn = document.getElementById('task-add-label-btn');
+  taskAddLabelBtn?.addEventListener('click', () => {
+    // Open the label manager while preserving the current task modal form state.
+    if (isModalOpen('task-modal')) {
+      returnToTaskModalAfterLabelsManager = true;
+      temporarilyHideTaskModalForLabelsManager();
+    } else {
+      returnToTaskModalAfterLabelsManager = false;
+    }
+
+    showLabelsModal();
+    document.getElementById('add-label-btn')?.focus();
+  });
+
   // Task modal
   document.getElementById('task-form').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -577,6 +620,8 @@ export function initializeModalHandlers() {
     e.preventDefault();
     const name = document.getElementById('label-name').value;
     const color = document.getElementById('label-color').value;
+
+    const wasCreating = !editingLabelId;
     
     if (editingLabelId) {
       updateLabel(editingLabelId, name, color);
@@ -587,6 +632,12 @@ export function initializeModalHandlers() {
     renderLabelsList();
     const { renderBoard } = await import('./render.js');
     renderBoard();
+
+    // If the label manager was launched from the task modal, return immediately
+    // after creating a new label so the user can apply it to the task.
+    if (returnToTaskModalAfterLabelsManager && wasCreating) {
+      hideLabelsModal();
+    }
   });
   
   document.getElementById('cancel-label-btn').addEventListener('click', hideLabelModal);
@@ -640,13 +691,35 @@ export function initializeModalHandlers() {
   // Close modals on Escape key
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
-      hideModal();
-      hideColumnModal();
-      hideLabelsModal();
-      hideLabelModal();
-      hideBoardsModal();
-      hideBoardRenameModal();
-      hideHelpModal();
+      // Close the top-most modal only (prevents closing underlying modals when
+      // using the label manager from inside the task modal).
+      if (isModalOpen('label-modal')) {
+        hideLabelModal();
+        return;
+      }
+      if (isModalOpen('labels-modal')) {
+        hideLabelsModal();
+        return;
+      }
+      if (isModalOpen('board-rename-modal')) {
+        hideBoardRenameModal();
+        return;
+      }
+      if (isModalOpen('boards-modal')) {
+        hideBoardsModal();
+        return;
+      }
+      if (isModalOpen('help-modal')) {
+        hideHelpModal();
+        return;
+      }
+      if (isModalOpen('column-modal')) {
+        hideColumnModal();
+        return;
+      }
+      if (isModalOpen('task-modal')) {
+        hideModal();
+      }
     }
   });
 }

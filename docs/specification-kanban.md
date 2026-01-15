@@ -122,6 +122,7 @@
   - Selected labels are shown as a single horizontal row of colored label pills
   - Each selected label pill has a small **×** button to remove it from the task
   - Label list supports a compact **search/filter** field to quickly find labels
+  - The label search field includes a small **+** icon button that opens **Manage Labels** so users can create a new label without leaving task editing; after adding a label, the task modal returns and preserves in-progress edits
 - **Task Limit**: If >12 tasks in column, show scrollbar (max-height 600px). "Show all tasks (N)" button expands to 80vh with scrollbar
 
 ### Labels

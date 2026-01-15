@@ -1072,8 +1072,33 @@ fieldset.form-group legend {
 }
 
 /* Label search */
-#task-label-search {
+.task-label-search-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   margin-bottom: 8px;
+}
+
+.task-label-search-row #task-label-search {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+/* Task modal: create label (+) button */
+#task-add-label-btn {
+  opacity: 0.75;
+}
+
+#task-add-label-btn:hover {
+  opacity: 1;
+  background-color: rgba(59, 130, 246, 0.12);
+}
+
+#task-add-label-btn:focus-visible {
+  opacity: 1;
+  background-color: rgba(59, 130, 246, 0.16);
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 /* Checkbox group (e.g., Settings modal) */
@@ -1157,6 +1182,8 @@ fieldset.form-group legend {
 /* Body state while dragging tasks */
 body.dragging .task-column {
   /* Subtle highlight to show drop zones */
+  background-color: rgba(59, 130, 246, 0.04);
+  overflow: visible;
 }
 
 body.dragging .tasks {
@@ -1165,14 +1192,11 @@ body.dragging .tasks {
   pointer-events: auto !important;
 }
 
-/* Ensure columns don't clip drop detection */
-body.dragging .task-column {
-  overflow: visible;
-}
-
 /* Body state while dragging columns */
 body.dragging-column #board-container {
   /* Visual feedback during column drag */
+  cursor: grabbing;
+  user-select: none;
 }
 
 /* Legacy dragging states (kept for compatibility) */
