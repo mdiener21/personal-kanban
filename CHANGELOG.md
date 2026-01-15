@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Manage Boards modal now includes an "Add Board" button (opens the Create New Board modal)
 - Settings toggles to show/hide task priority and show/hide task due date
+- Task modal label picker now includes a + button to open Manage Labels and return to the open task
 
 ### Changed (Unreleased)
 
@@ -18,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Board creation entry point moved from the controls dropdown into Manage Boards
 - New tasks are inserted at the top of the column (instead of appended to the bottom)
 - Export function now includes the board name and replaces any spaces with _ (underscore)
+- Label names are now limited to 40 characters (UI prevents longer input and shows an alert)
 
 ### Removed (Unreleased)
 

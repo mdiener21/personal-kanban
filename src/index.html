@@ -118,7 +118,12 @@
         <fieldset class="form-group">
           <legend>Labels</legend>
           <div id="task-active-labels" class="active-labels" role="list" aria-label="Selected labels"></div>
-          <input type="text" id="task-label-search" placeholder="Search labels…" autocomplete="off" aria-label="Filter available labels">
+          <div class="task-label-search-row">
+            <input type="text" id="task-label-search" placeholder="Search labels…" autocomplete="off" aria-label="Filter available labels">
+            <button id="task-add-label-btn" type="button" class="icon-btn" aria-label="Add a new label" title="Add label">
+              <span data-lucide="plus" aria-hidden="true"></span>
+            </button>
+          </div>
           <div id="task-labels-selection" class="labels-selection" role="listbox" aria-label="Available labels">
             <!-- Labels populated dynamically -->
           </div>
@@ -291,7 +296,7 @@
       <form id="label-form" novalidate>
         <div class="form-group">
           <label for="label-name">Label Name <span aria-hidden="true">*</span></label>
-          <input type="text" id="label-name" required placeholder="Enter label name..." aria-required="true">
+          <input type="text" id="label-name" required maxlength="40" placeholder="Enter label name..." aria-required="true">
         </div>
         <div class="form-group">
           <label for="label-color">Color</label>
