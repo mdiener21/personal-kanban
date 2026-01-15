@@ -61,7 +61,7 @@
 ```javascript
 {
   id: "label-id",
-  name: "Label Name",
+  name: "Label Name", // max 40 characters
   color: "#hexcolor"
 }
 ```

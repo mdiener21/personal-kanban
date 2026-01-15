@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Board creation entry point moved from the controls dropdown into Manage Boards
 - New tasks are inserted at the top of the column (instead of appended to the bottom)
 - Export function now includes the board name and replaces any spaces with _ (underscore)
+- Label names are now limited to 40 characters (UI prevents longer input and shows an alert)
 
 ### Removed (Unreleased)
 
