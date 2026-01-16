@@ -123,7 +123,7 @@
   - Selected labels are shown as a single horizontal row of colored label pills
   - Each selected label pill has a small **×** button to remove it from the task
   - Label list supports a compact **search/filter** field to quickly find labels
-  - The label search field includes a small **+** icon button that opens **Manage Labels** so users can create a new label without leaving task editing; after adding a label, the task modal returns and preserves in-progress edits
+  - The label search field includes a small **+** icon button that opens the **Add Label** modal directly so users can create a new label without leaving task editing; the task modal remains open behind it and preserves in-progress edits
 - **Task Limit**: If >12 tasks in column, show scrollbar (max-height 600px). "Show all tasks (N)" button expands to 80vh with scrollbar
 
 ### Labels
@@ -167,6 +167,12 @@
 ### Branding
 
 - Brand text displays the active board name (no static title text).
+
+### Reports
+
+- Separate page: `reports.html`
+- Shows an Apache ECharts calendar heatmap for the **active board** covering the last 365 days.
+- Each day’s value is the count of tasks whose `changeDate` falls on that date (YYYY-MM-DD).
 
 ### Icons
 

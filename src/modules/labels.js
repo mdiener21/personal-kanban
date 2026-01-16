@@ -1,6 +1,5 @@
 import { generateUUID } from './utils.js';
 import { loadLabels, saveLabels, loadTasks, saveTasks } from './storage.js';
-import { alertDialog } from './dialog.js';
 
 const MAX_LABEL_NAME_LENGTH = 40;
 

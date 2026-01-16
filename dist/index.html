@@ -7,8 +7,9 @@
   <title>Personal Kanban Board</title>
   <!-- Kanban favicon (inline SVG data URI) -->
   <link rel="icon" href="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='2' y='3' width='6' height='18' rx='1.5' fill='%233b82f6'/%3E%3Crect x='9' y='3' width='6' height='12' rx='1.5' fill='%2360a5fa'/%3E%3Crect x='16' y='3' width='6' height='8' rx='1.5' fill='%2393c5fd'/%3E%3C/svg%3E">
-  <script type="module" crossorigin src="./assets/index-Cjj6g6s5.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-2y3Pvwo8.css">
+  <script type="module" crossorigin src="./assets/index-B1emxukZ.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/storage-CJ9_F5Vi.js">
+  <link rel="stylesheet" crossorigin href="./assets/storage-B_ED5Qjc.css">
 </head>
 <body>
   <!-- Skip link for accessibility -->
@@ -64,6 +65,12 @@
         <button id="theme-toggle-btn" class="control-btn" type="button" aria-pressed="false" aria-label="Toggle dark mode">
           <span data-lucide="moon" aria-hidden="true"></span>
           <span>Dark</span>
+        </button>
+         <button id="show-reports-btn" class="control-btn" type="button" aria-pressed="false" aria-label="Show Reports">
+          <span data-lucide="chart-column" aria-hidden="true"></span>
+          <span><a class="control-btn" href="./reports.html" style="text-decoration:none;">
+          View Reports
+        </a></span> 
         </button>
         <button id="help-btn" class="control-btn" type="button" aria-haspopup="dialog">
           <span data-lucide="help-circle" aria-hidden="true"></span>

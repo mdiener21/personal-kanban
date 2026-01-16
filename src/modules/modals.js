@@ -23,6 +23,7 @@ let editingLabelId = null;
 let editingBoardId = null;
 let selectedTaskLabels = [];
 let returnToTaskModalAfterLabelsManager = false;
+let selectCreatedLabelInTaskEditor = false;
 const MAX_LABEL_NAME_LENGTH = 40;
 let hasShownLabelMaxLengthAlert = false;
 
@@ -115,6 +116,7 @@ export function showModal(columnName) {
   editingTaskId = null;
   selectedTaskLabels = [];
   returnToTaskModalAfterLabelsManager = false;
+  selectCreatedLabelInTaskEditor = false;
 
   // Add task: keep the modal in its default size and hide full-page toggle.
   setTaskModalFullscreen(false);
@@ -156,6 +158,7 @@ export function showEditModal(taskId) {
   editingTaskId = taskId;
   selectedTaskLabels = task.labels || [];
   returnToTaskModalAfterLabelsManager = false;
+  selectCreatedLabelInTaskEditor = false;
 
   // Edit task: allow user to toggle full-page mode.
   setTaskModalFullscreen(false);
@@ -280,9 +283,10 @@ function hideHelpModal() {
   modal.classList.add('hidden');
 }
 
-function showLabelModal(labelId = null) {
+function showLabelModal(labelId = null, { openedFromTaskEditor = false } = {}) {
   editingLabelId = labelId;
   hasShownLabelMaxLengthAlert = false;
+  selectCreatedLabelInTaskEditor = !!openedFromTaskEditor;
   const modal = document.getElementById('label-modal');
   const modalTitle = document.getElementById('label-modal-title');
   const nameInput = document.getElementById('label-name');
@@ -313,6 +317,7 @@ function hideLabelModal() {
   const modal = document.getElementById('label-modal');
   modal.classList.add('hidden');
   editingLabelId = null;
+  selectCreatedLabelInTaskEditor = false;
 }
 
 function renderLabelsList() {
@@ -636,7 +641,7 @@ export function initializeModalHandlers() {
     // From the task editor, '+' should open the Add Label modal directly.
     // Keep the task modal open behind it so edits are preserved.
     returnToTaskModalAfterLabelsManager = false;
-    showLabelModal();
+    showLabelModal(null, { openedFromTaskEditor: true });
   });
 
   const taskFullpageBtn = document.getElementById('task-fullpage-btn');
@@ -765,6 +770,15 @@ export function initializeModalHandlers() {
       await alertDialog({ title, message });
       document.getElementById('label-name')?.focus();
       return;
+    }
+
+    // If the label was created from within the task editor, auto-select it.
+    if (wasCreating && selectCreatedLabelInTaskEditor && result?.label?.id) {
+      if (!selectedTaskLabels.includes(result.label.id)) {
+        selectedTaskLabels.push(result.label.id);
+      }
+      updateTaskLabelsSelection();
+      document.getElementById('task-label-search')?.focus();
     }
 
     hideLabelModal();

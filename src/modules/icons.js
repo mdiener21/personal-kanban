@@ -21,7 +21,8 @@ import {
   Trash2,
   GripVertical,
   Pencil,
-  Fullscreen
+  Fullscreen,
+  ChartColumn
 } from 'lucide';
 
 // Map of all icons used in the app (PascalCase keys for createIcons)
@@ -43,7 +44,8 @@ const icons = {
   Trash2,
   GripVertical,
   Pencil,
-  Fullscreen
+  Fullscreen,
+  ChartColumn
 };
 
 /**
