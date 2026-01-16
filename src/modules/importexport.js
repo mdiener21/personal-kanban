@@ -11,6 +11,30 @@ import {
 
 import { createBoard, getActiveBoardName, listBoards, setActiveBoardId } from './storage.js';
 
+function safeParseArrayFromStorage(key) {
+  if (!key) return null;
+  const raw = localStorage.getItem(key);
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+function safeParseObjectFromStorage(key) {
+  if (!key) return null;
+  const raw = localStorage.getItem(key);
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
 function boardDisplayName(board) {
   const name = typeof board?.name === 'string' ? board.name.trim() : '';
   return name || 'Untitled board';
@@ -51,6 +75,19 @@ const allowedPriorities = new Set(['low', 'medium', 'high']);
 function normalizePriority(value) {
   const v = (value || '').toString().trim().toLowerCase();
   return allowedPriorities.has(v) ? v : 'low';
+}
+
+function normalizeSettingsForExport(settings) {
+  const obj = settings && typeof settings === 'object' && !Array.isArray(settings) ? settings : {};
+  const showPriority = obj.showPriority !== false;
+  const showDueDate = obj.showDueDate !== false;
+  const showAge = obj.showAge !== false;
+  const showChangeDate = obj.showChangeDate !== false;
+  const locale = typeof obj.locale === 'string' && obj.locale.trim()
+    ? obj.locale.trim()
+    : (typeof navigator !== 'undefined' && typeof navigator.language === 'string' ? navigator.language : 'en-US');
+  const defaultPriority = normalizePriority(obj.defaultPriority);
+  return { showPriority, showDueDate, showAge, showChangeDate, locale, defaultPriority };
 }
 
 function normalizeDueDate(value) {
@@ -193,6 +230,46 @@ export function exportTasks() {
   const blob = new Blob([dataStr], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${boardName.replaceAll(' ', '_').replaceAll('.', '_')}_board_${new Date().toISOString().replaceAll(':', '-').replaceAll('.', '-')}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// Export a specific board to JSON by boardId (does not switch active board).
+export function exportBoard(boardId) {
+  const id = typeof boardId === 'string' ? boardId.trim() : '';
+  if (!id) return;
+
+  const board = listBoards().find((b) => b.id === id);
+  const boardName = boardDisplayName(board);
+
+  const columnsKey = `kanbanBoard:${id}:columns`;
+  const tasksKey = `kanbanBoard:${id}:tasks`;
+  const labelsKey = `kanbanBoard:${id}:labels`;
+  const settingsKey = `kanbanBoard:${id}:settings`;
+
+  const rawTasks = safeParseArrayFromStorage(tasksKey) || [];
+  const rawColumns = safeParseArrayFromStorage(columnsKey) || [];
+  const rawLabels = safeParseArrayFromStorage(labelsKey) || [];
+  const rawSettings = safeParseObjectFromStorage(settingsKey) || null;
+
+  const tasks = rawTasks.map(normalizeTaskForExport);
+  const columns = rawColumns.map((c) => ({
+    ...c,
+    color: isHexColor(c?.color) ? c.color.trim() : '#3b82f6'
+  }));
+  const labels = Array.isArray(rawLabels) ? rawLabels : [];
+  const settings = normalizeSettingsForExport(rawSettings);
+
+  const exportData = { boardName, columns, tasks, labels, settings };
+  const dataStr = JSON.stringify(exportData, null, 2);
+  const blob = new Blob([dataStr], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+
   const a = document.createElement('a');
   a.href = url;
   a.download = `${boardName.replaceAll(' ', '_').replaceAll('.', '_')}_board_${new Date().toISOString().replaceAll(':', '-').replaceAll('.', '-')}.json`;

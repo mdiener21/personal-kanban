@@ -13,6 +13,7 @@ import {
 } from './storage.js';
 import { confirmDialog, alertDialog } from './dialog.js';
 import { renderIcons } from './icons.js';
+import { exportBoard } from './importexport.js';
 
 // Modal state
 let currentColumn = 'todo';
@@ -464,6 +465,20 @@ function renderBoardsList() {
       renderBoard();
     });
 
+    const exportBtn = document.createElement('button');
+    exportBtn.classList.add('btn-small');
+    exportBtn.type = 'button';
+    exportBtn.title = 'Export board';
+    exportBtn.setAttribute('aria-label', `Export board ${String(board.name || 'Untitled board')}`);
+    const exportIcon = document.createElement('span');
+    exportIcon.dataset.lucide = 'download';
+    exportBtn.appendChild(exportIcon);
+    exportBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      exportBoard(board.id);
+    });
+
     const editBtn = document.createElement('button');
     editBtn.classList.add('btn-small');
     const editIcon = document.createElement('span');
@@ -500,6 +515,7 @@ function renderBoardsList() {
     });
 
     actions.appendChild(switchBtn);
+    actions.appendChild(exportBtn);
     actions.appendChild(editBtn);
     actions.appendChild(deleteBtn);
 
