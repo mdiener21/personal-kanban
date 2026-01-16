@@ -54,15 +54,21 @@
         </button>
         <button id="export-btn" class="control-btn" type="button">
           <span data-lucide="download" aria-hidden="true"></span>
-          <span>Export</span>
+          <span>Export Board</span>
         </button>
         <button id="import-btn" class="control-btn" type="button">
           <span data-lucide="upload" aria-hidden="true"></span>
-          <span>Import</span>
+          <span>Import Board</span>
         </button>
         <button id="theme-toggle-btn" class="control-btn" type="button" aria-pressed="false" aria-label="Toggle dark mode">
           <span data-lucide="moon" aria-hidden="true"></span>
           <span>Dark</span>
+        </button>
+         <button id="show-reports-btn" class="control-btn" type="button" aria-pressed="false" aria-label="Show Reports">
+          <span data-lucide="chart-column" aria-hidden="true"></span>
+          <span><a class="control-btn" href="./reports.html" style="text-decoration:none;">
+          View Reports
+        </a></span> 
         </button>
         <button id="help-btn" class="control-btn" type="button" aria-haspopup="dialog">
           <span data-lucide="help-circle" aria-hidden="true"></span>
@@ -169,6 +175,9 @@
     <div class="modal-backdrop" data-close-modal></div>
     <article class="modal-content">
       <h3 id="labels-modal-title">Manage Labels</h3>
+      <div class="form-group task-label-search-row">
+        <input type="text" id="labels-search" placeholder="Search labels…" autocomplete="off" aria-label="Filter labels">
+      </div>
       <div id="labels-list" class="labels-list" role="list" aria-label="Available labels">
         <!-- Labels populated dynamically -->
       </div>
@@ -189,6 +198,10 @@
         <button id="add-board-btn" type="button" class="btn btn-primary">
           <span data-lucide="kanban" aria-hidden="true"></span>
           <span> Add Board</span>
+        </button>
+        <button id="boards-import-btn" type="button" class="btn btn-secondary">
+          <span data-lucide="upload" aria-hidden="true"></span>
+          <span> Import Board</span>
         </button>
         <button type="button" id="boards-close-btn" class="btn btn-secondary">Close</button>
       </div>

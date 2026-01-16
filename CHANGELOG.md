@@ -10,9 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added (Unreleased)
 
 - Manage Boards modal now includes an "Add Board" button (opens the Create New Board modal)
+- Manage Boards modal now includes an inline export button per board (download icon)
+- Manage Boards modal now includes an "Import Board" button
+- Reports page (reports.html) with an ECharts calendar heatmap of daily updates for the active board (last 365 days)
 - Settings toggles to show/hide task priority and show/hide task due date
 - Task modal label picker now includes a + button to open Manage Labels and return to the open task
 - Edit Task modal now includes an "Open in full page" button (fullscreen icon)
+- Manage Labels modal now includes a search field to filter labels
 
 ### Changed (Unreleased)
 
@@ -21,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - New tasks are inserted at the top of the column (instead of appended to the bottom)
 - Export function now includes the board name and replaces any spaces with _ (underscore)
 - Label names are now limited to 40 characters (UI prevents longer input and shows an alert)
+- Creating/editing a label now warns on duplicate names (case-insensitive, e.g. "Important" vs "important")
 
 ### Removed (Unreleased)
 

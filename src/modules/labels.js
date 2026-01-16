@@ -3,33 +3,95 @@ import { loadLabels, saveLabels, loadTasks, saveTasks } from './storage.js';
 
 const MAX_LABEL_NAME_LENGTH = 40;
 
-// Add a new label
+/**
+ * Normalize a label name for comparison.
+ * This function defines the canonical equality rules.
+ */
+function normalizeLabelName(name) {
+  return name
+    .trim()
+    .slice(0, MAX_LABEL_NAME_LENGTH)
+    .toLowerCase()
+    .replace(/\s+/g, ' ');
+}
+
+
+/**
+ * Check if a normalized label name already exists.
+ * Optionally excludes a label by ID (used for updates).
+ */
+function labelNameExists(labels, normalizedName, excludeLabelId = null) {
+  return labels.some(label => {
+    if (excludeLabelId && label.id === excludeLabelId) return false;
+    return normalizeLabelName(label.name) === normalizedName;
+  });
+}
+
+
+/**
+ * Add a new label (prevents duplicates, case-insensitive).
+ */
 export function addLabel(name, color) {
-  if (!name || name.trim() === '') return;
+  if (!name || name.trim() === '') {
+    return { success: false, reason: 'EMPTY_NAME' };
+  }
 
   const trimmedName = name.trim().slice(0, MAX_LABEL_NAME_LENGTH);
-  
+  const normalizedName = normalizeLabelName(trimmedName);
+
   const labels = loadLabels();
-  const id = trimmedName.toLowerCase().replace(/\s+/g, '-') + '-' + generateUUID().substring(0, 8);
+
+  if (labelNameExists(labels, normalizedName)) {
+    return {
+      success: false,
+      reason: 'DUPLICATE_NAME',
+      message: `Label "${trimmedName}" already exists.`
+    };
+  }
+
+  const id =
+    normalizedName.replace(/\s+/g, '-') +
+    '-' +
+    generateUUID().substring(0, 8);
+
   const newLabel = { id, name: trimmedName, color };
   labels.push(newLabel);
   saveLabels(labels);
-  return newLabel;
+
+  return { success: true, label: newLabel };
 }
 
-// Update an existing label
+/**
+ * Update an existing label (prevents duplicates, case-insensitive).
+ */
 export function updateLabel(labelId, name, color) {
-  if (!name || name.trim() === '') return;
+  if (!name || name.trim() === '') {
+    return { success: false, reason: 'EMPTY_NAME' };
+  }
 
   const trimmedName = name.trim().slice(0, MAX_LABEL_NAME_LENGTH);
-  
+  const normalizedName = normalizeLabelName(trimmedName);
+
   const labels = loadLabels();
   const labelIndex = labels.findIndex(l => l.id === labelId);
-  if (labelIndex !== -1) {
-    labels[labelIndex].name = trimmedName;
-    labels[labelIndex].color = color;
-    saveLabels(labels);
+
+  if (labelIndex === -1) {
+    return { success: false, reason: 'NOT_FOUND' };
   }
+
+  if (labelNameExists(labels, normalizedName, labelId)) {
+    return {
+      success: false,
+      reason: 'DUPLICATE_NAME',
+      message: `Another label with the name "${trimmedName}" already exists.`
+    };
+  }
+
+  labels[labelIndex].name = trimmedName;
+  labels[labelIndex].color = color;
+  saveLabels(labels);
+
+  return { success: true, label: labels[labelIndex] };
 }
 
 // Delete a label

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Personal Kanban Reports">
+  <title>Kanban Reports</title>
+  <script type="module" crossorigin src="./assets/reports-Bom9LevC.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/storage-CJ9_F5Vi.js">
+  <link rel="stylesheet" crossorigin href="./assets/storage-B_ED5Qjc.css">
+</head>
+<body>
+  <header>
+    <nav class="controls" role="toolbar" aria-label="Reports controls">
+      <div class="brand">
+        <span data-lucide="square-kanban" aria-hidden="true" class="brand-icon"></span>
+        <span class="brand-text" id="reports-title">Reports</span>
+      </div>
+
+      <div class="controls-actions" style="display:flex; position:static; box-shadow:none; border:none; padding:0; background:transparent;">
+        <a class="control-btn" href="./index.html" style="text-decoration:none;">
+          Back to Board
+        </a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="container" style="flex-direction: column; overflow: hidden;">
+    <section class="task-column" style="min-width: 0; flex: 1; margin: 10px 0;">
+      <div class="column-header" style="justify-content: space-between;">
+        <h2 style="text-align:left;">Daily updates (last 365 days)</h2>
+        <div class="task-counter" id="reports-board-badge" title="Active board">?</div>
+      </div>
+      <div id="reports-chart" style="width: 100%; height: 100%; min-height: 520px;"></div>
+    </section>
+  </main>
+
+</body>
+</html>

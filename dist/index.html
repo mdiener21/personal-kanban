@@ -7,8 +7,9 @@
   <title>Personal Kanban Board</title>
   <!-- Kanban favicon (inline SVG data URI) -->
   <link rel="icon" href="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='2' y='3' width='6' height='18' rx='1.5' fill='%233b82f6'/%3E%3Crect x='9' y='3' width='6' height='12' rx='1.5' fill='%2360a5fa'/%3E%3Crect x='16' y='3' width='6' height='8' rx='1.5' fill='%2393c5fd'/%3E%3C/svg%3E">
-  <script type="module" crossorigin src="./assets/index-BqlsLj55.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-CsCggUN_.css">
+  <script type="module" crossorigin src="./assets/index-B1emxukZ.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/storage-CJ9_F5Vi.js">
+  <link rel="stylesheet" crossorigin href="./assets/storage-B_ED5Qjc.css">
 </head>
 <body>
   <!-- Skip link for accessibility -->
@@ -55,15 +56,21 @@
         </button>
         <button id="export-btn" class="control-btn" type="button">
           <span data-lucide="download" aria-hidden="true"></span>
-          <span>Export</span>
+          <span>Export Board</span>
         </button>
         <button id="import-btn" class="control-btn" type="button">
           <span data-lucide="upload" aria-hidden="true"></span>
-          <span>Import</span>
+          <span>Import Board</span>
         </button>
         <button id="theme-toggle-btn" class="control-btn" type="button" aria-pressed="false" aria-label="Toggle dark mode">
           <span data-lucide="moon" aria-hidden="true"></span>
           <span>Dark</span>
+        </button>
+         <button id="show-reports-btn" class="control-btn" type="button" aria-pressed="false" aria-label="Show Reports">
+          <span data-lucide="chart-column" aria-hidden="true"></span>
+          <span><a class="control-btn" href="./reports.html" style="text-decoration:none;">
+          View Reports
+        </a></span> 
         </button>
         <button id="help-btn" class="control-btn" type="button" aria-haspopup="dialog">
           <span data-lucide="help-circle" aria-hidden="true"></span>
@@ -170,6 +177,9 @@
     <div class="modal-backdrop" data-close-modal></div>
     <article class="modal-content">
       <h3 id="labels-modal-title">Manage Labels</h3>
+      <div class="form-group task-label-search-row">
+        <input type="text" id="labels-search" placeholder="Search labels…" autocomplete="off" aria-label="Filter labels">
+      </div>
       <div id="labels-list" class="labels-list" role="list" aria-label="Available labels">
         <!-- Labels populated dynamically -->
       </div>
@@ -190,6 +200,10 @@
         <button id="add-board-btn" type="button" class="btn btn-primary">
           <span data-lucide="kanban" aria-hidden="true"></span>
           <span> Add Board</span>
+        </button>
+        <button id="boards-import-btn" type="button" class="btn btn-secondary">
+          <span data-lucide="upload" aria-hidden="true"></span>
+          <span> Import Board</span>
         </button>
         <button type="button" id="boards-close-btn" class="btn btn-secondary">Close</button>
       </div>

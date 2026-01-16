@@ -123,12 +123,13 @@
   - Selected labels are shown as a single horizontal row of colored label pills
   - Each selected label pill has a small **×** button to remove it from the task
   - Label list supports a compact **search/filter** field to quickly find labels
-  - The label search field includes a small **+** icon button that opens **Manage Labels** so users can create a new label without leaving task editing; after adding a label, the task modal returns and preserves in-progress edits
+  - The label search field includes a small **+** icon button that opens the **Add Label** modal directly so users can create a new label without leaving task editing; the task modal remains open behind it and preserves in-progress edits
 - **Task Limit**: If >12 tasks in column, show scrollbar (max-height 600px). "Show all tasks (N)" button expands to 80vh with scrollbar
 
 ### Labels
 
 - **Manage**: Dedicated modal listing all labels with color swatch, name, edit/delete buttons
+  - Includes a search field to filter labels by name (case-insensitive substring match)
 - **Create/Edit**: Modal with name input and color picker
 - **Delete**: Removes from all tasks, confirms deletion
 - **Assign**: Checkboxes in task modal, multiple labels per task
@@ -166,6 +167,12 @@
 ### Branding
 
 - Brand text displays the active board name (no static title text).
+
+### Reports
+
+- Separate page: `reports.html`
+- Shows an Apache ECharts calendar heatmap for the **active board** covering the last 365 days.
+- Each day’s value is the count of tasks whose `changeDate` falls on that date (YYYY-MM-DD).
 
 ### Icons
 
@@ -216,6 +223,8 @@
 - **Manage boards**: via Manage Boards modal:
   - List boards
   - Open a board (sets active and renders)
+  - Export a board (download icon → exports that board to JSON)
+  - Import a board (Import Board button → file picker; creates a new board and switches to it)
   - Rename a board (pencil icon → rename modal)
   - Delete a board (trash icon, always confirms: "Do you really want to delete…?")
   - Add a board ("Add Board" button → opens the Create New Board modal)

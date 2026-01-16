@@ -13,6 +13,7 @@ import {
 } from './storage.js';
 import { confirmDialog, alertDialog } from './dialog.js';
 import { renderIcons } from './icons.js';
+import { exportBoard } from './importexport.js';
 
 // Modal state
 let currentColumn = 'todo';
@@ -22,6 +23,7 @@ let editingLabelId = null;
 let editingBoardId = null;
 let selectedTaskLabels = [];
 let returnToTaskModalAfterLabelsManager = false;
+let selectCreatedLabelInTaskEditor = false;
 const MAX_LABEL_NAME_LENGTH = 40;
 let hasShownLabelMaxLengthAlert = false;
 
@@ -57,6 +59,11 @@ function restoreTaskModalAfterLabelsManager() {
 
 function getTaskLabelSearchQuery() {
   const input = document.getElementById('task-label-search');
+  return (input?.value || '').trim().toLowerCase();
+}
+
+function getLabelsManagerSearchQuery() {
+  const input = document.getElementById('labels-search');
   return (input?.value || '').trim().toLowerCase();
 }
 
@@ -109,6 +116,7 @@ export function showModal(columnName) {
   editingTaskId = null;
   selectedTaskLabels = [];
   returnToTaskModalAfterLabelsManager = false;
+  selectCreatedLabelInTaskEditor = false;
 
   // Add task: keep the modal in its default size and hide full-page toggle.
   setTaskModalFullscreen(false);
@@ -150,6 +158,7 @@ export function showEditModal(taskId) {
   editingTaskId = taskId;
   selectedTaskLabels = task.labels || [];
   returnToTaskModalAfterLabelsManager = false;
+  selectCreatedLabelInTaskEditor = false;
 
   // Edit task: allow user to toggle full-page mode.
   setTaskModalFullscreen(false);
@@ -239,14 +248,25 @@ function hideColumnModal() {
 }
 
 export function showLabelsModal() {
+  const input = document.getElementById('labels-search');
+  if (input) input.value = '';
   renderLabelsList();
   const modal = document.getElementById('labels-modal');
   modal.classList.remove('hidden');
+
+  // If the labels manager was opened from the task modal, the caller will
+  // choose focus (currently the Add Label button). Otherwise focus search.
+  if (!returnToTaskModalAfterLabelsManager) {
+    document.getElementById('labels-search')?.focus();
+  }
 }
 
 function hideLabelsModal() {
   const modal = document.getElementById('labels-modal');
   modal.classList.add('hidden');
+
+  const input = document.getElementById('labels-search');
+  if (input) input.value = '';
 
   if (returnToTaskModalAfterLabelsManager) {
     restoreTaskModalAfterLabelsManager();
@@ -263,9 +283,10 @@ function hideHelpModal() {
   modal.classList.add('hidden');
 }
 
-function showLabelModal(labelId = null) {
+function showLabelModal(labelId = null, { openedFromTaskEditor = false } = {}) {
   editingLabelId = labelId;
   hasShownLabelMaxLengthAlert = false;
+  selectCreatedLabelInTaskEditor = !!openedFromTaskEditor;
   const modal = document.getElementById('label-modal');
   const modalTitle = document.getElementById('label-modal-title');
   const nameInput = document.getElementById('label-name');
@@ -296,6 +317,7 @@ function hideLabelModal() {
   const modal = document.getElementById('label-modal');
   modal.classList.add('hidden');
   editingLabelId = null;
+  selectCreatedLabelInTaskEditor = false;
 }
 
 function renderLabelsList() {
@@ -303,7 +325,24 @@ function renderLabelsList() {
   container.innerHTML = '';
   
   const labels = loadLabels();
-  labels.forEach(label => {
+  const query = getLabelsManagerSearchQuery();
+  const filtered = query
+    ? labels.filter((label) => {
+        const name = (label.name || '').toLowerCase();
+        const id = (label.id || '').toLowerCase();
+        return name.includes(query) || id.includes(query);
+      })
+    : labels;
+
+  if (filtered.length === 0) {
+    const empty = document.createElement('div');
+    empty.classList.add('labels-empty');
+    empty.textContent = query ? 'No matching labels' : 'No labels yet';
+    container.appendChild(empty);
+    return;
+  }
+
+  filtered.forEach(label => {
     const labelItem = document.createElement('div');
     labelItem.classList.add('label-item');
     labelItem.style.display = 'flex';
@@ -431,6 +470,20 @@ function renderBoardsList() {
       renderBoard();
     });
 
+    const exportBtn = document.createElement('button');
+    exportBtn.classList.add('btn-small');
+    exportBtn.type = 'button';
+    exportBtn.title = 'Export board';
+    exportBtn.setAttribute('aria-label', `Export board ${String(board.name || 'Untitled board')}`);
+    const exportIcon = document.createElement('span');
+    exportIcon.dataset.lucide = 'download';
+    exportBtn.appendChild(exportIcon);
+    exportBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      exportBoard(board.id);
+    });
+
     const editBtn = document.createElement('button');
     editBtn.classList.add('btn-small');
     const editIcon = document.createElement('span');
@@ -467,6 +520,7 @@ function renderBoardsList() {
     });
 
     actions.appendChild(switchBtn);
+    actions.appendChild(exportBtn);
     actions.appendChild(editBtn);
     actions.appendChild(deleteBtn);
 
@@ -579,18 +633,15 @@ export function initializeModalHandlers() {
   const taskLabelSearch = document.getElementById('task-label-search');
   taskLabelSearch?.addEventListener('input', updateTaskLabelsSelection);
 
+  const labelsSearch = document.getElementById('labels-search');
+  labelsSearch?.addEventListener('input', renderLabelsList);
+
   const taskAddLabelBtn = document.getElementById('task-add-label-btn');
   taskAddLabelBtn?.addEventListener('click', () => {
-    // Open the label manager while preserving the current task modal form state.
-    if (isModalOpen('task-modal')) {
-      returnToTaskModalAfterLabelsManager = true;
-      temporarilyHideTaskModalForLabelsManager();
-    } else {
-      returnToTaskModalAfterLabelsManager = false;
-    }
-
-    showLabelsModal();
-    document.getElementById('add-label-btn')?.focus();
+    // From the task editor, '+' should open the Add Label modal directly.
+    // Keep the task modal open behind it so edits are preserved.
+    returnToTaskModalAfterLabelsManager = false;
+    showLabelModal(null, { openedFromTaskEditor: true });
   });
 
   const taskFullpageBtn = document.getElementById('task-fullpage-btn');
@@ -699,12 +750,37 @@ export function initializeModalHandlers() {
     }
 
     const wasCreating = !editingLabelId;
-    
-    if (editingLabelId) {
-      updateLabel(editingLabelId, trimmedName, color);
-    } else {
-      addLabel(trimmedName, color);
+
+    const result = editingLabelId
+      ? updateLabel(editingLabelId, trimmedName, color)
+      : addLabel(trimmedName, color);
+
+    if (!result?.success) {
+      let title = 'Unable to Save Label';
+      let message = 'Could not save label.';
+
+      if (result?.reason === 'DUPLICATE_NAME') {
+        title = 'Label Already Exists';
+        message = result?.message || 'A label with that name already exists (case-insensitive).';
+      } else if (result?.reason === 'EMPTY_NAME') {
+        title = 'Label Name Required';
+        message = 'Please enter a label name.';
+      }
+
+      await alertDialog({ title, message });
+      document.getElementById('label-name')?.focus();
+      return;
     }
+
+    // If the label was created from within the task editor, auto-select it.
+    if (wasCreating && selectCreatedLabelInTaskEditor && result?.label?.id) {
+      if (!selectedTaskLabels.includes(result.label.id)) {
+        selectedTaskLabels.push(result.label.id);
+      }
+      updateTaskLabelsSelection();
+      document.getElementById('task-label-search')?.focus();
+    }
+
     hideLabelModal();
     renderLabelsList();
     const { renderBoard } = await import('./render.js');
@@ -725,6 +801,16 @@ export function initializeModalHandlers() {
   document.getElementById('manage-boards-btn')?.addEventListener('click', showBoardsModal);
   document.getElementById('add-board-btn')?.addEventListener('click', async () => {
     document.dispatchEvent(new CustomEvent('kanban:open-board-create'));
+  });
+  document.getElementById('boards-import-btn')?.addEventListener('click', async () => {
+    const ok = await confirmDialog({
+      title: 'Import Board (New Board)',
+      message:
+        'Import will CREATE A NEW BOARD and switch to it. Your current active board will not be overwritten.\n\nContinue with import?',
+      confirmText: 'Import'
+    });
+    if (!ok) return;
+    document.getElementById('import-file')?.click();
   });
   document.getElementById('boards-close-btn')?.addEventListener('click', hideBoardsModal);
   document.querySelector('#boards-modal .modal-backdrop')?.addEventListener('click', hideBoardsModal);

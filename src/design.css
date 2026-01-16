@@ -876,6 +876,11 @@ fieldset.form-group legend {
   margin-top: 20px;
 }
 
+/* Manage Boards modal footer: keep buttons left-aligned. */
+#boards-modal .form-actions {
+  justify-content: flex-start;
+}
+
 /* ==========================================================================
    8. Modal Components
    ========================================================================== */
@@ -887,6 +892,11 @@ fieldset.form-group legend {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* Confirm/Alert dialog must appear above any open modal (label/task/etc). */
+#dialog-modal {
+  z-index: 2000;
 }
 
 .modal.hidden { display: none; }
@@ -1119,7 +1129,7 @@ fieldset.form-group legend {
   margin-bottom: 8px;
 }
 
-.task-label-search-row #task-label-search {
+.task-label-search-row input[type="text"] {
   flex: 1;
   margin-bottom: 0;
 }
