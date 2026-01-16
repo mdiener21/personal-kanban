@@ -218,6 +218,7 @@
   - List boards
   - Open a board (sets active and renders)
   - Export a board (download icon → exports that board to JSON)
+  - Import a board (Import Board button → file picker; creates a new board and switches to it)
   - Rename a board (pencil icon → rename modal)
   - Delete a board (trash icon, always confirms: "Do you really want to delete…?")
   - Add a board ("Add Board" button → opens the Create New Board modal)

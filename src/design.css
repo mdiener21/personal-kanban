@@ -876,6 +876,11 @@ fieldset.form-group legend {
   margin-top: 20px;
 }
 
+/* Manage Boards modal footer: keep buttons left-aligned. */
+#boards-modal .form-actions {
+  justify-content: flex-start;
+}
+
 /* ==========================================================================
    8. Modal Components
    ========================================================================== */

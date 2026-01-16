@@ -335,6 +335,7 @@ export function importTasks(file) {
       
       const { renderBoard } = await import('./render.js');
       renderBoard();
+      document.dispatchEvent(new CustomEvent('kanban:boards-changed'));
       alert('Board imported successfully!');
     } catch (error) {
       alert('Error parsing JSON file: ' + error.message);

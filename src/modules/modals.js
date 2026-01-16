@@ -788,6 +788,16 @@ export function initializeModalHandlers() {
   document.getElementById('add-board-btn')?.addEventListener('click', async () => {
     document.dispatchEvent(new CustomEvent('kanban:open-board-create'));
   });
+  document.getElementById('boards-import-btn')?.addEventListener('click', async () => {
+    const ok = await confirmDialog({
+      title: 'Import Board (New Board)',
+      message:
+        'Import will CREATE A NEW BOARD and switch to it. Your current active board will not be overwritten.\n\nContinue with import?',
+      confirmText: 'Import'
+    });
+    if (!ok) return;
+    document.getElementById('import-file')?.click();
+  });
   document.getElementById('boards-close-btn')?.addEventListener('click', hideBoardsModal);
   document.querySelector('#boards-modal .modal-backdrop')?.addEventListener('click', hideBoardsModal);
 
