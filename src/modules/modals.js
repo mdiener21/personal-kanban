@@ -60,6 +60,11 @@ function getTaskLabelSearchQuery() {
   return (input?.value || '').trim().toLowerCase();
 }
 
+function getLabelsManagerSearchQuery() {
+  const input = document.getElementById('labels-search');
+  return (input?.value || '').trim().toLowerCase();
+}
+
 function renderActiveTaskLabels() {
   const container = document.getElementById('task-active-labels');
   if (!container) return;
@@ -239,14 +244,25 @@ function hideColumnModal() {
 }
 
 export function showLabelsModal() {
+  const input = document.getElementById('labels-search');
+  if (input) input.value = '';
   renderLabelsList();
   const modal = document.getElementById('labels-modal');
   modal.classList.remove('hidden');
+
+  // If the labels manager was opened from the task modal, the caller will
+  // choose focus (currently the Add Label button). Otherwise focus search.
+  if (!returnToTaskModalAfterLabelsManager) {
+    document.getElementById('labels-search')?.focus();
+  }
 }
 
 function hideLabelsModal() {
   const modal = document.getElementById('labels-modal');
   modal.classList.add('hidden');
+
+  const input = document.getElementById('labels-search');
+  if (input) input.value = '';
 
   if (returnToTaskModalAfterLabelsManager) {
     restoreTaskModalAfterLabelsManager();
@@ -303,7 +319,24 @@ function renderLabelsList() {
   container.innerHTML = '';
   
   const labels = loadLabels();
-  labels.forEach(label => {
+  const query = getLabelsManagerSearchQuery();
+  const filtered = query
+    ? labels.filter((label) => {
+        const name = (label.name || '').toLowerCase();
+        const id = (label.id || '').toLowerCase();
+        return name.includes(query) || id.includes(query);
+      })
+    : labels;
+
+  if (filtered.length === 0) {
+    const empty = document.createElement('div');
+    empty.classList.add('labels-empty');
+    empty.textContent = query ? 'No matching labels' : 'No labels yet';
+    container.appendChild(empty);
+    return;
+  }
+
+  filtered.forEach(label => {
     const labelItem = document.createElement('div');
     labelItem.classList.add('label-item');
     labelItem.style.display = 'flex';
@@ -579,18 +612,15 @@ export function initializeModalHandlers() {
   const taskLabelSearch = document.getElementById('task-label-search');
   taskLabelSearch?.addEventListener('input', updateTaskLabelsSelection);
 
+  const labelsSearch = document.getElementById('labels-search');
+  labelsSearch?.addEventListener('input', renderLabelsList);
+
   const taskAddLabelBtn = document.getElementById('task-add-label-btn');
   taskAddLabelBtn?.addEventListener('click', () => {
-    // Open the label manager while preserving the current task modal form state.
-    if (isModalOpen('task-modal')) {
-      returnToTaskModalAfterLabelsManager = true;
-      temporarilyHideTaskModalForLabelsManager();
-    } else {
-      returnToTaskModalAfterLabelsManager = false;
-    }
-
-    showLabelsModal();
-    document.getElementById('add-label-btn')?.focus();
+    // From the task editor, '+' should open the Add Label modal directly.
+    // Keep the task modal open behind it so edits are preserved.
+    returnToTaskModalAfterLabelsManager = false;
+    showLabelModal();
   });
 
   const taskFullpageBtn = document.getElementById('task-fullpage-btn');
@@ -699,12 +729,28 @@ export function initializeModalHandlers() {
     }
 
     const wasCreating = !editingLabelId;
-    
-    if (editingLabelId) {
-      updateLabel(editingLabelId, trimmedName, color);
-    } else {
-      addLabel(trimmedName, color);
+
+    const result = editingLabelId
+      ? updateLabel(editingLabelId, trimmedName, color)
+      : addLabel(trimmedName, color);
+
+    if (!result?.success) {
+      let title = 'Unable to Save Label';
+      let message = 'Could not save label.';
+
+      if (result?.reason === 'DUPLICATE_NAME') {
+        title = 'Label Already Exists';
+        message = result?.message || 'A label with that name already exists (case-insensitive).';
+      } else if (result?.reason === 'EMPTY_NAME') {
+        title = 'Label Name Required';
+        message = 'Please enter a label name.';
+      }
+
+      await alertDialog({ title, message });
+      document.getElementById('label-name')?.focus();
+      return;
     }
+
     hideLabelModal();
     renderLabelsList();
     const { renderBoard } = await import('./render.js');

@@ -129,6 +129,7 @@
 ### Labels
 
 - **Manage**: Dedicated modal listing all labels with color swatch, name, edit/delete buttons
+  - Includes a search field to filter labels by name (case-insensitive substring match)
 - **Create/Edit**: Modal with name input and color picker
 - **Delete**: Removes from all tasks, confirms deletion
 - **Assign**: Checkboxes in task modal, multiple labels per task
