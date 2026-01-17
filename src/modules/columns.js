@@ -16,7 +16,7 @@ export function addColumn(name, color) {
   const columns = loadColumns();
   const maxOrder = columns.reduce((max, c) => Math.max(max, c.order ?? 0), 0);
   const id = name.toLowerCase().replace(/\s+/g, '-') + '-' + generateUUID().substring(0, 8);
-  const newColumn = { id, name: name.trim(), color: normalizeColumnColor(color), order: maxOrder + 1, collapsed: false };
+  const newColumn = { id, name: name.trim(), color: normalizeColumnColor(color), order: maxOrder - 1, collapsed: false };
   columns.push(newColumn);
   saveColumns(columns);
 }
