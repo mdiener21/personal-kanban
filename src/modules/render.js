@@ -66,16 +66,38 @@ function formatTaskAge(task) {
   const created = new Date(createdRaw);
   if (Number.isNaN(created.getTime())) return '';
 
-  const ageMs = Date.now() - created.getTime();
-  const ageDays = Math.max(0, Math.floor(ageMs / (24 * 60 * 60 * 1000)));
+  const MS_PER_DAY = 24 * 60 * 60 * 1000;
+  const ageDays = Math.max(
+    0,
+    Math.floor((Date.now() - created.getTime()) / MS_PER_DAY)
+  );
 
-  if (ageDays >= 30) {
-    const months = Math.max(1, Math.floor(ageDays / 30));
-    return `${months}M`;
+  // Less than 1 month → days only
+  if (ageDays < 30) {
+    return `${ageDays}d`;
   }
 
-  return `${ageDays}d`;
+  const years = Math.floor(ageDays / 365);
+  let remainingDays = ageDays % 365;
+
+  const months = Math.floor(remainingDays / 30);
+  remainingDays = remainingDays % 30;
+
+  const parts = [];
+
+  if (years >= 1) {
+    parts.push(`${years}y`);
+  }
+
+  if (months >= 1) {
+    parts.push(`${months}M`);
+  }
+
+  parts.push(`${remainingDays}d`);
+
+  return parts.join(' ');
 }
+
 
 // Create a task element
 function createTaskElement(task, settings) {
