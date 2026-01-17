@@ -122,7 +122,10 @@
 - **Display**: Title (clickable), optional description (clamped to ~2 lines), labels (colored badges), optional meta row (priority and/or due date depending on Settings), delete button
 - **Footer**: Can show `changeDate` ("Updated …") and task age ("Age …") depending on Settings toggles.
   - `changeDate` is displayed using the user-selected locale (via `toLocaleString(locale)`)
-  - Age is based on `creationDate` and displayed as `0d` for < 1 day, `Nd` for days, and `NM` for months (30 days per month, floor)
+  - Age is based on `creationDate` and displayed as `1y 6M 40d` for larger than 1 year,  `0d` for < 1 day, `Nd` for days, and `NM` for months (30 days per month, floor)
+    - Years shown only if age ≥ 1 year
+    - Months shown only if age ≥ 1 month
+    - Days always shown
 - **Label selection UX (modal)**:
   - Selected labels are shown as a single horizontal row of colored label pills
   - Each selected label pill has a small **×** button to remove it from the task

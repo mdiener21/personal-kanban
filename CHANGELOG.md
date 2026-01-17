@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed (unreleased)
 
+- Age is now shown as an example  `1y 6M 40d` not simply only `5d`
+
 ### Removed (unreleased)
 
 ## [1.0.4] - 2026-01-17
