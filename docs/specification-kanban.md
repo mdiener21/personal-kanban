@@ -93,6 +93,7 @@
 ### Column Features
 
 - **Create**: Modal form with column name input + color picker
+- **New column placement**: Newly created column are inserted to the far right of the board but before column `done` (order `-1`).
 - **Edit**: Open column menu (ellipsis) → pencil, edit name + color in modal
 - **Delete**: Open column menu (ellipsis) → trash, confirm if tasks exist
 - **Permanent Done column**: The column with id `done` cannot be deleted.
