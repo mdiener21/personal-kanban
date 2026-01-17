@@ -4,11 +4,11 @@ Live Demo-Site make it yours:  https://mdiener21.github.io/personal-kanban/
 
 Documentation: /docs  [documentation](https://github.com/mdiener21/personal-kanban/tree/main/docs)
 
-No backend. No tracking. No cloud, fully local in your own browser, no-server-required personal kanban board with localStorage persistence.
+No backend. No tracking. No cloud, fully local in your browser, no-server-required personal kanban board with localStorage persistence.
 
-The board data is stored only in your browser (ex. Chrome, Edge, Safari). The data is persistent from session to session even 
-if you delete all your cache the data is safe in your localStorage in the browser itself.  Safest is it use the simple export button
-that saves the board to a local file you can backup where you like.
+The board data is stored only in your browser (ex. Chrome, Edge, Safari). The data is persistent from session to session even
+if you delete all your cache the data is safe in your localStorage in the browser itself.  Safest is it use the export button
+that saves the board to a local file you can backup to your cloud storage, drop box, one drive, google drive etc.
 
 <img width="2543" height="1267" alt="image" src="https://github.com/user-attachments/assets/7f3a1a83-84ef-41fa-a099-728e45ad3418" />
 
