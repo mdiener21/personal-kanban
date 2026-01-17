@@ -7,20 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
-## Added (unreleased)
+### Added (unreleased)
 
+### Changed (unreleased)
+
+### Removed (unreleased)
+
+## [1.0.4] - 2026-01-17
+
+### Added (1.0.4)
+
+- Footer now shows the app version
 - Reports dashboard now includes weekly lead time (creation → done) bar chart with a trend line
 - Reports dashboard now includes weekly completion KPIs and a completed-per-week sparkline
 
+## [1.0.3] - 2026-01-17
+
+### Added (1.0.3)
+
 - Tasks now track `doneDate` when moved into the Done column
 
-- Footer now shows the app version
-
-## Changed (unreleased)
+### Changed (1.0.3)
 
 - The Done column is now permanent and cannot be deleted
-
-## Removed (unreleased)
 
 ## [1.0.2] - 2026-01-17
 
@@ -68,7 +77,6 @@ First public release. No backend. No tracking. No cloud, fully local in your own
 - Board-level task search filter (matches label name, task title, or description)
 - Show/expand all tasks when >12 tasks in a column
 
-
 ### Changed (0.0.1)
 
 - build process to use Vite
@@ -82,6 +90,3 @@ First public release. No backend. No tracking. No cloud, fully local in your own
 - Import/export JSON now includes `boardName` and import applies it to the active board
 - Import now creates a new board (no overwrite)
 - Default task priority is now `low` (configurable per board in Settings)
-
-
-
