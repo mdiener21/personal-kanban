@@ -295,7 +295,8 @@ function defaultColumnColor(id) {
 
 function normalizeColumn(c) {
   const color = isHexColor(c?.color) ? c.color.trim() : defaultColumnColor(c?.id);
-  return { ...c, color };
+  const collapsed = c?.collapsed === true;
+  return { ...c, color, collapsed };
 }
 
 // Load columns from localStorage

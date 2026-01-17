@@ -70,7 +70,7 @@ function trackPointer(evt) {
 
 // Initialize sortable for tasks within columns
 function initTaskSortables() {
-  const taskLists = document.querySelectorAll('.tasks');
+  const taskLists = document.querySelectorAll('.tasks:not(.hidden)');
   
   taskLists.forEach(taskList => {
     const sortable = new Sortable(taskList, {
@@ -135,7 +135,9 @@ function initColumnSortable() {
     ghostClass: 'column-ghost',
     chosenClass: 'column-chosen',
     dragClass: 'column-drag',
-    handle: '.column-drag-handle', // Only drag via handle
+    handle: '.column-header', // Drag via header (including title)
+    filter: 'button:not(.column-drag-handle), a, input, select, textarea, [contenteditable]',
+    preventOnFilter: true,
     draggable: '.task-column',
     scrollSensitivity: 80,
     scrollSpeed: 15,

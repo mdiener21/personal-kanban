@@ -16,9 +16,22 @@ export function addColumn(name, color) {
   const columns = loadColumns();
   const maxOrder = columns.reduce((max, c) => Math.max(max, c.order ?? 0), 0);
   const id = name.toLowerCase().replace(/\s+/g, '-') + '-' + generateUUID().substring(0, 8);
-  const newColumn = { id, name: name.trim(), color: normalizeColumnColor(color), order: maxOrder + 1 };
+  const newColumn = { id, name: name.trim(), color: normalizeColumnColor(color), order: maxOrder + 1, collapsed: false };
   columns.push(newColumn);
   saveColumns(columns);
+}
+
+export function toggleColumnCollapsed(columnId) {
+  const id = typeof columnId === 'string' ? columnId.trim() : '';
+  if (!id) return false;
+
+  const columns = loadColumns();
+  const column = columns.find((c) => c.id === id);
+  if (!column) return false;
+
+  column.collapsed = column.collapsed !== true;
+  saveColumns(columns);
+  return true;
 }
 
 // Update an existing column

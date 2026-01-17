@@ -169,10 +169,12 @@ function normalizeImportedColumns(columns) {
     const name = typeof c?.name === 'string' ? c.name : String(c?.name ?? '');
     const order = Number.isFinite(c?.order) ? c.order : undefined;
     const color = isHexColor(c?.color) ? c.color.trim() : '#3b82f6';
+    const collapsed = c?.collapsed === true;
     return {
       id: id.trim(),
       name: name.trim(),
       color,
+      collapsed,
       ...(order !== undefined ? { order } : {})
     };
   });
@@ -260,7 +262,8 @@ export function exportBoard(boardId) {
   const tasks = rawTasks.map(normalizeTaskForExport);
   const columns = rawColumns.map((c) => ({
     ...c,
-    color: isHexColor(c?.color) ? c.color.trim() : '#3b82f6'
+    color: isHexColor(c?.color) ? c.color.trim() : '#3b82f6',
+    collapsed: c?.collapsed === true
   }));
   const labels = Array.isArray(rawLabels) ? rawLabels : [];
   const settings = normalizeSettingsForExport(rawSettings);

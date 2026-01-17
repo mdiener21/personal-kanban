@@ -52,6 +52,7 @@
   id: "column-id",
   name: "Column Name",
   color: "#hexcolor",
+  collapsed: boolean, // optional, defaults false
   order: number
 }
 ```
@@ -94,6 +95,7 @@
 - **Edit**: Open column menu (ellipsis) → pencil, edit name + color in modal
 - **Delete**: Open column menu (ellipsis) → trash, confirm if tasks exist
 - **Reorder**: Drag via grip icon handle, updates order property
+- **Collapse**: Toggle button (left of the grip handle) collapses a column into a ~20px vertical bar; state is stored per column.
 - **Actions**: Plus icon (add task), pencil (edit), trash (delete)
 
 #### Column Header Actions
