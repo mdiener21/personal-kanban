@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed (unreleased)
 
 - Age is now shown as an example  `1y 6M 40d` not simply only `5d`
+- fix: correct column order calculation when adding a new column so that done remains in last order
 
 ### Removed (unreleased)
 
