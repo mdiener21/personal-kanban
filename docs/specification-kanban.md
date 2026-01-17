@@ -178,6 +178,16 @@
 - Shows an Apache ECharts calendar heatmap for the **active board** covering the last 365 days.
 - Each day’s value is the count of tasks whose `changeDate` falls on that date (YYYY-MM-DD).
 
+#### Lead Time & Completion
+
+- Reports dashboard also shows **weekly lead time** for completed tasks (creation → done):
+  - Uses `creationDate` and `doneDate` on tasks.
+  - Lead time is grouped by week (Monday-start), displayed as a **bar chart** of **average lead time (days)**.
+  - Includes a **trend line** (4-week moving average).
+- Reports dashboard also shows a **weekly completion summary**:
+  - KPI tiles for “Completed this week”, “Completed last week”, and “Avg lead time (last 12 weeks)”.
+  - A small sparkline chart of tasks completed per week (last 12 weeks).
+
 ### Icons
 
 - Lucide icons are tree-shaken via `src/modules/icons.js` to minimize bundle size.

@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Added (unreleased)
 
+- Reports dashboard now includes weekly lead time (creation → done) bar chart with a trend line
+- Reports dashboard now includes weekly completion KPIs and a completed-per-week sparkline
+
 - Tasks now track `doneDate` when moved into the Done column
 
 ## Changed (unreleased)
