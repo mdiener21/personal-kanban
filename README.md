@@ -2,6 +2,8 @@
 
 Live Demo-Site make it yours:  https://mdiener21.github.io/personal-kanban/
 
+Documentation: /docs  [documentation](https://github.com/mdiener21/personal-kanban/tree/main/docs)
+
 No backend. No tracking. No cloud, fully local in your own browser, no-server-required personal kanban board with localStorage persistence.
 
 The board data is stored only in your browser (ex. Chrome, Edge, Safari). The data is persistent from session to session even 
@@ -90,40 +92,3 @@ The built files will be in the `dist` directory.
 ```bash
 npm run preview
 ```
-
-
-## Project Structure
-
-```text
-personal-kanban/
-├── src/
-│   ├── modules/
-│   │   ├── utils.js          # Utility functions
-│   │   ├── storage.js        # localStorage operations
-│   │   ├── labels.js         # Label management
-│   │   ├── columns.js        # Column management
-│   │   ├── tasks.js          # Task management
-│   │   ├── dragdrop.js       # Drag & drop functionality
-│   │   ├── modals.js         # Modal UI logic
-│   │   ├── render.js         # Rendering logic
-│   │   └── importexport.js   # Import/Export functionality
-│   ├── index.html            # Main HTML file
-│   ├── kanban.js             # Main entry point
-│   └── design.css            # Styles
-├── package.json
-├── vite.config.js
-└── README.md
-```
-
-## Usage
-
-- **Add Column**: Click "Add Column" button
-- **Add Task**: Click the + icon in any column header
-- **Edit Task**: Click on task text to edit
-- **Move Task**: Drag and drop tasks between columns
-- **Reorder Columns**: Drag column headers using the grip icon
-- **Manage Labels**: Click "Manage Labels" to create/edit/delete labels
-- **Export Data**: Click "Export" to save your board as JSON
-- **Import Data**: Click "Import" to load a previously exported board
-
-
