@@ -3,7 +3,7 @@
 This page describes common **Kanban board groups**, what they are used for, and the **recommended basic column structure** to use on each board.  
 These columns complement the label taxonomy and provide a ready-to-use board layout.
 
-### Status / Workflow stages
+### Status / Workflow stages **Recommended columns:**
 
 - **To Do**
 - **In Progress**
@@ -59,7 +59,7 @@ Organizing coursework, exams, and academic deadlines.
 - In Study
 - Ready for Submission
 - Submitted
-- Completed
+- Done
 
 **Typical labels:**  
 Homework, Exam Preparation, Assignment Due, Thesis.
@@ -78,7 +78,7 @@ Tracking leads and deals from first contact to close.
 - Qualified
 - Proposal Sent
 - Negotiation
-- Closed
+- Done
 
 **Typical labels:**  
 New Lead, Follow Up, Demo, Won, Lost.

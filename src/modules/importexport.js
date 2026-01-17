@@ -107,6 +107,9 @@ function normalizeTaskForExport(task) {
       ? task.changeDate
       : (typeof task?.changedDate === 'string' ? task.changedDate : undefined);
 
+  const isDone = task?.column === 'done';
+  const doneDate = typeof task?.doneDate === 'string' ? task.doneDate.toString().trim() : '';
+
   return {
     ...task,
     title: title.toString().trim(),
@@ -114,6 +117,7 @@ function normalizeTaskForExport(task) {
     priority: normalizePriority(task?.priority),
     dueDate,
     ...(typeof changeDate === 'string' ? { changeDate: changeDate.toString().trim() } : {}),
+    ...(isDone && doneDate ? { doneDate } : { doneDate: undefined }),
     // Avoid exporting the legacy field name.
     changedDate: undefined
   };
@@ -143,6 +147,12 @@ function normalizeImportedTasks(tasks) {
         ? t.changeDate
         : (typeof t?.changedDate === 'string' ? t.changedDate : undefined);
 
+    const doneDateRaw = typeof t?.doneDate === 'string' ? t.doneDate.trim() : '';
+    const isDone = column.trim() === 'done';
+    const doneDate = isDone
+      ? (doneDateRaw || (typeof changeDate === 'string' ? changeDate.trim() : '') || (creationDate || ''))
+      : '';
+
     return {
       id: id.trim(),
       title: title.trim(),
@@ -153,6 +163,7 @@ function normalizeImportedTasks(tasks) {
       ...(order !== undefined ? { order } : {}),
       ...(creationDate ? { creationDate } : {}),
       ...(typeof changeDate === 'string' && changeDate.trim() ? { changeDate: changeDate.trim() } : {}),
+      ...(doneDate ? { doneDate } : {}),
       labels
     };
   });
@@ -178,6 +189,12 @@ function normalizeImportedColumns(columns) {
       ...(order !== undefined ? { order } : {})
     };
   });
+
+  // Ensure the permanent Done column always exists.
+  if (!normalized.some((c) => c.id === 'done')) {
+    const maxOrder = normalized.reduce((max, c) => Math.max(max, Number.isFinite(c?.order) ? c.order : 0), 0);
+    normalized.push({ id: 'done', name: 'Done', color: '#16a34a', order: maxOrder + 1, collapsed: false });
+  }
 
   const isValid = normalized.every((c) => c.id && c.name);
   return isValid ? normalized : null;

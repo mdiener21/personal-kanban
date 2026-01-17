@@ -336,6 +336,11 @@ function createColumnElement(column) {
     e.stopPropagation();
     closeAllColumnMenus();
     (async () => {
+      if (column.id === 'done') {
+        await alertDialog({ title: 'Cannot Delete Column', message: 'The Done column is permanent and cannot be deleted.' });
+        return;
+      }
+
       const columns = loadColumns();
       if (columns.length <= 1) {
         await alertDialog({ title: 'Cannot Delete Column', message: 'Cannot delete the last column.' });
