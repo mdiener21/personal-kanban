@@ -1,6 +1,6 @@
 import { loadColumns, loadTasks, loadLabels, loadSettings } from './storage.js';
 import { deleteTask } from './tasks.js';
-import { deleteColumn } from './columns.js';
+import { deleteColumn, toggleColumnCollapsed } from './columns.js';
 import { showModal, showEditModal, showEditColumnModal } from './modals.js';
 import { initDragDrop } from './dragdrop.js';
 import { confirmDialog, alertDialog } from './dialog.js';
@@ -226,10 +226,27 @@ function createColumnElement(column) {
   div.draggable = false;
   div.setAttribute('aria-labelledby', `column-title-${column.id}`);
 
+  const isCollapsed = column?.collapsed === true;
+  if (isCollapsed) div.classList.add('is-collapsed');
+
   if (column?.color) {
     div.style.setProperty('--column-accent', column.color);
   }
   
+  const collapseBtn = document.createElement('button');
+  collapseBtn.classList.add('column-collapse-btn');
+  collapseBtn.type = 'button';
+  collapseBtn.setAttribute('aria-label', isCollapsed ? `Expand ${column.name} column` : `Collapse ${column.name} column`);
+  collapseBtn.title = isCollapsed ? 'Expand column' : 'Collapse column';
+  const collapseIcon = document.createElement('span');
+  collapseIcon.dataset.lucide = isCollapsed ? 'chevron-right' : 'chevrons-right-left';
+  collapseIcon.setAttribute('aria-hidden', 'true');
+  collapseBtn.appendChild(collapseIcon);
+  collapseBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (toggleColumnCollapsed(column.id)) renderBoard();
+  });
+
   const dragHandle = document.createElement('button');
   dragHandle.classList.add('column-drag-handle');
   dragHandle.type = 'button';
@@ -359,6 +376,7 @@ function createColumnElement(column) {
   headerActions.appendChild(addBtn);
   headerActions.appendChild(menuWrapper);
   
+  headerDiv.appendChild(collapseBtn);
   headerDiv.appendChild(dragHandle);
   headerDiv.appendChild(h2);
   headerDiv.appendChild(taskCounter);
@@ -368,6 +386,12 @@ function createColumnElement(column) {
   ul.classList.add('tasks');
   ul.setAttribute('role', 'list');
   ul.setAttribute('aria-label', `Tasks in ${column.name}`);
+
+  if (isCollapsed) {
+    ul.classList.add('hidden');
+    headerActions.classList.add('hidden');
+    taskCounter.classList.add('hidden');
+  }
   
   div.appendChild(headerDiv);
   div.appendChild(ul);

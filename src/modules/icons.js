@@ -22,7 +22,10 @@ import {
   GripVertical,
   Pencil,
   Fullscreen,
-  ChartColumn
+  ChartColumn,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsRightLeft
 } from 'lucide';
 
 // Map of all icons used in the app (PascalCase keys for createIcons)
@@ -45,7 +48,10 @@ const icons = {
   GripVertical,
   Pencil,
   Fullscreen,
-  ChartColumn
+  ChartColumn,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsRightLeft
 };
 
 /**

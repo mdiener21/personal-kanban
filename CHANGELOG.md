@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Task modal label picker now includes a + button to open Manage Labels and return to the open task
 - Edit Task modal now includes an "Open in full page" button (fullscreen icon)
 - Manage Labels modal now includes a search field to filter labels
+- Columns can now be collapsed into a ~20px bar via a new toggle button (left of the drag handle)
 
 ### Changed (Unreleased)
 
