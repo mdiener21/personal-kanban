@@ -41,7 +41,8 @@
   order: number,
   labels: ["label-id-1", "label-id-2"],
   creationDate: "YYYY-MM-DDTHH:MM:SSZ",
-  changeDate: "YYYY-MM-DDTHH:MM:SSZ" // updated on task save (create, edit, change column)
+  changeDate: "YYYY-MM-DDTHH:MM:SSZ", // updated on task save (create, edit, change column)
+  doneDate: "YYYY-MM-DDTHH:MM:SSZ" // set only when task enters the Done column; removed when leaving Done
 }
 ```
 
@@ -94,6 +95,7 @@
 - **Create**: Modal form with column name input + color picker
 - **Edit**: Open column menu (ellipsis) → pencil, edit name + color in modal
 - **Delete**: Open column menu (ellipsis) → trash, confirm if tasks exist
+- **Permanent Done column**: The column with id `done` cannot be deleted.
 - **Reorder**: Drag via grip icon handle, updates order property
 - **Collapse**: Toggle button (left of the grip handle) collapses a column into a ~20px vertical bar; state is stored per column.
 - **Actions**: Plus icon (add task), pencil (edit), trash (delete)

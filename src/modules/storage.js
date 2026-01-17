@@ -299,16 +299,32 @@ function normalizeColumn(c) {
   return { ...c, color, collapsed };
 }
 
+function ensureDoneColumn(columns) {
+  const list = Array.isArray(columns) ? columns.slice() : [];
+  if (list.some((c) => c && c.id === 'done')) return list;
+
+  const maxOrder = list.reduce((max, c) => Math.max(max, Number.isFinite(c?.order) ? c.order : 0), 0);
+  list.push({ id: 'done', name: 'Done', color: '#16a34a', order: maxOrder + 1, collapsed: false });
+  return list;
+}
+
 // Load columns from localStorage
 export function loadColumns() {
   ensureBoardsInitialized();
   const boardId = getActiveBoardId() || DEFAULT_BOARD_ID;
   const stored = localStorage.getItem(keyFor(boardId, 'columns'));
   const parsed = safeParseArray(stored);
-  if (parsed) return parsed.map(normalizeColumn);
+  if (parsed) {
+    const normalized = ensureDoneColumn(parsed.map(normalizeColumn));
+    // Persist back if done column was missing.
+    if (!normalized.some((c) => c && c.id === 'done') || normalized.length !== parsed.length) {
+      localStorage.setItem(keyFor(boardId, 'columns'), JSON.stringify(normalized));
+    }
+    return normalized;
+  }
 
   // Safety fallback
-  return defaultColumns().map(normalizeColumn);
+  return ensureDoneColumn(defaultColumns().map(normalizeColumn));
 }
 
 // Save columns to localStorage
@@ -325,8 +341,40 @@ export function loadTasks() {
   const stored = localStorage.getItem(keyFor(boardId, 'tasks'));
   const parsed = safeParseArray(stored);
   if (parsed) {
-    taskCacheByBoard.set(boardId, parsed);
-    return parsed;
+    let didChange = false;
+    const normalized = parsed.map((t) => {
+      const task = t && typeof t === 'object' ? { ...t } : t;
+      if (!task || typeof task !== 'object') return task;
+
+      const isDone = task.column === 'done';
+      const hasDoneDate = typeof task.doneDate === 'string' && task.doneDate.trim() !== '';
+      const changeDate = typeof task.changeDate === 'string' && task.changeDate.trim() ? task.changeDate.trim() : '';
+      const creationDate = typeof task.creationDate === 'string' && task.creationDate.trim() ? task.creationDate.trim() : '';
+
+      if (isDone && !hasDoneDate) {
+        // One-time legacy migration: doneDate mirrors changeDate for tasks in Done.
+        // Safety fallback to creationDate only if changeDate is missing.
+        const inferred = changeDate ? changeDate : creationDate;
+        if (inferred) {
+          task.doneDate = inferred;
+          didChange = true;
+        }
+      }
+
+      if (!isDone && hasDoneDate) {
+        delete task.doneDate;
+        didChange = true;
+      }
+
+      return task;
+    });
+
+    if (didChange) {
+      localStorage.setItem(keyFor(boardId, 'tasks'), JSON.stringify(normalized));
+    }
+
+    taskCacheByBoard.set(boardId, normalized);
+    return normalized;
   }
 
   // If localStorage is empty, keep a stable in-memory default set for this session.

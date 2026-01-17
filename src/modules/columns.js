@@ -49,6 +49,10 @@ export function updateColumn(columnId, name, color) {
 
 // Delete a column
 export function deleteColumn(columnId) {
+  if (columnId === 'done') {
+    return false;
+  }
+
   const columns = loadColumns();
   if (columns.length <= 1) {
     return false;

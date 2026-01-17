@@ -48,7 +48,8 @@ export function addTask(title, description, priority, dueDate, columnName, label
     order: 1,
     labels: [...labels],
     creationDate: nowIso,
-    changeDate: nowIso
+    changeDate: nowIso,
+    ...(columnName === 'done' ? { doneDate: nowIso } : {})
   };
 
   updatedTasks.push(newTask);
@@ -62,13 +63,24 @@ export function updateTask(taskId, title, description, priority, dueDate, column
   const tasks = loadTasks();
   const taskIndex = tasks.findIndex(t => t.id === taskId);
   if (taskIndex !== -1) {
+    const prevColumn = tasks[taskIndex].column;
+    const nextColumn = columnName;
+    const nowIso = new Date().toISOString();
+
     tasks[taskIndex].title = title.trim();
     tasks[taskIndex].description = (description || '').toString().trim();
     tasks[taskIndex].priority = normalizePriority(priority);
     tasks[taskIndex].dueDate = normalizeDueDate(dueDate);
-    tasks[taskIndex].column = columnName;
+    tasks[taskIndex].column = nextColumn;
     tasks[taskIndex].labels = [...labels];
-    tasks[taskIndex].changeDate = new Date().toISOString();
+
+    if (prevColumn !== 'done' && nextColumn === 'done') {
+      tasks[taskIndex].doneDate = nowIso;
+    } else if (prevColumn === 'done' && nextColumn !== 'done') {
+      delete tasks[taskIndex].doneDate;
+    }
+
+    tasks[taskIndex].changeDate = nowIso;
     saveTasks(tasks);
   }
 }
@@ -112,11 +124,23 @@ export function updateTaskPositions() {
       const nextColumn = current.column;
       const nextOrder = tasksInSameColumn.length;
       const didMove = task.column !== nextColumn;
-      return {
+      const nextTask = {
         ...task,
         column: nextColumn,
         order: nextOrder,
         ...(didMove ? { changeDate: nowIso } : {})
+      };
+
+      if (didMove) {
+        if (task.column !== 'done' && nextColumn === 'done') {
+          nextTask.doneDate = nowIso;
+        } else if (task.column === 'done' && nextColumn !== 'done') {
+          delete nextTask.doneDate;
+        }
+      }
+
+      return {
+        ...nextTask
       };
     }
     return task;
