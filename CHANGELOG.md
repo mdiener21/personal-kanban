@@ -5,9 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## Unreleased
 
-### Added (Unreleased)
+## Added (unreleased)
+
+## Changed (unreleased)
+
+## Removed (unreleased)
+
+## [1.0.2] - 2026-01-17
+
+### Added (1.0.2)
 
 - Manage Boards modal now includes an "Add Board" button (opens the Create New Board modal)
 - Manage Boards modal now includes an inline export button per board (download icon)
@@ -19,7 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Manage Labels modal now includes a search field to filter labels
 - Columns can now be collapsed into a ~20px bar via a new toggle button (left of the drag handle)
 
-### Changed (Unreleased)
+### Changed (1.0.2)
 
 - Creating a board while the Manage Boards modal is open immediately refreshes the boards list to show the new active board
 - Board creation entry point moved from the controls dropdown into Manage Boards
@@ -28,7 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Label names are now limited to 40 characters (UI prevents longer input and shows an alert)
 - Creating/editing a label now warns on duplicate names (case-insensitive, e.g. "Important" vs "important")
 
-### Removed (Unreleased)
+### Removed (1.0.2)
 
 - Page refresh/leave warning (`beforeunload`) prompt
 - "New Board" button from the controls dropdown menu
