@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Tasks now track `doneDate` when moved into the Done column
 
+- Footer now shows the app version
+
 ## Changed (unreleased)
 
 - The Done column is now permanent and cannot be deleted

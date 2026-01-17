@@ -332,6 +332,13 @@ body {
   margin: 0;
 }
 
+.footer-version {
+  margin-left: 10px;
+  opacity: 0.85;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
 /* ==========================================================================
    4. Button Components (reusable)
    ========================================================================== */

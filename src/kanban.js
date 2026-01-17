@@ -11,6 +11,12 @@ import { initializeSettingsUI } from './modules/settings.js';
 
 // Add task button listeners
 document.addEventListener('DOMContentLoaded', () => {
+  const versionEl = document.getElementById('app-version');
+  if (versionEl && typeof __APP_VERSION__ !== 'undefined' && __APP_VERSION__) {
+    versionEl.textContent = `v${__APP_VERSION__}`;
+    versionEl.title = `Version ${__APP_VERSION__}`;
+  }
+
   initializeThemeToggle();
 
   // Settings (per-board)
