@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Personal Kanban Reports">
   <title>Kanban Reports</title>
-  <script type="module" crossorigin src="./assets/reports-v8znJ526.js"></script>
-  <link rel="modulepreload" crossorigin href="./assets/storage-zmOQFfzu.js">
-  <link rel="stylesheet" crossorigin href="./assets/storage-Cb4e44Bm.css">
+  <script type="module" crossorigin src="./assets/reports-Cs7hn876.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/storage-DTHROI-l.js">
+  <link rel="stylesheet" crossorigin href="./assets/storage-DLN0tu0n.css">
 </head>
 <body>
   <header>
@@ -25,13 +25,48 @@
     </nav>
   </header>
 
-  <main class="container" style="flex-direction: column; overflow: hidden;">
-    <section class="task-column" style="min-width: 0; flex: 1; margin: 10px 0;">
+  <main class="container reports-dashboard">
+    <section class="task-column reports-kpis" aria-label="Weekly completion summary">
       <div class="column-header" style="justify-content: space-between;">
-        <h2 style="text-align:left;">Daily updates (last 365 days)</h2>
+        <h2 style="text-align:left;">Weekly completion</h2>
         <div class="task-counter" id="reports-board-badge" title="Active board">?</div>
       </div>
-      <div id="reports-chart" style="width: 100%; height: 100%; min-height: 520px;"></div>
+
+      <div class="reports-kpi-grid" role="group" aria-label="Completion KPIs">
+        <div class="reports-kpi">
+          <div class="reports-kpi-label">Completed this week</div>
+          <div class="reports-kpi-value" id="reports-completed-this-week">0</div>
+        </div>
+        <div class="reports-kpi">
+          <div class="reports-kpi-label">Completed last week</div>
+          <div class="reports-kpi-value" id="reports-completed-last-week">0</div>
+        </div>
+        <div class="reports-kpi">
+          <div class="reports-kpi-label">Avg lead time (last 12 weeks)</div>
+          <div class="reports-kpi-value" id="reports-avg-leadtime-12w">–</div>
+        </div>
+      </div>
+
+      <div class="reports-spark" aria-label="Tasks completed per week sparkline">
+        <div class="reports-spark-title">Tasks completed per week (last 12 weeks)</div>
+        <div id="reports-completed-spark" style="width: 100%; height: 120px;"></div>
+      </div>
+    </section>
+
+    <section class="task-column" style="min-width: 0; margin: 10px 0;">
+      <div class="column-header" style="justify-content: space-between;">
+        <h2 style="text-align:left;">Lead time (creation → done)</h2>
+        <div class="task-counter" id="reports-leadtime-badge" title="Completed tasks (last 12 weeks)">0</div>
+      </div>
+      <div id="reports-leadtime-chart" style="width: 100%; height: 360px;"></div>
+    </section>
+
+    <section class="task-column" style="min-width: 0; margin: 10px 0;">
+      <div class="column-header" style="justify-content: space-between;">
+        <h2 style="text-align:left;">Daily updates (last 365 days)</h2>
+        <div class="task-counter" title="Active board" style="visibility:hidden;">?</div>
+      </div>
+      <div id="reports-chart" style="width: 100%; height: 520px;"></div>
     </section>
   </main>
 
