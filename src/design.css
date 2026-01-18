@@ -1449,6 +1449,14 @@ body.dragging-column #board-container {
 }
 
 @media (max-width: 600px) {
+  /* Keep the overall app within the viewport so the footer stays visible.
+     Scrolling should happen inside columns/task lists (not the page). */
+  body {
+    height: 100dvh;      /* better than 100vh on mobile browsers with dynamic bars */
+    min-height: 100dvh;
+    overflow: hidden;
+  }
+
   /* Mobile header: brand left, menu button right, search below */
   .controls {
     display: grid;
@@ -1489,10 +1497,16 @@ body.dragging-column #board-container {
   /* Scrollable columns horizontally with snap */
   .container,
   .board-container {
+    flex: 1 1 auto;
     flex-direction: row;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     padding-bottom: 12px;
+    min-height: 0;
+  }
+  
+  .footer{
+    padding-bottom: calc(16px + env(safe-area-inset-bottom));
   }
   
   /* Disable snap during drag so tasks can move between columns */
@@ -1516,6 +1530,7 @@ body.dragging-column #board-container {
     display: flex;
     flex-direction: column;
     flex: 0 0 auto;
+    min-height: 0;
   }
   
   /* Ensure tasks list scrolls inside the fixed height column */
@@ -1523,6 +1538,7 @@ body.dragging-column #board-container {
     flex: 1 1 auto;
     overflow-y: auto;
     max-height: none !important;
+    min-height: 0;
   }
 
   /* Full screen modals for easier editing */
