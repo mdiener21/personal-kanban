@@ -276,7 +276,7 @@
 
 ### Scrolling
 
-- **Desktop**: Default max-height 600px per column task list. If >12 tasks: show "Show all tasks (N)" button. Expanded state: max-height 80vh.
+- **Desktop**: Default max-height 600px per column task list. Expanded state: max-height 80vh.
 - **Mobile**: Columns have fixed height based on viewport with internal vertical scrolling. Board scrolls horizontally with snap-to-column.
 - Styled scrollbar: 8px width, blue thumb
 
@@ -308,7 +308,7 @@
 - **Export warning**: Before exporting, the app warns that export only includes the active board (not all boards).
 - **Import**: Imports from JSON by creating a **new board** (tasks + columns + labels), restores settings when present, and uses `boardName` for the new board when provided; supports backward compatibility
 - **Import warning**: Before importing, the app warns that a new board will be created and the UI will switch to it.
-- **Filename**: `kanban-board-YYYY-MM-DD.json`
+- **Filename**: `{boardName}-YYYY-MM-DD.json`
 
 ## CSS Architecture
 
