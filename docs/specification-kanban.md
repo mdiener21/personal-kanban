@@ -208,6 +208,9 @@ The notification system alerts users to tasks with approaching or past due dates
 - Displays: task title, due date status (overdue/due today/due tomorrow/due in N days), and priority
 - Clicking a notification opens the task edit modal
 - Shows up to 5 tasks with a "more" link to the full modal
+- Shows up to 5 tasks with a "more" link to the full modal
+- Includes a close (X) button to hide the banner
+- Banner visibility is user-controlled and persisted in localStorage
 - Excludes tasks in the 'done' column
 - Banner is hidden when there are no qualifying tasks
 
@@ -216,6 +219,8 @@ The notification system alerts users to tasks with approaching or past due dates
 - Accessed via the bell icon in the board controls menu
 - Bell icon shows a badge with the count of qualifying tasks
 - Lists all tasks with due dates within 2 days or overdue
+- Lists all tasks with due dates within 2 days or overdue
+- Includes a toggle to show/hide the notification banner
 - Each notification shows: task title, due date status, priority
 - Clicking a notification opens the task edit modal
 - Sorted by urgency (most overdue first)

@@ -1268,6 +1268,24 @@ fieldset.form-group legend {
   touch-action: pan-y;
 }
 
+.notification-banner-close-btn {
+  flex-shrink: 0;
+  align-self: flex-start;
+  margin-left: 8px;
+  opacity: 0.65;
+}
+
+.notification-banner-close-btn:hover {
+  opacity: 1;
+  background-color: var(--surface-muted);
+}
+
+@media (max-width: 600px) {
+  .notification-banner-close-btn {
+    padding: 6px;
+  }
+}
+
 /* Desktop/tablet: show banner items left-to-right (horizontal scroll). */
 @media (min-width: 601px) {
   .notification-banner-list {
@@ -1293,8 +1311,8 @@ fieldset.form-group legend {
   padding: 6px 12px;
   background-color: var(--surface);
   border: 1px solid var(--border-subtle);
-  border-radius: 6px;
-  font-size: 13px;
+  border-radius: 3px;
+  font-size: 12px;
   cursor: pointer;
   transition: background-color var(--transition-fast), border-color var(--transition-fast);
   max-width: 100%;
@@ -1366,6 +1384,7 @@ fieldset.form-group legend {
 .notification-banner-item.notification-more {
   font-style: italic;
   color: var(--text-muted);
+  max-width: 500px;
 }
 
 /* Notification Badge (on bell button) */
@@ -1393,6 +1412,14 @@ fieldset.form-group legend {
   max-height: 400px;
   overflow-y: auto;
   margin-bottom: 16px;
+}
+
+.notifications-controls {
+  margin: 0 0 12px 0;
+  padding: 10px 12px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  background: var(--surface-muted);
 }
 
 .notification-item {

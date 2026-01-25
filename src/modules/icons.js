@@ -27,6 +27,7 @@ import {
   ChevronRight,
   ChevronsRightLeft,
   ArrowUpDown,
+  X,
   Bell,
   BellRing
 } from 'lucide';
@@ -56,6 +57,7 @@ const icons = {
   ChevronRight,
   ChevronsRightLeft,
   ArrowUpDown,
+  X,
   Bell,
   BellRing
 };

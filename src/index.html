@@ -94,6 +94,9 @@
     <div class="notification-banner-content">
       <span data-lucide="bell-ring" aria-hidden="true" class="notification-banner-icon"></span>
       <div id="notification-banner-list" class="notification-banner-list"></div>
+      <button id="notification-banner-close-btn" type="button" class="icon-btn notification-banner-close-btn" aria-label="Hide notification banner" title="Hide notification banner">
+        <span data-lucide="x" aria-hidden="true"></span>
+      </button>
     </div>
   </div>
 
@@ -448,6 +451,12 @@
     <div class="modal-backdrop" data-close-modal></div>
     <article class="modal-content">
       <h3 id="notifications-modal-title">Upcoming & Overdue Tasks</h3>
+      <div class="notifications-controls checkbox-group" aria-label="Notification settings">
+        <label for="notification-banner-visibility-toggle">
+          <input id="notification-banner-visibility-toggle" type="checkbox">
+          Show notification banner
+        </label>
+      </div>
       <div id="notifications-list" class="notifications-list" role="list" aria-label="Tasks with approaching due dates"></div>
       <div class="form-actions">
         <button type="button" id="notifications-close-btn" class="btn btn-primary">Close</button>

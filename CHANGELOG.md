@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Notification banner showing tasks due within 2 days or overdue, positioned below the header
 - Notifications modal accessible via bell icon in the board menu, listing all urgent tasks
 - Notification badge on bell icon showing count of tasks needing attention
+- Notification banner close (X) button to hide the banner
+- Notifications modal toggle to show/hide the notification banner
 
 ### Changed (unreleased)
 

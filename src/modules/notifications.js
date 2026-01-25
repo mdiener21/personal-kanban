@@ -4,6 +4,22 @@ import { renderIcons } from './icons.js';
 
 const NOTIFICATION_THRESHOLD_DAYS = 2;
 
+const NOTIFICATION_BANNER_HIDDEN_KEY = 'kanbanNotificationBannerHidden';
+
+function isNotificationBannerHidden() {
+  return localStorage.getItem(NOTIFICATION_BANNER_HIDDEN_KEY) === 'true';
+}
+
+function setNotificationBannerHidden(hidden) {
+  localStorage.setItem(NOTIFICATION_BANNER_HIDDEN_KEY, hidden ? 'true' : 'false');
+}
+
+function syncNotificationBannerVisibilityToggle() {
+  const toggle = document.getElementById('notification-banner-visibility-toggle');
+  if (!toggle) return;
+  toggle.checked = !isNotificationBannerHidden();
+}
+
 /**
  * Get all tasks that are due within the threshold or overdue.
  * Excludes tasks in the 'done' column.
@@ -98,6 +114,12 @@ export function renderNotificationBanner() {
     return;
   }
 
+  // Respect user preference to hide the banner.
+  if (isNotificationBannerHidden()) {
+    banner.classList.add('hidden');
+    return;
+  }
+
   list.innerHTML = '';
 
   // Show up to 5 tasks in the banner
@@ -149,7 +171,7 @@ export function renderNotificationBanner() {
     more.classList.add('notification-banner-item', 'notification-more');
     more.setAttribute('role', 'button');
     more.setAttribute('tabindex', '0');
-    more.textContent = `+${tasks.length - 5} more...`;
+    more.textContent = `+${tasks.length - 5} `;
     more.addEventListener('click', showNotificationsModal);
     more.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
@@ -268,6 +290,7 @@ export function updateNotificationBadge() {
  * Show the notifications modal.
  */
 export function showNotificationsModal() {
+  syncNotificationBannerVisibilityToggle();
   renderNotificationsModalContent();
   const modal = document.getElementById('notifications-modal');
   modal?.classList.remove('hidden');
@@ -293,6 +316,18 @@ export function isNotificationsModalOpen() {
  * Initialize notification handlers.
  */
 export function initializeNotifications() {
+  const bannerCloseBtn = document.getElementById('notification-banner-close-btn');
+  bannerCloseBtn?.addEventListener('click', () => {
+    setNotificationBannerHidden(true);
+    refreshNotifications();
+  });
+
+  const bannerToggle = document.getElementById('notification-banner-visibility-toggle');
+  bannerToggle?.addEventListener('change', () => {
+    setNotificationBannerHidden(!bannerToggle.checked);
+    refreshNotifications();
+  });
+
   // Bell button click handler
   const notificationsBtn = document.getElementById('notifications-btn');
   notificationsBtn?.addEventListener('click', showNotificationsModal);
@@ -314,6 +349,9 @@ export function initializeNotifications() {
 
   // Initial render
   refreshNotifications();
+
+  // Keep toggle in sync on load.
+  syncNotificationBannerVisibilityToggle();
 }
 
 /**
