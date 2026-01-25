@@ -52,6 +52,11 @@
           <span data-lucide="sliders-horizontal" aria-hidden="true"></span>
           <span>Settings</span>
         </button>
+        <button id="notifications-btn" class="control-btn" type="button" aria-haspopup="dialog">
+          <span data-lucide="bell" aria-hidden="true"></span>
+          <span>Notifications</span>
+          <span id="notification-badge" class="notification-badge hidden" aria-label="notifications count"></span>
+        </button>
         <button id="export-btn" class="control-btn" type="button">
           <span data-lucide="download" aria-hidden="true"></span>
           <span>Export Board</span>
@@ -83,6 +88,17 @@
       <input type="file" id="import-file" accept="application/json" class="sr-only" aria-label="Import board file">
     </nav>
   </header>
+
+  <!-- Notification Banner -->
+  <div id="notification-banner" class="notification-banner hidden" role="alert" aria-live="polite">
+    <div class="notification-banner-content">
+      <span data-lucide="bell-ring" aria-hidden="true" class="notification-banner-icon"></span>
+      <div id="notification-banner-list" class="notification-banner-list"></div>
+      <button id="notification-banner-close-btn" type="button" class="icon-btn notification-banner-close-btn" aria-label="Hide notification banner" title="Hide notification banner">
+        <span data-lucide="x" aria-hidden="true"></span>
+      </button>
+    </div>
+  </div>
 
   <main id="board-container" class="board-container" aria-label="Kanban board">
     <!-- Columns rendered dynamically by JavaScript -->
@@ -426,6 +442,24 @@
       </div>
       <div class="form-actions">
         <button type="button" id="help-close-btn" class="btn btn-primary">Close</button>
+      </div>
+    </article>
+  </div>
+
+  <!-- Notifications Modal -->
+  <div id="notifications-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="notifications-modal-title">
+    <div class="modal-backdrop" data-close-modal></div>
+    <article class="modal-content">
+      <h3 id="notifications-modal-title">Upcoming & Overdue Tasks</h3>
+      <div class="notifications-controls checkbox-group" aria-label="Notification settings">
+        <label for="notification-banner-visibility-toggle">
+          <input id="notification-banner-visibility-toggle" type="checkbox">
+          Show notification banner
+        </label>
+      </div>
+      <div id="notifications-list" class="notifications-list" role="list" aria-label="Tasks with approaching due dates"></div>
+      <div class="form-actions">
+        <button type="button" id="notifications-close-btn" class="btn btn-primary">Close</button>
       </div>
     </article>
   </div>

@@ -96,6 +96,10 @@
 - **New column placement**: Newly created column are inserted to the far right of the board but before column `done` (order `-1`).
 - **Edit**: Open column menu (ellipsis) → pencil, edit name + color in modal
 - **Delete**: Open column menu (ellipsis) → trash, confirm if tasks exist
+- **Sort**: Open column menu (ellipsis) → Sort → choose "By Due Date" or "By Priority"
+  - By Due Date: sorts tasks ascending (earliest due date first); tasks without due dates appear at the end
+  - By Priority: sorts tasks descending (high → medium → low)
+  - Sorting permanently reorders tasks (updates the `order` property)
 - **Permanent Done column**: The column with id `done` cannot be deleted.
 - **Reorder**: Drag via grip icon handle, updates order property
 - **Collapse**: Toggle button (left of the grip handle) collapses a column into a ~20px vertical bar; state is stored per column.
@@ -104,7 +108,7 @@
 #### Column Header Actions
 
 - Plus icon: adds a task to this column
-- Ellipsis icon: opens a small menu with Edit (pencil) and Delete (trash)
+- Ellipsis icon: opens a small menu with Edit (pencil), Sort (arrow-up-down with submenu), and Delete (trash)
 
 #### Column Color
 
@@ -155,6 +159,7 @@
   - Help button (opens help modal)
   - Manage Labels button
   - Settings button (opens Settings modal)
+  - Notifications button (opens notifications modal, shows badge with count)
   - Add Column button
   - Export button (downloads JSON)
   - Import button (file picker for JSON)
@@ -189,14 +194,42 @@
   - Lead time is grouped by week (Monday-start), displayed as a **bar chart** of **average lead time (days)**.
   - Includes a **trend line** (4-week moving average).
 - Reports dashboard also shows a **weekly completion summary**:
-  - KPI tiles for “Completed this week”, “Completed last week”, and “Avg lead time (last 12 weeks)”.
+  - KPI tiles for "Completed this week", "Completed last week", and "Avg lead time (last 12 weeks)".
   - A small sparkline chart of tasks completed per week (last 12 weeks).
+
+### Notification System
+
+The notification system alerts users to tasks with approaching or past due dates.
+
+#### Notification Banner
+
+- Positioned below the header, spanning across all columns
+- Shows when any task has a due date within 2 days or is overdue
+- Displays: task title, due date status (overdue/due today/due tomorrow/due in N days), and priority
+- Clicking a notification opens the task edit modal
+- Shows up to 5 tasks with a "more" link to the full modal
+- Shows up to 5 tasks with a "more" link to the full modal
+- Includes a close (X) button to hide the banner
+- Banner visibility is user-controlled and persisted in localStorage
+- Excludes tasks in the 'done' column
+- Banner is hidden when there are no qualifying tasks
+
+#### Notifications Modal
+
+- Accessed via the bell icon in the board controls menu
+- Bell icon shows a badge with the count of qualifying tasks
+- Lists all tasks with due dates within 2 days or overdue
+- Lists all tasks with due dates within 2 days or overdue
+- Includes a toggle to show/hide the notification banner
+- Each notification shows: task title, due date status, priority
+- Clicking a notification opens the task edit modal
+- Sorted by urgency (most overdue first)
 
 ### Icons
 
 - Lucide icons are tree-shaken via `src/modules/icons.js` to minimize bundle size.
 - Only icons used in the app are imported and registered.
-- Icons used: `SquareKanban`, `Search`, `Plus`, `Fullscreen`, `Settings`, `Columns3`, `Tag`, `SlidersHorizontal`, `Download`, `Upload`, `Moon`, `Sun`, `HelpCircle`, `EllipsisVertical`, `Trash2`, `GripVertical`, `Pencil`, `Kanban`
+- Icons used: `SquareKanban`, `Search`, `Plus`, `Fullscreen`, `Settings`, `Columns3`, `Tag`, `SlidersHorizontal`, `Download`, `Upload`, `Moon`, `Sun`, `HelpCircle`, `EllipsisVertical`, `Trash2`, `GripVertical`, `Pencil`, `Kanban`, `ArrowUpDown`, `ChevronRight`, `Bell`, `BellRing`
 - To add a new icon:
   1. Import it from `lucide` in `icons.js`
   2. Add it to the `icons` object (PascalCase key)
@@ -276,7 +309,7 @@
 
 ### Scrolling
 
-- **Desktop**: Default max-height 600px per column task list. If >12 tasks: show "Show all tasks (N)" button. Expanded state: max-height 80vh.
+- **Desktop**: Default max-height 600px per column task list. Expanded state: max-height 80vh.
 - **Mobile**: Columns have fixed height based on viewport with internal vertical scrolling. Board scrolls horizontally with snap-to-column.
 - Styled scrollbar: 8px width, blue thumb
 
@@ -308,7 +341,7 @@
 - **Export warning**: Before exporting, the app warns that export only includes the active board (not all boards).
 - **Import**: Imports from JSON by creating a **new board** (tasks + columns + labels), restores settings when present, and uses `boardName` for the new board when provided; supports backward compatibility
 - **Import warning**: Before importing, the app warns that a new board will be created and the UI will switch to it.
-- **Filename**: `kanban-board-YYYY-MM-DD.json`
+- **Filename**: `{boardName}-YYYY-MM-DD.json`
 
 ## CSS Architecture
 

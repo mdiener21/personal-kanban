@@ -8,6 +8,7 @@ import { initializeThemeToggle } from './modules/theme.js';
 import { initializeBoardsUI } from './modules/boards.js';
 import { confirmDialog } from './modules/dialog.js';
 import { initializeSettingsUI } from './modules/settings.js';
+import { initializeNotifications } from './modules/notifications.js';
 
 // Add task button listeners
 document.addEventListener('DOMContentLoaded', () => {
@@ -36,6 +37,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Initialize modal handlers
   initializeModalHandlers();
+
+  // Initialize notifications
+  initializeNotifications();
 
   // Export button listener
   document.getElementById('export-btn').addEventListener('click', async () => {

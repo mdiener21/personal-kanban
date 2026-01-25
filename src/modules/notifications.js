@@ -1,0 +1,364 @@
+import { loadTasks, loadSettings } from './storage.js';
+import { showEditModal } from './modals.js';
+import { renderIcons } from './icons.js';
+
+const NOTIFICATION_THRESHOLD_DAYS = 2;
+
+const NOTIFICATION_BANNER_HIDDEN_KEY = 'kanbanNotificationBannerHidden';
+
+function isNotificationBannerHidden() {
+  return localStorage.getItem(NOTIFICATION_BANNER_HIDDEN_KEY) === 'true';
+}
+
+function setNotificationBannerHidden(hidden) {
+  localStorage.setItem(NOTIFICATION_BANNER_HIDDEN_KEY, hidden ? 'true' : 'false');
+}
+
+function syncNotificationBannerVisibilityToggle() {
+  const toggle = document.getElementById('notification-banner-visibility-toggle');
+  if (!toggle) return;
+  toggle.checked = !isNotificationBannerHidden();
+}
+
+/**
+ * Get all tasks that are due within the threshold or overdue.
+ * Excludes tasks in the 'done' column.
+ * @returns {Array} Array of task objects with additional `daysUntilDue` property
+ */
+export function getNotificationTasks() {
+  const tasks = loadTasks();
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  return tasks
+    .filter((task) => {
+      // Exclude tasks in 'done' column
+      if (task.column === 'done') return false;
+
+      // Must have a due date
+      const dueDate = (task.dueDate || '').toString().trim();
+      if (!dueDate) return false;
+
+      // Parse the due date
+      const dueDateParsed = new Date(dueDate + 'T00:00:00');
+      if (Number.isNaN(dueDateParsed.getTime())) return false;
+
+      // Calculate days until due
+      const diffMs = dueDateParsed.getTime() - today.getTime();
+      const daysUntilDue = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+      // Include if overdue or within threshold
+      return daysUntilDue <= NOTIFICATION_THRESHOLD_DAYS;
+    })
+    .map((task) => {
+      const dueDateParsed = new Date(task.dueDate + 'T00:00:00');
+      const diffMs = dueDateParsed.getTime() - today.getTime();
+      const daysUntilDue = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+      return {
+        ...task,
+        daysUntilDue
+      };
+    })
+    .sort((a, b) => a.daysUntilDue - b.daysUntilDue); // Most urgent first
+}
+
+/**
+ * Format the due date display text based on days until due.
+ * @param {number} daysUntilDue
+ * @param {string} dueDate - The original due date string
+ * @param {string} locale - Locale for formatting
+ * @returns {Object} { text: string, className: string }
+ */
+function formatDueStatus(daysUntilDue, dueDate, locale) {
+  const dueDateParsed = new Date(dueDate + 'T00:00:00');
+  const formattedDate = dueDateParsed.toLocaleDateString(locale || undefined);
+
+  if (daysUntilDue < 0) {
+    const overdueDays = Math.abs(daysUntilDue);
+    return {
+      text: `Overdue by ${overdueDays} day${overdueDays === 1 ? '' : 's'} (${formattedDate})`,
+      className: 'overdue'
+    };
+  } else if (daysUntilDue === 0) {
+    return {
+      text: `Due today (${formattedDate})`,
+      className: 'overdue'
+    };
+  } else if (daysUntilDue === 1) {
+    return {
+      text: `Due tomorrow (${formattedDate})`,
+      className: 'due-soon'
+    };
+  } else {
+    return {
+      text: `Due in ${daysUntilDue} days (${formattedDate})`,
+      className: 'due-soon'
+    };
+  }
+}
+
+/**
+ * Render the notification banner.
+ */
+export function renderNotificationBanner() {
+  const banner = document.getElementById('notification-banner');
+  const list = document.getElementById('notification-banner-list');
+  if (!banner || !list) return;
+
+  const tasks = getNotificationTasks();
+  const settings = loadSettings();
+
+  if (tasks.length === 0) {
+    banner.classList.add('hidden');
+    return;
+  }
+
+  // Respect user preference to hide the banner.
+  if (isNotificationBannerHidden()) {
+    banner.classList.add('hidden');
+    return;
+  }
+
+  list.innerHTML = '';
+
+  // Show up to 5 tasks in the banner
+  const displayTasks = tasks.slice(0, 5);
+
+  displayTasks.forEach((task) => {
+    const item = document.createElement('div');
+    item.classList.add('notification-banner-item');
+    item.setAttribute('role', 'button');
+    item.setAttribute('tabindex', '0');
+    item.setAttribute('aria-label', `Open task: ${task.title}`);
+
+    const titleSpan = document.createElement('span');
+    titleSpan.classList.add('task-title');
+    const legacyTitle = typeof task.text === 'string' ? task.text : '';
+    titleSpan.textContent =
+      typeof task.title === 'string' && task.title.trim() ? task.title : legacyTitle;
+
+    const dueStatus = formatDueStatus(task.daysUntilDue, task.dueDate, settings.locale);
+    const dueSpan = document.createElement('span');
+    dueSpan.classList.add('due-date', dueStatus.className);
+    dueSpan.textContent = dueStatus.text;
+
+    const priority = typeof task.priority === 'string' ? task.priority : 'low';
+    const prioritySpan = document.createElement('span');
+    prioritySpan.classList.add('priority-badge', `priority-${priority}`);
+    prioritySpan.textContent = priority;
+
+    item.appendChild(titleSpan);
+    item.appendChild(dueSpan);
+    item.appendChild(prioritySpan);
+
+    // Click handler to open task
+    const openTask = () => showEditModal(task.id);
+    item.addEventListener('click', openTask);
+    item.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openTask();
+      }
+    });
+
+    list.appendChild(item);
+  });
+
+  // If there are more tasks, show a "more" indicator
+  if (tasks.length > 5) {
+    const more = document.createElement('div');
+    more.classList.add('notification-banner-item', 'notification-more');
+    more.setAttribute('role', 'button');
+    more.setAttribute('tabindex', '0');
+    more.textContent = `+${tasks.length - 5} `;
+    more.addEventListener('click', showNotificationsModal);
+    more.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        showNotificationsModal();
+      }
+    });
+    list.appendChild(more);
+  }
+
+  banner.classList.remove('hidden');
+  renderIcons();
+}
+
+/**
+ * Render the notifications modal content.
+ */
+function renderNotificationsModalContent() {
+  const list = document.getElementById('notifications-list');
+  if (!list) return;
+
+  const tasks = getNotificationTasks();
+  const settings = loadSettings();
+
+  list.innerHTML = '';
+
+  if (tasks.length === 0) {
+    const empty = document.createElement('div');
+    empty.classList.add('notifications-empty');
+    empty.textContent = 'No tasks due within the next 2 days.';
+    list.appendChild(empty);
+    return;
+  }
+
+  tasks.forEach((task) => {
+    const item = document.createElement('div');
+    item.classList.add('notification-item');
+    item.setAttribute('role', 'button');
+    item.setAttribute('tabindex', '0');
+    item.setAttribute('aria-label', `Open task: ${task.title}`);
+
+    const content = document.createElement('div');
+    content.classList.add('notification-item-content');
+
+    const title = document.createElement('div');
+    title.classList.add('notification-item-title');
+    const legacyTitle = typeof task.text === 'string' ? task.text : '';
+    title.textContent =
+      typeof task.title === 'string' && task.title.trim() ? task.title : legacyTitle;
+
+    const meta = document.createElement('div');
+    meta.classList.add('notification-item-meta');
+
+    const dueStatus = formatDueStatus(task.daysUntilDue, task.dueDate, settings.locale);
+    const dueSpan = document.createElement('span');
+    dueSpan.classList.add(dueStatus.className);
+    dueSpan.textContent = dueStatus.text;
+
+    const priority = typeof task.priority === 'string' ? task.priority : 'low';
+    const prioritySpan = document.createElement('span');
+    prioritySpan.classList.add('notification-item-priority', `priority-${priority}`);
+    prioritySpan.textContent = priority;
+
+    meta.appendChild(dueSpan);
+    meta.appendChild(prioritySpan);
+
+    content.appendChild(title);
+    content.appendChild(meta);
+
+    const arrow = document.createElement('span');
+    arrow.classList.add('notification-item-arrow');
+    arrow.dataset.lucide = 'chevron-right';
+
+    item.appendChild(content);
+    item.appendChild(arrow);
+
+    // Click handler to open task and close modal
+    const openTask = () => {
+      hideNotificationsModal();
+      showEditModal(task.id);
+    };
+    item.addEventListener('click', openTask);
+    item.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openTask();
+      }
+    });
+
+    list.appendChild(item);
+  });
+
+  renderIcons();
+}
+
+/**
+ * Update the notification badge count on the bell button.
+ */
+export function updateNotificationBadge() {
+  const badge = document.getElementById('notification-badge');
+  if (!badge) return;
+
+  const tasks = getNotificationTasks();
+  const count = tasks.length;
+
+  if (count === 0) {
+    badge.classList.add('hidden');
+    badge.textContent = '';
+  } else {
+    badge.classList.remove('hidden');
+    badge.textContent = count > 99 ? '99+' : String(count);
+  }
+}
+
+/**
+ * Show the notifications modal.
+ */
+export function showNotificationsModal() {
+  syncNotificationBannerVisibilityToggle();
+  renderNotificationsModalContent();
+  const modal = document.getElementById('notifications-modal');
+  modal?.classList.remove('hidden');
+}
+
+/**
+ * Hide the notifications modal.
+ */
+export function hideNotificationsModal() {
+  const modal = document.getElementById('notifications-modal');
+  modal?.classList.add('hidden');
+}
+
+/**
+ * Check if the notifications modal is open.
+ */
+export function isNotificationsModalOpen() {
+  const modal = document.getElementById('notifications-modal');
+  return modal && !modal.classList.contains('hidden');
+}
+
+/**
+ * Initialize notification handlers.
+ */
+export function initializeNotifications() {
+  const bannerCloseBtn = document.getElementById('notification-banner-close-btn');
+  bannerCloseBtn?.addEventListener('click', () => {
+    setNotificationBannerHidden(true);
+    refreshNotifications();
+  });
+
+  const bannerToggle = document.getElementById('notification-banner-visibility-toggle');
+  bannerToggle?.addEventListener('change', () => {
+    setNotificationBannerHidden(!bannerToggle.checked);
+    refreshNotifications();
+  });
+
+  // Bell button click handler
+  const notificationsBtn = document.getElementById('notifications-btn');
+  notificationsBtn?.addEventListener('click', showNotificationsModal);
+
+  // Close button handler
+  const closeBtn = document.getElementById('notifications-close-btn');
+  closeBtn?.addEventListener('click', hideNotificationsModal);
+
+  // Backdrop click handler
+  const backdrop = document.querySelector('#notifications-modal .modal-backdrop');
+  backdrop?.addEventListener('click', hideNotificationsModal);
+
+  // Escape key handler
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && isNotificationsModalOpen()) {
+      hideNotificationsModal();
+    }
+  });
+
+  // Initial render
+  refreshNotifications();
+
+  // Keep toggle in sync on load.
+  syncNotificationBannerVisibilityToggle();
+}
+
+/**
+ * Refresh all notification UI elements.
+ * Call this after renderBoard() or any task update.
+ */
+export function refreshNotifications() {
+  renderNotificationBanner();
+  updateNotificationBadge();
+}
