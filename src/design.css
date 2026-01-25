@@ -1261,6 +1261,8 @@ fieldset.form-group legend {
   flex: 1 1 auto;
   min-width: 0;
   min-height: 0;
+  padding: 2px 2px 3px 2px;
+  box-sizing: border-box;
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
@@ -1288,6 +1290,10 @@ fieldset.form-group legend {
 
 /* Desktop/tablet: show banner items left-to-right (horizontal scroll). */
 @media (min-width: 601px) {
+  .notification-banner {
+    max-height: 180px;
+  }
+
   .notification-banner-list {
     flex-direction: row;
     flex-wrap: nowrap;
@@ -1295,6 +1301,7 @@ fieldset.form-group legend {
     overflow-x: auto;
     overflow-y: hidden;
     touch-action: pan-x;
+    padding-bottom: 10px;
   }
 }
 
