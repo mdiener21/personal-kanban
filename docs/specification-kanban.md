@@ -96,6 +96,10 @@
 - **New column placement**: Newly created column are inserted to the far right of the board but before column `done` (order `-1`).
 - **Edit**: Open column menu (ellipsis) → pencil, edit name + color in modal
 - **Delete**: Open column menu (ellipsis) → trash, confirm if tasks exist
+- **Sort**: Open column menu (ellipsis) → Sort → choose "By Due Date" or "By Priority"
+  - By Due Date: sorts tasks ascending (earliest due date first); tasks without due dates appear at the end
+  - By Priority: sorts tasks descending (high → medium → low)
+  - Sorting permanently reorders tasks (updates the `order` property)
 - **Permanent Done column**: The column with id `done` cannot be deleted.
 - **Reorder**: Drag via grip icon handle, updates order property
 - **Collapse**: Toggle button (left of the grip handle) collapses a column into a ~20px vertical bar; state is stored per column.
@@ -104,7 +108,7 @@
 #### Column Header Actions
 
 - Plus icon: adds a task to this column
-- Ellipsis icon: opens a small menu with Edit (pencil) and Delete (trash)
+- Ellipsis icon: opens a small menu with Edit (pencil), Sort (arrow-up-down with submenu), and Delete (trash)
 
 #### Column Color
 
@@ -196,7 +200,7 @@
 
 - Lucide icons are tree-shaken via `src/modules/icons.js` to minimize bundle size.
 - Only icons used in the app are imported and registered.
-- Icons used: `SquareKanban`, `Search`, `Plus`, `Fullscreen`, `Settings`, `Columns3`, `Tag`, `SlidersHorizontal`, `Download`, `Upload`, `Moon`, `Sun`, `HelpCircle`, `EllipsisVertical`, `Trash2`, `GripVertical`, `Pencil`, `Kanban`
+- Icons used: `SquareKanban`, `Search`, `Plus`, `Fullscreen`, `Settings`, `Columns3`, `Tag`, `SlidersHorizontal`, `Download`, `Upload`, `Moon`, `Sun`, `HelpCircle`, `EllipsisVertical`, `Trash2`, `GripVertical`, `Pencil`, `Kanban`, `ArrowUpDown`, `ChevronRight`
 - To add a new icon:
   1. Import it from `lucide` in `icons.js`
   2. Add it to the `icons` object (PascalCase key)

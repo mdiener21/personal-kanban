@@ -1,4 +1,4 @@
-import { loadColumns, loadTasks, loadLabels, loadSettings } from './storage.js';
+import { loadColumns, loadTasks, loadLabels, loadSettings, saveTasks } from './storage.js';
 import { deleteTask } from './tasks.js';
 import { deleteColumn, toggleColumnCollapsed } from './columns.js';
 import { showModal, showEditModal, showEditColumnModal } from './modals.js';
@@ -40,6 +40,71 @@ function closeAllColumnMenus(exceptMenu = null) {
     if (exceptMenu && menu === exceptMenu) return;
     menu.classList.add('hidden');
   });
+  // Also close any open submenus
+  document.querySelectorAll('.column-submenu').forEach((submenu) => {
+    submenu.classList.add('hidden');
+  });
+}
+
+/**
+ * Sort tasks by due date (ascending).
+ * Tasks without due dates are placed at the end.
+ */
+function sortTasksByDueDate(tasks) {
+  return [...tasks].sort((a, b) => {
+    const dateA = (a.dueDate || '').toString().trim();
+    const dateB = (b.dueDate || '').toString().trim();
+
+    // Tasks without due date go to the end
+    if (!dateA && !dateB) return 0;
+    if (!dateA) return 1;
+    if (!dateB) return -1;
+
+    // Compare dates (YYYY-MM-DD format sorts correctly as strings)
+    return dateA.localeCompare(dateB);
+  });
+}
+
+/**
+ * Sort tasks by priority (descending: high → medium → low).
+ */
+function sortTasksByPriority(tasks) {
+  const priorityOrder = { high: 0, medium: 1, low: 2 };
+  return [...tasks].sort((a, b) => {
+    const prioA = priorityOrder[a.priority] ?? 2;
+    const prioB = priorityOrder[b.priority] ?? 2;
+    return prioA - prioB;
+  });
+}
+
+/**
+ * Apply sorting to tasks in a specific column and persist.
+ * @param {string} columnId - The column to sort
+ * @param {'dueDate'|'priority'} sortBy - Sort criteria
+ */
+function sortColumnTasks(columnId, sortBy) {
+  const tasks = loadTasks();
+
+  // Get tasks in this column
+  const columnTasks = tasks.filter((t) => t.column === columnId);
+  const otherTasks = tasks.filter((t) => t.column !== columnId);
+
+  // Sort the column's tasks
+  const sortedColumnTasks =
+    sortBy === 'dueDate' ? sortTasksByDueDate(columnTasks) : sortTasksByPriority(columnTasks);
+
+  // Update order property (1-based)
+  const updatedColumnTasks = sortedColumnTasks.map((task, index) => ({
+    ...task,
+    order: index + 1
+  }));
+
+  // Combine and save
+  const updatedTasks = [...otherTasks, ...updatedColumnTasks];
+  saveTasks(updatedTasks);
+
+  // Re-render the board
+  renderBoard();
 }
 
 function formatDisplayDate(value, locale) {
@@ -382,7 +447,88 @@ function createColumnElement(column) {
     })();
   });
 
+  // Sort submenu wrapper
+  const sortWrapper = document.createElement('div');
+  sortWrapper.classList.add('column-menu-submenu-wrapper');
+
+  const sortBtn = document.createElement('button');
+  sortBtn.classList.add('column-menu-item', 'has-submenu');
+  sortBtn.type = 'button';
+  sortBtn.setAttribute('role', 'menuitem');
+  sortBtn.setAttribute('aria-haspopup', 'menu');
+  sortBtn.setAttribute('aria-expanded', 'false');
+  const sortIcon = document.createElement('span');
+  sortIcon.dataset.lucide = 'arrow-up-down';
+  sortIcon.setAttribute('aria-hidden', 'true');
+  sortBtn.appendChild(sortIcon);
+  const sortText = document.createTextNode(' Sort');
+  sortBtn.appendChild(sortText);
+  // Add chevron indicator for submenu (points left since submenu opens to the left)
+  const chevronIcon = document.createElement('span');
+  chevronIcon.dataset.lucide = 'chevron-left';
+  chevronIcon.classList.add('submenu-chevron');
+  chevronIcon.setAttribute('aria-hidden', 'true');
+  sortBtn.appendChild(chevronIcon);
+  sortBtn.title = 'Sort tasks in column';
+
+  // Submenu container
+  const sortSubmenu = document.createElement('div');
+  sortSubmenu.classList.add('column-submenu', 'hidden');
+  sortSubmenu.setAttribute('role', 'menu');
+
+  // Sort by Due Date option
+  const sortByDueDateBtn = document.createElement('button');
+  sortByDueDateBtn.classList.add('column-menu-item');
+  sortByDueDateBtn.type = 'button';
+  sortByDueDateBtn.setAttribute('role', 'menuitem');
+  sortByDueDateBtn.textContent = 'By Due Date';
+  sortByDueDateBtn.title = 'Sort by due date (earliest first)';
+  sortByDueDateBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closeAllColumnMenus();
+    sortColumnTasks(column.id, 'dueDate');
+  });
+
+  // Sort by Priority option
+  const sortByPriorityBtn = document.createElement('button');
+  sortByPriorityBtn.classList.add('column-menu-item');
+  sortByPriorityBtn.type = 'button';
+  sortByPriorityBtn.setAttribute('role', 'menuitem');
+  sortByPriorityBtn.textContent = 'By Priority';
+  sortByPriorityBtn.title = 'Sort by priority (high to low)';
+  sortByPriorityBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closeAllColumnMenus();
+    sortColumnTasks(column.id, 'priority');
+  });
+
+  sortSubmenu.appendChild(sortByDueDateBtn);
+  sortSubmenu.appendChild(sortByPriorityBtn);
+
+  // Toggle submenu on click
+  sortBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isExpanded = !sortSubmenu.classList.contains('hidden');
+    sortSubmenu.classList.toggle('hidden');
+    sortBtn.setAttribute('aria-expanded', isExpanded ? 'false' : 'true');
+  });
+
+  // Show submenu on hover (desktop)
+  sortWrapper.addEventListener('mouseenter', () => {
+    sortSubmenu.classList.remove('hidden');
+    sortBtn.setAttribute('aria-expanded', 'true');
+  });
+
+  sortWrapper.addEventListener('mouseleave', () => {
+    sortSubmenu.classList.add('hidden');
+    sortBtn.setAttribute('aria-expanded', 'false');
+  });
+
+  sortWrapper.appendChild(sortBtn);
+  sortWrapper.appendChild(sortSubmenu);
+
   menu.appendChild(editColBtn);
+  menu.appendChild(sortWrapper);
   menu.appendChild(deleteColBtn);
 
   menuBtn.addEventListener('click', (e) => {

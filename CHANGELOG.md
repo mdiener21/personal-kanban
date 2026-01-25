@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added (unreleased)
 
+- Column menu now includes a "Sort" option to sort tasks by due date (earliest first) or priority (high to low)
+
 ### Changed (unreleased)
 
 - Age is now shown as an example  `1y 6M 40d` not simply only `5d`

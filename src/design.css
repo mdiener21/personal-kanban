@@ -733,6 +733,66 @@ body.dragging-column .column-header * {
 .column-menu-item.danger { color: var(--color-danger); }
 .column-menu-item.danger svg { stroke: var(--color-danger); }
 
+/* Column menu submenu */
+.column-menu-submenu-wrapper {
+  position: relative;
+}
+
+.column-menu-item.has-submenu {
+  justify-content: flex-start;
+  flex-direction: row-reverse;
+}
+
+.submenu-chevron {
+  margin-right: 2px;
+  opacity: 0.6;
+}
+
+.submenu-chevron svg {
+  width: 14px;
+  height: 14px;
+}
+
+.column-submenu {
+  position: absolute;
+  top: 0;
+  right: 100%;
+  margin-right: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: var(--shadow-md);
+  z-index: 100;
+  min-width: 120px;
+}
+
+.column-submenu.hidden {
+  display: none;
+}
+
+/* Mobile: submenu appears below instead of to the right */
+@media (max-width: 600px) {
+  .column-submenu {
+    position: static;
+    margin-left: 0;
+    margin-top: 4px;
+    box-shadow: none;
+    border: none;
+    background: var(--surface-muted);
+    border-radius: 6px;
+    padding: 4px;
+  }
+
+  .column-submenu .column-menu-item {
+    padding-left: 16px;
+    font-size: 12px;
+  }
+}
+
 /* Tasks list */
 .tasks {
   display: flex;
