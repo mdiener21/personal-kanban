@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added (unreleased)
 
+
+### Changed (unreleased)
+
+
+### Removed (unreleased)
+
+## [1.0.5] - 2026-01-25
+
+### Added (1.0.5)
+
 - Column menu now includes a "Sort" option to sort tasks by due date (earliest first) or priority (high to low)
 - Notification banner showing tasks due within 2 days or overdue, positioned below the header
 - Notifications modal accessible via bell icon in the board menu, listing all urgent tasks
@@ -16,12 +26,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Notification banner close (X) button to hide the banner
 - Notifications modal toggle to show/hide the notification banner
 
-### Changed (unreleased)
+### Changed (1.0.5)
 
-- Age is now shown as an example  `1y 6M 40d` not simply only `5d`
-- fix: correct column order calculation when adding a new column so that done remains in last order
-
-### Removed (unreleased)
+- Age is now shown as an example `1y 6M 40d` not simply only `5d`
+- Fix: correct column order calculation when adding a new column so that done remains in last order
+- Notification banner layout/scroll behavior refined for desktop and mobile
 
 ## [1.0.4] - 2026-01-17
 
