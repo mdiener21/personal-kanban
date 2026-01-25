@@ -53,3 +53,14 @@
 ## Style system
 - Styling is custom CSS variables and components in `src/design.css` (light/dark via `document.documentElement.dataset.theme`).
   - Theme persistence key: `kanban-theme` (see `src/modules/theme.js`).
+
+## Release process
+- Update `CHANGELOG.md` following **Keep a Changelog** for any user-visible changes
+- Bump version in `package.json` and `package-lock.json`
+- Commit with message `chore(release): vX.Y.Z`
+- Tag the commit with `vX.Y.Z`
+- Push commit and tag to GitHub
+- Create a GitHub Release from the tag, copy changelog entries from **[Unreleased]** section
+- Publish the release via GitHub Actions (workflow triggers on new tags)
+- Update `docs/specification-kanban.md` as needed for any feature changes
+
