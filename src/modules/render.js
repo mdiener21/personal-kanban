@@ -5,6 +5,7 @@ import { showModal, showEditModal, showEditColumnModal } from './modals.js';
 import { initDragDrop } from './dragdrop.js';
 import { confirmDialog, alertDialog } from './dialog.js';
 import { renderIcons } from './icons.js';
+import { refreshNotifications } from './notifications.js';
 
 let columnMenuCloseHandlerAttached = false;
 
@@ -625,6 +626,9 @@ export function renderBoard() {
 
   // Re-render icons for dynamically created elements
   renderIcons();
+
+  // Refresh notifications after board render
+  refreshNotifications();
 
   if (!columnMenuCloseHandlerAttached) {
     columnMenuCloseHandlerAttached = true;

@@ -26,7 +26,9 @@ import {
   ChevronLeft,
   ChevronRight,
   ChevronsRightLeft,
-  ArrowUpDown
+  ArrowUpDown,
+  Bell,
+  BellRing
 } from 'lucide';
 
 // Map of all icons used in the app (PascalCase keys for createIcons)
@@ -53,7 +55,9 @@ const icons = {
   ChevronLeft,
   ChevronRight,
   ChevronsRightLeft,
-  ArrowUpDown
+  ArrowUpDown,
+  Bell,
+  BellRing
 };
 
 /**

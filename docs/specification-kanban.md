@@ -159,6 +159,7 @@
   - Help button (opens help modal)
   - Manage Labels button
   - Settings button (opens Settings modal)
+  - Notifications button (opens notifications modal, shows badge with count)
   - Add Column button
   - Export button (downloads JSON)
   - Import button (file picker for JSON)
@@ -193,14 +194,37 @@
   - Lead time is grouped by week (Monday-start), displayed as a **bar chart** of **average lead time (days)**.
   - Includes a **trend line** (4-week moving average).
 - Reports dashboard also shows a **weekly completion summary**:
-  - KPI tiles for “Completed this week”, “Completed last week”, and “Avg lead time (last 12 weeks)”.
+  - KPI tiles for "Completed this week", "Completed last week", and "Avg lead time (last 12 weeks)".
   - A small sparkline chart of tasks completed per week (last 12 weeks).
+
+### Notification System
+
+The notification system alerts users to tasks with approaching or past due dates.
+
+#### Notification Banner
+
+- Positioned below the header, spanning across all columns
+- Shows when any task has a due date within 2 days or is overdue
+- Displays: task title, due date status (overdue/due today/due tomorrow/due in N days), and priority
+- Clicking a notification opens the task edit modal
+- Shows up to 5 tasks with a "more" link to the full modal
+- Excludes tasks in the 'done' column
+- Banner is hidden when there are no qualifying tasks
+
+#### Notifications Modal
+
+- Accessed via the bell icon in the board controls menu
+- Bell icon shows a badge with the count of qualifying tasks
+- Lists all tasks with due dates within 2 days or overdue
+- Each notification shows: task title, due date status, priority
+- Clicking a notification opens the task edit modal
+- Sorted by urgency (most overdue first)
 
 ### Icons
 
 - Lucide icons are tree-shaken via `src/modules/icons.js` to minimize bundle size.
 - Only icons used in the app are imported and registered.
-- Icons used: `SquareKanban`, `Search`, `Plus`, `Fullscreen`, `Settings`, `Columns3`, `Tag`, `SlidersHorizontal`, `Download`, `Upload`, `Moon`, `Sun`, `HelpCircle`, `EllipsisVertical`, `Trash2`, `GripVertical`, `Pencil`, `Kanban`, `ArrowUpDown`, `ChevronRight`
+- Icons used: `SquareKanban`, `Search`, `Plus`, `Fullscreen`, `Settings`, `Columns3`, `Tag`, `SlidersHorizontal`, `Download`, `Upload`, `Moon`, `Sun`, `HelpCircle`, `EllipsisVertical`, `Trash2`, `GripVertical`, `Pencil`, `Kanban`, `ArrowUpDown`, `ChevronRight`, `Bell`, `BellRing`
 - To add a new icon:
   1. Import it from `lucide` in `icons.js`
   2. Add it to the `icons` object (PascalCase key)
