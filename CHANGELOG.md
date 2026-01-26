@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed (unreleased)
 
 - Notifications upcoming window (days) is now configurable per board in Settings (default: 3)
+- Theme toggle now shows the sun icon when dark mode is active
 
 
 ### Removed (unreleased)
