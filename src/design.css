@@ -1327,6 +1327,7 @@ fieldset.form-group legend {
   min-width: 0;
   overflow: hidden;
   align-self: flex-start;
+  flex: 0 0 auto; /* Prevent squeezing so overflow triggers the +more indicator on desktop */
 }
 
 .notification-banner-item:hover {
@@ -1337,20 +1338,20 @@ fieldset.form-group legend {
 .notification-banner-item .task-title {
   font-weight: 600;
   color: var(--text);
-  max-width: 220px;
+  min-width: 15ch; /* guarantee ~15 chars visible before ellipsis */
+  max-width: 260px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  flex-shrink: 1;
-  min-width: 0;
+  flex-shrink: 0;
 }
 
 .notification-banner-item .due-date {
   font-size: 12px;
   color: var(--text-muted);
   white-space: nowrap;
-  flex-shrink: 1;
-  min-width: 0;
+  flex-shrink: 0;
+  min-width: 16ch; /* keep "Due tomorrow (MM/DD)" visible */
   max-width: 260px;
   overflow: hidden;
   text-overflow: ellipsis;
