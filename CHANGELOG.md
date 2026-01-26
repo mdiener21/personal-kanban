@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Notifications upcoming window (days) is now configurable per board in Settings (default: 3)
 - Theme toggle now shows the sun icon when dark mode is active
 - Notification banner on desktop now fills a single row with as many tasks as fit before showing a “more” indicator
+- Notification banner now refits its task count when the window is resized
 
 
 ### Removed (unreleased)

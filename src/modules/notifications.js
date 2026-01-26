@@ -3,6 +3,7 @@ import { showEditModal } from './modals.js';
 import { renderIcons } from './icons.js';
 
 const NOTIFICATION_BANNER_HIDDEN_KEY = 'kanbanNotificationBannerHidden';
+let bannerResizeTimeout;
 
 function isNotificationBannerHidden() {
   return localStorage.getItem(NOTIFICATION_BANNER_HIDDEN_KEY) === 'true';
@@ -390,6 +391,12 @@ export function initializeNotifications() {
     if (e.key === 'Escape' && isNotificationsModalOpen()) {
       hideNotificationsModal();
     }
+  });
+
+  // Reflow banner items on viewport resize (debounced)
+  window.addEventListener('resize', () => {
+    clearTimeout(bannerResizeTimeout);
+    bannerResizeTimeout = setTimeout(renderNotificationBanner, 120);
   });
 
   // Initial render
