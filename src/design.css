@@ -1445,7 +1445,7 @@ fieldset.form-group legend {
 }
 
 .notification-item:hover {
-  background-color: var(--btn-small-hover-bg);
+  background-color: var(--color-danger-bg);
   transform: translateX(4px);
 }
 
