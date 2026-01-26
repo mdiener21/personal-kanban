@@ -3,7 +3,7 @@ import './modules/icons.js';
 
 import { renderBoard, setBoardFilterQuery } from './modules/render.js';
 import { initializeModalHandlers } from './modules/modals.js';
-import { exportTasks, importTasks } from './modules/importexport.js';
+import { exportTasks, importTasks, exportRecentActivityReport } from './modules/importexport.js';
 import { initializeThemeToggle } from './modules/theme.js';
 import { initializeBoardsUI } from './modules/boards.js';
 import { confirmDialog } from './modules/dialog.js';
@@ -51,6 +51,18 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     if (!ok) return;
     exportTasks();
+  });
+
+  // Export recent activity button listener
+  document.getElementById('export-recent-btn').addEventListener('click', async () => {
+    const ok = await confirmDialog({
+      title: 'Export Recent Activity Report',
+      message:
+        'Export tasks that were completed or updated in the last 7 days for LLM analysis.\n\nThis creates a JSON file optimized for generating summary reports.\n\nContinue?',
+      confirmText: 'Export Report'
+    });
+    if (!ok) return;
+    exportRecentActivityReport();
   });
 
   // Import button listener

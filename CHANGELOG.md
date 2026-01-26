@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added (unreleased)
 
+- Export Recent Activity button that exports tasks completed or updated in the last 7 days as JSON for LLM report generation
 
 ### Changed (unreleased)
 

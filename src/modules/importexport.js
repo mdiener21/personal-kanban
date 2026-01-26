@@ -267,6 +267,86 @@ export function exportTasks() {
   URL.revokeObjectURL(url);
 }
 
+// Export recent tasks (done or updated in last 7 days) for LLM report generation
+export function exportRecentActivityReport() {
+  const allTasks = loadTasks().map(normalizeTaskForExport);
+  const now = new Date();
+  const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+  
+  const recentTasks = allTasks.filter((task) => {
+    // Include if task is in done column
+    if (task.column === 'done') {
+      // Check if doneDate is within last 7 days
+      if (task.doneDate) {
+        const doneDate = new Date(task.doneDate);
+        if (!Number.isNaN(doneDate.getTime()) && doneDate >= sevenDaysAgo) {
+          return true;
+        }
+      }
+    }
+    
+    // Include if task was updated in last 7 days
+    if (task.changeDate) {
+      const changeDate = new Date(task.changeDate);
+      if (!Number.isNaN(changeDate.getTime()) && changeDate >= sevenDaysAgo) {
+        return true;
+      }
+    }
+    
+    return false;
+  });
+  
+  // Sort by priority (high > medium > low) then by date (most recent first)
+  const priorityWeight = { high: 3, medium: 2, low: 1 };
+  recentTasks.sort((a, b) => {
+    const priorityDiff = priorityWeight[b.priority] - priorityWeight[a.priority];
+    if (priorityDiff !== 0) return priorityDiff;
+    
+    const aDate = new Date(a.changeDate || a.doneDate || 0);
+    const bDate = new Date(b.changeDate || b.doneDate || 0);
+    return bDate.getTime() - aDate.getTime();
+  });
+  
+  const boardName = getActiveBoardName();
+  const columns = loadColumns().map((c) => ({
+    id: c.id,
+    name: c.name
+  }));
+  const labels = loadLabels().map((l) => ({
+    id: l.id,
+    name: l.name
+  }));
+  
+  const exportData = {
+    boardName,
+    reportType: 'recent-activity',
+    periodDays: 7,
+    generatedAt: now.toISOString(),
+    summary: {
+      totalTasks: recentTasks.length,
+      completedTasks: recentTasks.filter((t) => t.column === 'done').length,
+      highPriorityTasks: recentTasks.filter((t) => t.priority === 'high').length,
+      mediumPriorityTasks: recentTasks.filter((t) => t.priority === 'medium').length,
+      lowPriorityTasks: recentTasks.filter((t) => t.priority === 'low').length
+    },
+    columns,
+    labels,
+    tasks: recentTasks
+  };
+  
+  const dataStr = JSON.stringify(exportData, null, 2);
+  const blob = new Blob([dataStr], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${boardName.replaceAll(' ', '_')}_recent_activity_${new Date().toISOString().slice(0, 10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
 // Export a specific board to JSON by boardId (does not switch active board).
 export function exportBoard(boardId) {
   const id = typeof boardId === 'string' ? boardId.trim() : '';
