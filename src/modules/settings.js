@@ -52,12 +52,13 @@ export function initializeSettingsUI() {
 
   const showPriorityEl = document.getElementById('settings-show-priority');
   const showDueDateEl = document.getElementById('settings-show-due-date');
+  const notificationDaysEl = document.getElementById('settings-notification-days');
   const showAgeEl = document.getElementById('settings-show-age');
   const showChangeDateEl = document.getElementById('settings-show-change-date');
   const localeEl = document.getElementById('settings-locale');
   const defaultPriorityEl = document.getElementById('settings-default-priority');
 
-  if (!openBtn || !closeBtn || !showPriorityEl || !showDueDateEl || !showAgeEl || !showChangeDateEl || !localeEl || !defaultPriorityEl) return;
+  if (!openBtn || !closeBtn || !showPriorityEl || !showDueDateEl || !notificationDaysEl || !showAgeEl || !showChangeDateEl || !localeEl || !defaultPriorityEl) return;
 
   function syncFormFromSettings() {
     const settings = loadSettings();
@@ -65,6 +66,8 @@ export function initializeSettingsUI() {
     showDueDateEl.checked = settings.showDueDate !== false;
     showAgeEl.checked = settings.showAge !== false;
     showChangeDateEl.checked = settings.showChangeDate !== false;
+
+    notificationDaysEl.value = String(Number.isFinite(settings.notificationDays) ? settings.notificationDays : 3);
 
     const options = buildLocaleOptions(settings.locale);
     localeEl.innerHTML = '';
@@ -113,6 +116,13 @@ export function initializeSettingsUI() {
   showDueDateEl.addEventListener('change', async () => {
     const current = loadSettings();
     await applyAndRerender({ ...current, showDueDate: Boolean(showDueDateEl.checked) });
+  });
+
+  notificationDaysEl.addEventListener('change', async () => {
+    const current = loadSettings();
+    const raw = Number.parseInt(notificationDaysEl.value, 10);
+    const notificationDays = Number.isFinite(raw) ? raw : 3;
+    await applyAndRerender({ ...current, notificationDays });
   });
 
   localeEl.addEventListener('change', async () => {

@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed (unreleased)
 
+- Notifications upcoming window (days) is now configurable per board in Settings (default: 3)
+
 
 ### Removed (unreleased)
 

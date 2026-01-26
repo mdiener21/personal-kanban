@@ -2,8 +2,6 @@ import { loadTasks, loadSettings } from './storage.js';
 import { showEditModal } from './modals.js';
 import { renderIcons } from './icons.js';
 
-const NOTIFICATION_THRESHOLD_DAYS = 2;
-
 const NOTIFICATION_BANNER_HIDDEN_KEY = 'kanbanNotificationBannerHidden';
 
 function isNotificationBannerHidden() {
@@ -27,6 +25,8 @@ function syncNotificationBannerVisibilityToggle() {
  */
 export function getNotificationTasks() {
   const tasks = loadTasks();
+  const settings = loadSettings();
+  const thresholdDays = Number.isFinite(settings.notificationDays) ? settings.notificationDays : 3;
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -48,7 +48,7 @@ export function getNotificationTasks() {
       const daysUntilDue = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
       // Include if overdue or within threshold
-      return daysUntilDue <= NOTIFICATION_THRESHOLD_DAYS;
+      return daysUntilDue <= thresholdDays;
     })
     .map((task) => {
       const dueDateParsed = new Date(task.dueDate + 'T00:00:00');
@@ -143,14 +143,14 @@ export function renderNotificationBanner() {
     dueSpan.classList.add('due-date', dueStatus.className);
     dueSpan.textContent = dueStatus.text;
 
-    const priority = typeof task.priority === 'string' ? task.priority : 'low';
-    const prioritySpan = document.createElement('span');
-    prioritySpan.classList.add('priority-badge', `priority-${priority}`);
-    prioritySpan.textContent = priority;
+    // const priority = typeof task.priority === 'string' ? task.priority : 'low';
+    // const prioritySpan = document.createElement('span');
+    // prioritySpan.classList.add('priority-badge', `priority-${priority}`);
+    // prioritySpan.textContent = priority;
 
     item.appendChild(titleSpan);
     item.appendChild(dueSpan);
-    item.appendChild(prioritySpan);
+    // item.appendChild(prioritySpan);
 
     // Click handler to open task
     const openTask = () => showEditModal(task.id);
@@ -195,13 +195,16 @@ function renderNotificationsModalContent() {
 
   const tasks = getNotificationTasks();
   const settings = loadSettings();
+  const thresholdDays = Number.isFinite(settings.notificationDays) ? settings.notificationDays : 3;
 
   list.innerHTML = '';
 
   if (tasks.length === 0) {
     const empty = document.createElement('div');
     empty.classList.add('notifications-empty');
-    empty.textContent = 'No tasks due within the next 2 days.';
+    empty.textContent = thresholdDays === 0
+      ? 'No tasks due today.'
+      : `No tasks due within the next ${thresholdDays} day${thresholdDays === 1 ? '' : 's'}.`;
     list.appendChild(empty);
     return;
   }
