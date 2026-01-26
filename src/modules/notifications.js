@@ -2,8 +2,6 @@ import { loadTasks, loadSettings } from './storage.js';
 import { showEditModal } from './modals.js';
 import { renderIcons } from './icons.js';
 
-const NOTIFICATION_THRESHOLD_DAYS = 2;
-
 const NOTIFICATION_BANNER_HIDDEN_KEY = 'kanbanNotificationBannerHidden';
 
 function isNotificationBannerHidden() {
@@ -27,6 +25,8 @@ function syncNotificationBannerVisibilityToggle() {
  */
 export function getNotificationTasks() {
   const tasks = loadTasks();
+  const settings = loadSettings();
+  const thresholdDays = Number.isFinite(settings.notificationDays) ? settings.notificationDays : 3;
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -48,7 +48,7 @@ export function getNotificationTasks() {
       const daysUntilDue = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
       // Include if overdue or within threshold
-      return daysUntilDue <= NOTIFICATION_THRESHOLD_DAYS;
+      return daysUntilDue <= thresholdDays;
     })
     .map((task) => {
       const dueDateParsed = new Date(task.dueDate + 'T00:00:00');
@@ -122,10 +122,8 @@ export function renderNotificationBanner() {
 
   list.innerHTML = '';
 
-  // Show up to 5 tasks in the banner
-  const displayTasks = tasks.slice(0, 5);
-
-  displayTasks.forEach((task) => {
+  const isDesktop = window.matchMedia('(min-width: 601px)').matches;
+  const createBannerItem = (task) => {
     const item = document.createElement('div');
     item.classList.add('notification-banner-item');
     item.setAttribute('role', 'button');
@@ -143,16 +141,9 @@ export function renderNotificationBanner() {
     dueSpan.classList.add('due-date', dueStatus.className);
     dueSpan.textContent = dueStatus.text;
 
-    const priority = typeof task.priority === 'string' ? task.priority : 'low';
-    const prioritySpan = document.createElement('span');
-    prioritySpan.classList.add('priority-badge', `priority-${priority}`);
-    prioritySpan.textContent = priority;
-
     item.appendChild(titleSpan);
     item.appendChild(dueSpan);
-    item.appendChild(prioritySpan);
 
-    // Click handler to open task
     const openTask = () => showEditModal(task.id);
     item.addEventListener('click', openTask);
     item.addEventListener('keydown', (e) => {
@@ -162,24 +153,75 @@ export function renderNotificationBanner() {
       }
     });
 
-    list.appendChild(item);
-  });
+    return item;
+  };
 
-  // If there are more tasks, show a "more" indicator
-  if (tasks.length > 5) {
-    const more = document.createElement('div');
-    more.classList.add('notification-banner-item', 'notification-more');
-    more.setAttribute('role', 'button');
-    more.setAttribute('tabindex', '0');
-    more.textContent = `+${tasks.length - 5} `;
-    more.addEventListener('click', showNotificationsModal);
-    more.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        showNotificationsModal();
+  if (isDesktop) {
+    const availableWidth = list.clientWidth || list.getBoundingClientRect().width;
+    let shown = 0;
+
+    for (const task of tasks) {
+      const item = createBannerItem(task);
+      list.appendChild(item);
+      shown += 1;
+
+      // If we overflow and already have at least one item, back out the last addition.
+      if (list.scrollWidth > availableWidth && shown > 1) {
+        list.removeChild(item);
+        shown -= 1;
+        break;
       }
+    }
+
+    const remaining = tasks.length - shown;
+    if (remaining > 0) {
+      const more = document.createElement('div');
+      more.classList.add('notification-banner-item', 'notification-more');
+      more.setAttribute('role', 'button');
+      more.setAttribute('tabindex', '0');
+      more.textContent = `+${remaining} `;
+      more.addEventListener('click', showNotificationsModal);
+      more.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          showNotificationsModal();
+        }
+      });
+
+      list.appendChild(more);
+
+      // If adding the indicator overflows, reclaim one more slot for it.
+      if (list.scrollWidth > availableWidth && shown > 0) {
+        list.removeChild(list.children[shown - 1]);
+        shown -= 1;
+        const updatedRemaining = tasks.length - shown;
+        more.textContent = `+${updatedRemaining} `;
+        list.appendChild(more);
+      }
+    }
+  } else {
+    const displayTasks = tasks.slice(0, 5);
+
+    displayTasks.forEach((task) => {
+      const item = createBannerItem(task);
+      list.appendChild(item);
     });
-    list.appendChild(more);
+
+    if (tasks.length > 5) {
+      const more = document.createElement('div');
+      more.classList.add('notification-banner-item', 'notification-more');
+      more.setAttribute('role', 'button');
+      more.setAttribute('tabindex', '0');
+      more.textContent = `+${tasks.length - 5} `;
+      more.addEventListener('click', showNotificationsModal);
+      more.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          showNotificationsModal();
+        }
+      });
+      list.appendChild(more);
+    }
   }
 
   banner.classList.remove('hidden');
@@ -195,13 +237,16 @@ function renderNotificationsModalContent() {
 
   const tasks = getNotificationTasks();
   const settings = loadSettings();
+  const thresholdDays = Number.isFinite(settings.notificationDays) ? settings.notificationDays : 3;
 
   list.innerHTML = '';
 
   if (tasks.length === 0) {
     const empty = document.createElement('div');
     empty.classList.add('notifications-empty');
-    empty.textContent = 'No tasks due within the next 2 days.';
+    empty.textContent = thresholdDays === 0
+      ? 'No tasks due today.'
+      : `No tasks due within the next ${thresholdDays} day${thresholdDays === 1 ? '' : 's'}.`;
     list.appendChild(empty);
     return;
   }

@@ -170,6 +170,7 @@
 - Settings modal allows:
   - Toggle to show/hide task priority
   - Toggle to show/hide task due date
+  - Number input to set the notifications upcoming window (days)
   - Toggle to show/hide task age
   - Toggle to show/hide task updated date/time (`changeDate`)
   - Locale dropdown for formatting the updated timestamp
@@ -204,8 +205,8 @@ The notification system alerts users to tasks with approaching or past due dates
 #### Notification Banner
 
 - Positioned below the header, spanning across all columns
-- Shows when any task has a due date within 2 days or is overdue
-- Displays: task title, due date status (overdue/due today/due tomorrow/due in N days), and priority
+- Shows when any task has a due date within the configured upcoming window (default 3 days) or is overdue
+- Displays: task title and due date status (overdue/due today/due tomorrow/due in N days)
 - Clicking a notification opens the task edit modal
 - Shows up to 5 tasks with a "more" link to the full modal
 - Shows up to 5 tasks with a "more" link to the full modal
@@ -218,8 +219,7 @@ The notification system alerts users to tasks with approaching or past due dates
 
 - Accessed via the bell icon in the board controls menu
 - Bell icon shows a badge with the count of qualifying tasks
-- Lists all tasks with due dates within 2 days or overdue
-- Lists all tasks with due dates within 2 days or overdue
+- Lists all tasks with due dates within the configured upcoming window (default 3 days) or overdue
 - Includes a toggle to show/hide the notification banner
 - Each notification shows: task title, due date status, priority
 - Clicking a notification opens the task edit modal

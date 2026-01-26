@@ -184,7 +184,10 @@ function defaultSettings() {
     showAge: true,
     showChangeDate: true,
     locale,
-    defaultPriority: 'low'
+    defaultPriority: 'low',
+    // Number of days ahead (inclusive) to consider tasks "upcoming" for notifications.
+    // Overdue tasks are always included.
+    notificationDays: 3
   };
 }
 
@@ -421,7 +424,12 @@ function normalizeSettings(raw) {
   const showChangeDate = obj.showChangeDate !== false;
   const priority = (obj.defaultPriority || '').toString().trim().toLowerCase();
   const defaultPriority = (priority === 'low' || priority === 'medium' || priority === 'high') ? priority : 'low';
-  return { showPriority, showDueDate, showAge, showChangeDate, locale, defaultPriority };
+  const rawNotificationDays = Number.parseInt((obj.notificationDays ?? '').toString(), 10);
+  const notificationDays = Number.isFinite(rawNotificationDays)
+    ? Math.min(365, Math.max(0, rawNotificationDays))
+    : 3;
+
+  return { showPriority, showDueDate, showAge, showChangeDate, locale, defaultPriority, notificationDays };
 }
 
 export function loadSettings() {

@@ -87,7 +87,11 @@ function normalizeSettingsForExport(settings) {
     ? obj.locale.trim()
     : (typeof navigator !== 'undefined' && typeof navigator.language === 'string' ? navigator.language : 'en-US');
   const defaultPriority = normalizePriority(obj.defaultPriority);
-  return { showPriority, showDueDate, showAge, showChangeDate, locale, defaultPriority };
+  const rawNotificationDays = Number.parseInt((obj.notificationDays ?? '').toString(), 10);
+  const notificationDays = Number.isFinite(rawNotificationDays)
+    ? Math.min(365, Math.max(0, rawNotificationDays))
+    : 3;
+  return { showPriority, showDueDate, showAge, showChangeDate, locale, defaultPriority, notificationDays };
 }
 
 function normalizeDueDate(value) {
@@ -224,6 +228,10 @@ function normalizeImportedSettings(settings) {
   const locale = typeof settings.locale === 'string' && settings.locale.trim() ? settings.locale.trim() : undefined;
   const defaultPriorityRaw = typeof settings.defaultPriority === 'string' ? settings.defaultPriority : undefined;
   const defaultPriority = defaultPriorityRaw ? normalizePriority(defaultPriorityRaw) : undefined;
+  const rawNotificationDays = Number.parseInt((settings.notificationDays ?? '').toString(), 10);
+  const notificationDays = Number.isFinite(rawNotificationDays)
+    ? Math.min(365, Math.max(0, rawNotificationDays))
+    : undefined;
   return {
     showPriority,
     showDueDate,
@@ -231,6 +239,7 @@ function normalizeImportedSettings(settings) {
     showChangeDate,
     ...(locale ? { locale } : {})
     ,...(defaultPriority ? { defaultPriority } : {})
+    ,...(notificationDays !== undefined ? { notificationDays } : {})
   };
 }
 

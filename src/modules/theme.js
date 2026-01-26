@@ -28,12 +28,12 @@ function updateThemeToggleButton(theme) {
 
   btn.setAttribute('aria-pressed', String(theme === 'dark'));
 
-  const iconSpan = btn.querySelector('span[data-lucide]');
-  if (iconSpan) {
-    iconSpan.setAttribute('data-lucide', nextIcon);
+  const iconEl = btn.querySelector('[data-lucide]');
+  if (iconEl) {
+    iconEl.setAttribute('data-lucide', nextIcon);
   }
 
-  // Preserve the icon span, replace only the trailing text
+  // Preserve the icon element, replace only the trailing text
   const existingTextNodes = Array.from(btn.childNodes).filter((n) => n.nodeType === Node.TEXT_NODE);
   for (const n of existingTextNodes) n.remove();
   btn.appendChild(document.createTextNode(` ${nextLabel}`));
