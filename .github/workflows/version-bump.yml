@@ -3,6 +3,10 @@ name: Auto Version Bump
 # This workflow automatically bumps the minor version in package.json
 # on every commit to the main branch (e.g., 1.0.5 -> 1.1.0).
 # The version bump commit includes [skip ci] to prevent infinite loops.
+#
+# Note: This workflow uses GITHUB_TOKEN which should have sufficient permissions
+# for repositories without branch protection. If branch protection is enabled,
+# you may need to use a Personal Access Token (PAT) with appropriate permissions.
 
 on:
   push:
@@ -79,5 +83,9 @@ jobs:
           else
             NEW_VERSION=$(node -p "require('./package.json').version")
             git commit -m "chore: bump version to $NEW_VERSION [skip ci]"
-            git push
+            git push origin main || {
+              echo "Error: Failed to push changes to main branch"
+              echo "This may be due to branch protection rules or insufficient permissions"
+              exit 1
+            }
           fi
