@@ -1,5 +1,9 @@
 name: Auto Version Bump
 
+# This workflow automatically bumps the minor version in package.json
+# on every commit to the main branch (e.g., 1.0.5 -> 1.1.0).
+# The version bump commit includes [skip ci] to prevent infinite loops.
+
 on:
   push:
     branches:
@@ -11,7 +15,7 @@ permissions:
 jobs:
   bump-version:
     runs-on: ubuntu-latest
-    # Skip if commit message contains [skip ci] or is from github-actions bot
+    # Skip if commit message contains [skip ci]
     if: "!contains(github.event.head_commit.message, '[skip ci]')"
     steps:
       - name: Checkout repository
@@ -36,6 +40,13 @@ jobs:
           CURRENT_VERSION=$(node -p "require('./package.json').version")
           echo "Current version: $CURRENT_VERSION"
           
+          # Validate version format (should be X.Y.Z)
+          if ! [[ $CURRENT_VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Error: Version must be in X.Y.Z format (e.g., 1.0.5)"
+            echo "Current version '$CURRENT_VERSION' is not supported"
+            exit 1
+          fi
+          
           # Parse version
           IFS='.' read -r -a VERSION_PARTS <<< "$CURRENT_VERSION"
           MAJOR="${VERSION_PARTS[0]}"
@@ -57,7 +68,12 @@ jobs:
 
       - name: Commit version bump
         run: |
-          git add package.json package-lock.json
+          # Add files that exist
+          git add package.json
+          if [ -f package-lock.json ]; then
+            git add package-lock.json
+          fi
+          
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
