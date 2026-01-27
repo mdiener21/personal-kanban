@@ -85,3 +85,75 @@ Important notes:
 - Export on a schedule (end of day / end of week).
 - Use multiple boards to separate contexts (work, personal, projects).
 - Use labels to slice across columns (e.g., Urgent, Feature, Task).
+
+## Strong Action Verbs for Task Management
+
+Using strong action verbs is key to creating clear, actionable, and results-oriented tasks. Here is a curated list of action words categorized by the type of work:
+
+## 1. Project & Task Management
+
+- **Implement**: Put a plan or project into effect
+- **Coordinate**: Bring different elements into a harmonious, functional whole
+- **Execute**: Carry out a plan or task to completion
+- **Spearhead**: Lead a new initiative or project from start to finish
+- **Delegate**: Entrust tasks to team members to increase efficiency
+- **Oversee**: Monitor a process to ensure it stays on track
+- **Streamline**: Simplify a process to make it faster or more efficient
+- **Prioritize**: Organize tasks based on importance
+
+## 2. Research & Analysis
+
+- **Analyze**: Examine data or information in detail to draw conclusions
+- **Assess**: Evaluate the value, quality, or impact of something
+- **Investigate**: Systematically search for facts or solutions
+- **Forecast**: Predict future trends or requirements
+- **Diagnose**: Identify the root cause of a problem
+- **Audit**: Examine processes or records for accuracy
+- **Quantify**: Express results or findings in numerical terms
+- **Map**: Outline a plan or process
+
+## 3. Creation & Development
+
+- **Conceptualize**: Develop an idea or design from the initial phase
+- **Draft**: Create a preliminary version of a document or plan
+- **Architect**: Structure or build a complex system or plan
+- **Prototype**: Build an early model of a product or process
+- **Initiate**: Start a new project or program
+- **Design**: Create a plan or blueprint for a new product or system
+- **Author**: Produce written content
+
+## 4. Leadership & Communication
+
+- **Negotiate**: Discuss with others to reach an agreement
+- **Mentor**: Guide and develop the skills of team members
+- **Mobilize**: Organize people to take specific, collaborative action
+- **Persuade**: Convince others to accept a new idea or approach
+- **Present**: Deliver information to stakeholders
+- **Align**: Coordinate teams to work toward the same goal
+
+## 5. Efficiency & Results (Increasing/Reducing)
+
+- **Boost**: Increase performance or sales
+- **Maximize**: Get the most out of a resource or process
+- **Optimize**: Refine a process to make it the best possible version
+- **Cut**: Reduce costs, time, or unnecessary steps
+- **Conserve**: Save resources
+- **Accelerate**: Hasten the progress of a task or project
+- **Deliver**: Produce a finished result
+
+## 6. Technical & Operational
+
+- **Automate**: Set up a process to run without manual intervention
+- **Troubleshoot**: Resolve technical issues or problems
+- **Deploy**: Launch a system or software
+- **Configure**: Set up equipment or software for use
+- **Maintain**: Ensure systems remain operational
+- **Integrate**: Combine two or more systems or components
+
+## 7. Administrative & Organization
+
+- **Catalog**: Organize items systematically
+- **Schedule**: Plan specific times for tasks
+- **Assemble**: Gather components or data
+- **Reconcile**: Match records or accounts
+- **Screen**: Filter applicants or information for relevance
