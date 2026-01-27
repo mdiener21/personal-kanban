@@ -4,9 +4,9 @@ name: Auto Version Bump
 # on every commit to the main branch (e.g., 1.0.5 -> 1.1.0).
 # The version bump commit includes [skip ci] to prevent infinite loops.
 #
-# Note: This workflow uses GITHUB_TOKEN which should have sufficient permissions
-# for repositories without branch protection. If branch protection is enabled,
-# you may need to use a Personal Access Token (PAT) with appropriate permissions.
+# This workflow creates a Pull Request with the version bump, which respects
+# branch protection rules. The PR can be manually reviewed and merged, or
+# you can enable auto-merge on the PR if desired.
 
 on:
   push:
@@ -15,6 +15,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   bump-version:
@@ -70,22 +71,44 @@ jobs:
             npm install --package-lock-only
           fi
 
-      - name: Commit version bump
+      - name: Commit version bump and create PR
         run: |
           # Add files that exist
           git add package.json
           if [ -f package-lock.json ]; then
             git add package-lock.json
           fi
-          
+
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
             NEW_VERSION=$(node -p "require('./package.json').version")
+            BRANCH_NAME="chore/version-bump-${NEW_VERSION}"
+
+            # Create and checkout new branch
+            git checkout -b "$BRANCH_NAME"
+
+            # Commit changes
             git commit -m "chore: bump version to $NEW_VERSION [skip ci]"
-            git push origin main || {
-              echo "Error: Failed to push changes to main branch"
-              echo "This may be due to branch protection rules or insufficient permissions"
-              exit 1
-            }
-          fi
+
+            # Push to remote
+            git push origin "$BRANCH_NAME"
+
+            # Create pull request using GitHub CLI
+            gh pr create \
+              --title "chore: bump version to $NEW_VERSION" \
+              --body "Automated version bump from ${{ github.sha }}
+
+This PR was automatically created by the version bump workflow.
+
+**Changes:**
+- Bumped version to $NEW_VERSION in package.json
+- Updated package-lock.json (if present)
+
+**Note:** This commit includes [skip ci] to prevent triggering another version bump." \
+              --base main \
+              --head "$BRANCH_NAME" \
+              --label "automated" \
+              --label "version-bump"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
