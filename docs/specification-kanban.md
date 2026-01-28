@@ -42,7 +42,10 @@
   labels: ["label-id-1", "label-id-2"],
   creationDate: "YYYY-MM-DDTHH:MM:SSZ",
   changeDate: "YYYY-MM-DDTHH:MM:SSZ", // updated on task save (create, edit, change column)
-  doneDate: "YYYY-MM-DDTHH:MM:SSZ" // set only when task enters the Done column; removed when leaving Done
+  doneDate: "YYYY-MM-DDTHH:MM:SSZ", // set only when task enters the Done column; removed when leaving Done
+  columnHistory: [
+    { column: "column-id", at: "YYYY-MM-DDTHH:MM:SSZ" }
+  ] // appended when tasks move columns; used for cumulative flow reports
 }
 ```
 
@@ -187,6 +190,8 @@
 - Separate page: `reports.html`
 - Shows an Apache ECharts calendar heatmap for the **active board** covering the last 365 days.
 - Each day’s value is the count of tasks whose `changeDate` falls on that date (YYYY-MM-DD).
+- Reports page uses an **independent, reports-only layout** (does not reuse the main board toolbar/column styling).
+- Reports dashboard is designed as a **fixed viewport grid** so sections are visible without page scrolling.
 
 #### Lead Time & Completion
 
@@ -197,6 +202,15 @@
 - Reports dashboard also shows a **weekly completion summary**:
   - KPI tiles for "Completed this week", "Completed last week", and "Avg lead time (last 12 weeks)".
   - A small sparkline chart of tasks completed per week (last 12 weeks).
+
+#### Cumulative Flow Diagram (WIP)
+
+- Reports dashboard includes a **Cumulative Flow Diagram** (stacked area chart):
+  - X-axis: time (daily buckets)
+  - Y-axis: task count
+  - Series are **colored by column** and **ordered by workflow** (based on `column.order`, with Done last).
+  - Uses `task.columnHistory` to determine which column each task was in on each day.
+  - Legacy tasks without history are seeded with a single entry at the earliest known timestamp (creation/change date) using the task’s current column.
 
 ### Notification System
 

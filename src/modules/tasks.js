@@ -49,6 +49,7 @@ export function addTask(title, description, priority, dueDate, columnName, label
     labels: [...labels],
     creationDate: nowIso,
     changeDate: nowIso,
+    columnHistory: [{ column: columnName, at: nowIso }],
     ...(columnName === 'done' ? { doneDate: nowIso } : {})
   };
 
@@ -67,12 +68,23 @@ export function updateTask(taskId, title, description, priority, dueDate, column
     const nextColumn = columnName;
     const nowIso = new Date().toISOString();
 
+    // Ensure we have a baseline history entry before appending transitions.
+    if (!Array.isArray(tasks[taskIndex].columnHistory) || tasks[taskIndex].columnHistory.length === 0) {
+      const seededAt = tasks[taskIndex].creationDate || tasks[taskIndex].changeDate || nowIso;
+      const seededColumn = typeof prevColumn === 'string' ? prevColumn : nextColumn;
+      tasks[taskIndex].columnHistory = [{ column: seededColumn, at: seededAt }];
+    }
+
     tasks[taskIndex].title = title.trim();
     tasks[taskIndex].description = (description || '').toString().trim();
     tasks[taskIndex].priority = normalizePriority(priority);
     tasks[taskIndex].dueDate = normalizeDueDate(dueDate);
     tasks[taskIndex].column = nextColumn;
     tasks[taskIndex].labels = [...labels];
+
+    if (prevColumn !== nextColumn) {
+      tasks[taskIndex].columnHistory.push({ column: nextColumn, at: nowIso });
+    }
 
     if (prevColumn !== 'done' && nextColumn === 'done') {
       tasks[taskIndex].doneDate = nowIso;
@@ -132,6 +144,12 @@ export function updateTaskPositions() {
       };
 
       if (didMove) {
+        const history = Array.isArray(task.columnHistory) && task.columnHistory.length
+          ? [...task.columnHistory]
+          : [{ column: task.column, at: task.creationDate || task.changeDate || nowIso }];
+        history.push({ column: nextColumn, at: nowIso });
+        nextTask.columnHistory = history;
+
         if (task.column !== 'done' && nextColumn === 'done') {
           nextTask.doneDate = nowIso;
         } else if (task.column === 'done' && nextColumn !== 'done') {
