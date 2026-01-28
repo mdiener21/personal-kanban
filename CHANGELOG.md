@@ -9,9 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added (unreleased)
 
+- Reports dashboard: Cumulative Flow Diagram (CFD) stacked area chart showing task count by column over time.
+
 
 ### Changed (unreleased)
-- Collapsed columns now display the task count in the header (e.g., "To Do (5)")- Notifications upcoming window (days) is now configurable per board in Settings (default: 3)
+
+- Tasks now track `columnHistory` to support cumulative flow reporting.
+- Reports page layout redesigned as a fixed dashboard grid with reports-specific styles (no page scrolling).
+- Collapsed columns now display the task count in the header (e.g., "To Do (5)")
+- Notifications upcoming window (days) is now configurable per board in Settings (default: 3)
 - Theme toggle now shows the sun icon when dark mode is active
 - Notification banner on desktop now fills a single row with as many tasks as fit before showing a “more” indicator
 - Notification banner now refits its task count when the window is resized

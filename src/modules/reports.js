@@ -1,7 +1,7 @@
 import * as echarts from 'echarts';
 import { renderIcons } from './icons.js';
 import { ensureBoardsInitialized, getActiveBoardId, getActiveBoardName } from './storage.js';
-import { loadTasks } from './storage.js';
+import { loadColumns, loadTasks } from './storage.js';
 
 function isoDateOnly(value) {
   const s = (value || '').toString().trim();
@@ -316,6 +316,193 @@ function buildCompletedSparkOption({ labels, completedCounts }) {
   };
 }
 
+function isHexColor(value) {
+  return typeof value === 'string' && /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(value.trim());
+}
+
+function hexToRgba(hex, alpha) {
+  const a = Math.max(0, Math.min(1, Number(alpha)));
+  if (!isHexColor(hex)) return `rgba(59,130,246,${a})`;
+  const raw = hex.trim().slice(1);
+  const full = raw.length === 3
+    ? raw.split('').map((c) => c + c).join('')
+    : raw;
+  const r = Number.parseInt(full.slice(0, 2), 16);
+  const g = Number.parseInt(full.slice(2, 4), 16);
+  const b = Number.parseInt(full.slice(4, 6), 16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+
+function sortColumnsForCfd(columns) {
+  const list = Array.isArray(columns) ? columns.slice() : [];
+  const done = list.find((c) => c?.id === 'done') || null;
+  const others = list.filter((c) => c?.id && c.id !== 'done');
+
+  const indexed = others.map((c, idx) => ({ c, idx }));
+  indexed.sort((a, b) => {
+    const ao = Number.isFinite(a.c?.order) ? a.c.order : null;
+    const bo = Number.isFinite(b.c?.order) ? b.c.order : null;
+    if (ao != null && bo != null && ao !== bo) return ao - bo;
+    if (ao != null && bo == null) return -1;
+    if (ao == null && bo != null) return 1;
+    return a.idx - b.idx;
+  });
+
+  const sorted = indexed.map((x) => x.c);
+  if (done) sorted.push(done);
+  return sorted;
+}
+
+function normalizeTaskColumnHistory(task) {
+  const raw = task?.columnHistory;
+  const entries = Array.isArray(raw) ? raw : [];
+  const cleaned = entries
+    .map((e) => {
+      const column = typeof e?.column === 'string' ? e.column.trim() : '';
+      const at = safeDate(e?.at);
+      if (!column || !at) return null;
+      return { column, at };
+    })
+    .filter(Boolean)
+    .sort((a, b) => a.at.getTime() - b.at.getTime());
+
+  if (cleaned.length > 0) return cleaned;
+
+  const fallbackAt = safeDate(task?.creationDate) || safeDate(task?.changeDate) || safeDate(task?.doneDate);
+  const fallbackColumn = typeof task?.column === 'string' ? task.column.trim() : '';
+  if (!fallbackAt || !fallbackColumn) return [];
+  return [{ column: fallbackColumn, at: fallbackAt }];
+}
+
+function computeCumulativeFlow({ tasks, columns, rangeStart, rangeEnd, includeDone }) {
+  const days = eachDayInclusive(rangeStart, rangeEnd);
+  const dayEnds = days.map((d) => new Date(d.getFullYear(), d.getMonth(), d.getDate(), 23, 59, 59, 999));
+  const labels = days.map((d) => formatIsoDate(d));
+
+  const countsByColumnId = new Map();
+  const ensureSeries = (columnId) => {
+    if (!countsByColumnId.has(columnId)) {
+      countsByColumnId.set(columnId, new Array(labels.length).fill(0));
+    }
+    return countsByColumnId.get(columnId);
+  };
+
+  for (const task of tasks || []) {
+    const history = normalizeTaskColumnHistory(task);
+    if (!history.length) continue;
+
+    let currentColumn = null;
+    let eventIndex = -1;
+
+    for (let dayIndex = 0; dayIndex < dayEnds.length; dayIndex++) {
+      const dayEnd = dayEnds[dayIndex];
+      while (eventIndex + 1 < history.length && history[eventIndex + 1].at <= dayEnd) {
+        eventIndex += 1;
+        currentColumn = history[eventIndex].column;
+      }
+
+      if (!currentColumn) continue;
+      if (!includeDone && currentColumn === 'done') continue;
+
+      const series = ensureSeries(currentColumn);
+      series[dayIndex] += 1;
+    }
+  }
+
+  const sortedColumns = sortColumnsForCfd(columns);
+  const columnById = new Map(sortedColumns.map((c) => [c.id, c]));
+
+  // Preserve workflow order; append any unknown columns referenced in history.
+  const orderedIds = sortedColumns.map((c) => c.id);
+  for (const id of countsByColumnId.keys()) {
+    if (!orderedIds.includes(id)) orderedIds.push(id);
+  }
+
+  const seriesDefs = orderedIds
+    .filter((id) => includeDone || id !== 'done')
+    .map((id) => {
+      const c = columnById.get(id);
+      const name = typeof c?.name === 'string' && c.name.trim() ? c.name.trim() : (id === 'done' ? 'Done' : id);
+      const color = isHexColor(c?.color) ? c.color.trim() : '#3b82f6';
+      const data = countsByColumnId.get(id) || new Array(labels.length).fill(0);
+      return { id, name, color, data };
+    });
+
+  return { labels, seriesDefs };
+}
+
+function buildCfdOption({ labels, seriesDefs, boardName }) {
+  const plotSeries = Array.isArray(seriesDefs) ? seriesDefs.slice().reverse() : [];
+  const maxY = seriesDefs.length
+    ? Math.max(1, ...labels.map((_, i) => seriesDefs.reduce((s, series) => s + (series.data[i] || 0), 0)))
+    : 1;
+
+  return {
+    title: {
+      top: 12,
+      left: 'center',
+      text: `Cumulative flow — ${boardName}`
+    },
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: { type: 'line' },
+      formatter: (params) => {
+        const items = Array.isArray(params) ? params : [];
+        const date = items[0]?.axisValueLabel || '';
+        const lines = [`${date}`];
+        let total = 0;
+        for (const p of items) {
+          const v = Number(p?.value) || 0;
+          total += v;
+          lines.push(`${p.marker || ''}${p.seriesName}: ${v}`);
+        }
+        lines.push(`<span style="opacity:.7">Total: ${total}</span>`);
+        return lines.join('<br/>');
+      }
+    },
+    legend: {
+      top: 40,
+      type: 'scroll'
+    },
+    grid: {
+      left: 40,
+      right: 20,
+      top: 80,
+      bottom: 45
+    },
+    xAxis: {
+      type: 'category',
+      data: labels,
+      boundaryGap: false,
+      axisLabel: { hideOverlap: true }
+    },
+    yAxis: {
+      type: 'value',
+      name: 'Tasks',
+      min: 0,
+      max: Math.ceil(maxY)
+    },
+    dataZoom: [
+      {
+        type: 'inside',
+        xAxisIndex: 0,
+        filterMode: 'none'
+      }
+    ],
+    series: plotSeries.map((s) => ({
+      name: s.name,
+      type: 'line',
+      stack: 'total',
+      symbol: 'none',
+      data: s.data,
+      lineStyle: { width: 1.5, color: s.color },
+      itemStyle: { color: s.color },
+      areaStyle: { color: hexToRgba(s.color, 0.28) },
+      emphasis: { focus: 'series' }
+    }))
+  };
+}
+
 function main() {
   ensureBoardsInitialized();
   renderIcons();
@@ -326,10 +513,8 @@ function main() {
   const badge = document.getElementById('reports-board-badge');
   if (badge) badge.textContent = (boardName || 'Board').slice(0, 2).toUpperCase();
 
-  const chartDom = document.getElementById('reports-chart');
-  if (!chartDom) return;
-
   const tasks = loadTasks();
+  const columns = loadColumns();
 
   // Weekly completion + lead time (last 12 weeks)
   const now = new Date();
@@ -377,17 +562,57 @@ function main() {
 
   const { data, max } = computeDailyUpdateCounts(tasks, start, end);
 
-  const chart = echarts.init(chartDom);
-  const option = buildOption({
-    rangeStart: start,
-    rangeEnd: end,
-    data,
-    maxValue: max,
-    boardName: boardName || (boardId || 'Active board')
-  });
+  const chartDom = document.getElementById('reports-chart');
+  if (chartDom) {
+    const chart = echarts.init(chartDom);
+    const option = buildOption({
+      rangeStart: start,
+      rangeEnd: end,
+      data,
+      maxValue: max,
+      boardName: boardName || (boardId || 'Active board')
+    });
 
-  chart.setOption(option);
-  window.addEventListener('resize', () => chart.resize());
+    chart.setOption(option);
+    window.addEventListener('resize', () => chart.resize());
+  }
+
+  // Cumulative Flow Diagram (CFD)
+  const cfdDom = document.getElementById('reports-cfd-chart');
+  const cfdRangeEl = document.getElementById('reports-cfd-range');
+  const cfdIncludeDoneEl = document.getElementById('reports-cfd-include-done');
+  if (cfdDom) {
+    const cfdChart = echarts.init(cfdDom);
+
+    const updateCfd = () => {
+      const rangeDaysRaw = Number.parseInt((cfdRangeEl?.value ?? '90').toString(), 10);
+      const rangeDays = Number.isFinite(rangeDaysRaw) ? Math.min(365, Math.max(7, rangeDaysRaw)) : 90;
+      const includeDone = cfdIncludeDoneEl ? cfdIncludeDoneEl.checked === true : true;
+
+      const cfdEnd = new Date();
+      const cfdStart = new Date();
+      cfdStart.setDate(cfdEnd.getDate() - (rangeDays - 1));
+
+      const { labels, seriesDefs } = computeCumulativeFlow({
+        tasks,
+        columns,
+        rangeStart: cfdStart,
+        rangeEnd: cfdEnd,
+        includeDone
+      });
+
+      cfdChart.setOption(buildCfdOption({
+        labels,
+        seriesDefs,
+        boardName: boardName || (boardId || 'Active board')
+      }), true);
+    };
+
+    updateCfd();
+    cfdRangeEl?.addEventListener('change', updateCfd);
+    cfdIncludeDoneEl?.addEventListener('change', updateCfd);
+    window.addEventListener('resize', () => cfdChart.resize());
+  }
 }
 
 main();

@@ -114,6 +114,17 @@ function normalizeTaskForExport(task) {
   const isDone = task?.column === 'done';
   const doneDate = typeof task?.doneDate === 'string' ? task.doneDate.toString().trim() : '';
 
+  const columnHistory = Array.isArray(task?.columnHistory)
+    ? task.columnHistory
+        .map((e) => {
+          const column = typeof e?.column === 'string' ? e.column.trim() : '';
+          const at = typeof e?.at === 'string' ? e.at.trim() : '';
+          if (!column || !at) return null;
+          return { column, at };
+        })
+        .filter(Boolean)
+    : undefined;
+
   return {
     ...task,
     title: title.toString().trim(),
@@ -122,6 +133,7 @@ function normalizeTaskForExport(task) {
     dueDate,
     ...(typeof changeDate === 'string' ? { changeDate: changeDate.toString().trim() } : {}),
     ...(isDone && doneDate ? { doneDate } : { doneDate: undefined }),
+    ...(columnHistory && columnHistory.length ? { columnHistory } : { columnHistory: undefined }),
     // Avoid exporting the legacy field name.
     changedDate: undefined
   };
@@ -157,6 +169,17 @@ function normalizeImportedTasks(tasks) {
       ? (doneDateRaw || (typeof changeDate === 'string' ? changeDate.trim() : '') || (creationDate || ''))
       : '';
 
+    const columnHistory = Array.isArray(t?.columnHistory)
+      ? t.columnHistory
+          .map((e) => {
+            const column = typeof e?.column === 'string' ? e.column.trim() : String(e?.column ?? '').trim();
+            const at = typeof e?.at === 'string' ? e.at.trim() : String(e?.at ?? '').trim();
+            if (!column || !at) return null;
+            return { column, at };
+          })
+          .filter(Boolean)
+      : undefined;
+
     return {
       id: id.trim(),
       title: title.trim(),
@@ -168,6 +191,7 @@ function normalizeImportedTasks(tasks) {
       ...(creationDate ? { creationDate } : {}),
       ...(typeof changeDate === 'string' && changeDate.trim() ? { changeDate: changeDate.trim() } : {}),
       ...(doneDate ? { doneDate } : {}),
+      ...(columnHistory && columnHistory.length ? { columnHistory } : {}),
       labels
     };
   });

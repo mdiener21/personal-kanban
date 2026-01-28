@@ -113,7 +113,8 @@ function defaultTasks() {
       column: 'todo',
       labels: ['urgent'],
       creationDate: created,
-      changeDate: created
+      changeDate: created,
+      columnHistory: [{ column: 'todo', at: created }]
     },
     {
       id: generateUUID(),
@@ -124,7 +125,8 @@ function defaultTasks() {
       column: 'inprogress',
       labels: ['feature'],
       creationDate: created,
-      changeDate: created
+      changeDate: created,
+      columnHistory: [{ column: 'inprogress', at: created }]
     },
     {
       id: generateUUID(),
@@ -135,7 +137,8 @@ function defaultTasks() {
       column: 'inprogress',
       labels: [],
       creationDate: created,
-      changeDate: created
+      changeDate: created,
+      columnHistory: [{ column: 'inprogress', at: created }]
     },
     {
       id: generateUUID(),
@@ -146,7 +149,8 @@ function defaultTasks() {
       column: 'inprogress',
       labels: ['task'],
       creationDate: created,
-      changeDate: created
+      changeDate: created,
+      columnHistory: [{ column: 'inprogress', at: created }]
     },
     {
       id: generateUUID(),
@@ -157,7 +161,9 @@ function defaultTasks() {
       column: 'done',
       labels: ['urgent', 'feature'],
       creationDate: created,
-      changeDate: created
+      changeDate: created,
+      doneDate: created,
+      columnHistory: [{ column: 'done', at: created }]
     },
     {
       id: generateUUID(),
@@ -168,7 +174,9 @@ function defaultTasks() {
       column: 'done',
       labels: [],
       creationDate: created,
-      changeDate: created
+      changeDate: created,
+      doneDate: created,
+      columnHistory: [{ column: 'done', at: created }]
     }
   ];
 }
@@ -367,6 +375,40 @@ export function loadTasks() {
       if (!isDone && hasDoneDate) {
         delete task.doneDate;
         didChange = true;
+      }
+
+      // One-time migration: ensure a usable column history exists for reports (CFD).
+      // We cannot reconstruct past moves for legacy tasks, so seed with the current column
+      // at the earliest known timestamp.
+      const rawHistory = task.columnHistory;
+      const history = Array.isArray(rawHistory) ? rawHistory : null;
+      const seededAt = changeDate || creationDate || nowIso();
+      const seededColumn = typeof task.column === 'string' ? task.column.trim() : '';
+
+      if (!history || history.length === 0) {
+        if (seededAt && seededColumn) {
+          task.columnHistory = [{ column: seededColumn, at: seededAt }];
+          didChange = true;
+        }
+      } else {
+        const cleaned = history
+          .map((e) => {
+            const column = typeof e?.column === 'string' ? e.column.trim() : '';
+            const at = typeof e?.at === 'string' ? e.at.trim() : '';
+            if (!column || !at) return null;
+            return { column, at };
+          })
+          .filter(Boolean);
+
+        if (cleaned.length === 0) {
+          if (seededAt && seededColumn) {
+            task.columnHistory = [{ column: seededColumn, at: seededAt }];
+            didChange = true;
+          }
+        } else if (cleaned.length !== history.length) {
+          task.columnHistory = cleaned;
+          didChange = true;
+        }
       }
 
       return task;
