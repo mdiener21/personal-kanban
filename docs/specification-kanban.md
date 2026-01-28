@@ -102,7 +102,7 @@
   - Sorting permanently reorders tasks (updates the `order` property)
 - **Permanent Done column**: The column with id `done` cannot be deleted.
 - **Reorder**: Drag via grip icon handle, updates order property
-- **Collapse**: Toggle button (left of the grip handle) collapses a column into a ~20px vertical bar; state is stored per column.
+- **Collapse**: Toggle button (left of the grip handle) collapses a column into a ~20px vertical bar; state is stored per column. When collapsed, the column header displays the task count in the format "ColumnName (count)".
 - **Actions**: Plus icon (add task), pencil (edit), trash (delete)
 
 #### Column Header Actions

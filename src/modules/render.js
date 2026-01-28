@@ -15,6 +15,11 @@ export function setBoardFilterQuery(query) {
   boardFilterQuery = (query || '').toString();
 }
 
+function getTaskCountInColumn(columnId) {
+  const tasks = loadTasks();
+  return tasks.filter(t => t.column === columnId).length;
+}
+
 function taskMatchesFilter(task, queryLower, labelsById) {
   if (!queryLower) return true;
 
@@ -350,7 +355,12 @@ function createColumnElement(column) {
   
   const h2 = document.createElement('h2');
   h2.id = `column-title-${column.id}`;
-  h2.textContent = column.name;
+  if (isCollapsed) {
+    const taskCount = getTaskCountInColumn(column.id);
+    h2.textContent = `${column.name} (${taskCount})`;
+  } else {
+    h2.textContent = column.name;
+  }
   
   const taskCounter = document.createElement('span');
   taskCounter.classList.add('task-counter');
