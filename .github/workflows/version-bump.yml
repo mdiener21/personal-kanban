@@ -97,18 +97,9 @@ jobs:
             # Create pull request using GitHub CLI
             gh pr create \
               --title "chore: bump version to $NEW_VERSION" \
-              --body "Automated version bump from ${{ github.sha }}
-
-          This PR was automatically created by the version bump workflow.
-
-          **Changes:**
-          - Bumped version to $NEW_VERSION in package.json
-          - Updated package-lock.json (if present)
-
-          **Note:** This commit includes [skip ci] to prevent triggering another version bump." \
-                        --base main \
-                        --head "$BRANCH_NAME" \
-                        --label "automated" \
-                        --label "version-bump"
-                  env:
-                    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              --body "Automated version bump to $NEW_VERSION from commit $GITHUB_SHA" \
+              --base main \
+              --head "$BRANCH_NAME"
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
