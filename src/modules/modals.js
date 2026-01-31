@@ -34,6 +34,18 @@ function setTaskModalFullscreen(isFullscreen) {
 
   const btn = document.getElementById('task-fullpage-btn');
   btn?.setAttribute('aria-pressed', isFullscreen ? 'true' : 'false');
+  
+  // Update icon and title based on state
+  if (btn) {
+    const icon = btn.querySelector('[data-lucide]');
+    if (icon) {
+      icon.setAttribute('data-lucide', isFullscreen ? 'minimize-2' : 'maximize-2');
+    }
+    btn.title = isFullscreen ? 'Exit full page' : 'Open in full page';
+  }
+  
+  // Re-render icons after changing the icon name
+  renderIcons();
 }
 
 function isModalOpen(modalId) {
