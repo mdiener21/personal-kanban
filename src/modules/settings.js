@@ -1,4 +1,5 @@
 import { loadSettings, saveSettings } from './storage.js';
+import { setupModalCloseHandlers } from './modals.js';
 
 function uniq(values) {
   const out = [];
@@ -90,7 +91,7 @@ export function initializeSettingsUI() {
   });
 
   closeBtn.addEventListener('click', hideSettingsModal);
-  backdrop?.addEventListener('click', hideSettingsModal);
+  setupModalCloseHandlers('settings-modal', hideSettingsModal);
 
   document.addEventListener('keydown', (e) => {
     const modal = document.getElementById('settings-modal');

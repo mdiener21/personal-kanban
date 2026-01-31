@@ -1316,6 +1316,12 @@ fieldset.form-group legend {
   margin: 0;
 }
 
+.modal-header-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
 /* Task modal: desktop full-page toggle (mobile already uses full screen modals) */
 #task-modal.fullscreen .modal-content {
   width: 100%;
@@ -1596,7 +1602,6 @@ fieldset.form-group legend {
 
 /* Notifications Modal List */
 .notifications-list {
-  max-height: 400px;
   overflow-y: auto;
   margin-bottom: 16px;
 }
@@ -1902,7 +1907,6 @@ fieldset.form-group legend {
 }
 
 #labels-list {
-  max-height: 400px;
   overflow-y: auto;
 }
 

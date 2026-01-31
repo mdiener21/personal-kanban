@@ -34,11 +34,44 @@ function setTaskModalFullscreen(isFullscreen) {
 
   const btn = document.getElementById('task-fullpage-btn');
   btn?.setAttribute('aria-pressed', isFullscreen ? 'true' : 'false');
+  
+  // Update icon and title based on state
+  if (btn) {
+    const icon = btn.querySelector('[data-lucide]');
+    if (icon) {
+      icon.setAttribute('data-lucide', isFullscreen ? 'minimize-2' : 'maximize-2');
+    }
+    btn.title = isFullscreen ? 'Exit full page' : 'Open in full page';
+  }
+  
+  // Re-render icons after changing the icon name
+  renderIcons();
 }
 
 function isModalOpen(modalId) {
   const modal = document.getElementById(modalId);
   return !!modal && !modal.classList.contains('hidden');
+}
+
+/**
+ * Generic modal close handler setup.
+ * Automatically wires up backdrop click, close buttons (X), and cancel buttons.
+ * @param {string} modalId - The ID of the modal element
+ * @param {Function} closeHandler - The function to call when closing
+ */
+function setupModalCloseHandlers(modalId, closeHandler) {
+  const modal = document.getElementById(modalId);
+  if (!modal) return;
+
+  // Backdrop click
+  const backdrop = modal.querySelector('.modal-backdrop');
+  backdrop?.addEventListener('click', closeHandler);
+
+  // Close buttons (X icons) and cancel buttons - match by ID pattern
+  const closeButtons = modal.querySelectorAll('[id$="-close-btn"], [id$="-close-modal-btn"], [id$="-cancel-btn"]');
+  closeButtons.forEach((btn) => {
+    btn.addEventListener('click', closeHandler);
+  });
 }
 
 function temporarilyHideTaskModalForLabelsManager() {
@@ -110,6 +143,8 @@ function renderActiveTaskLabels() {
     container.appendChild(pill);
   });
 }
+
+export { setupModalCloseHandlers };
 
 export function showModal(columnName) {
   currentColumn = columnName || loadColumns()[0]?.id || 'todo';
@@ -670,8 +705,7 @@ export function initializeModalHandlers() {
     renderBoard();
   });
 
-  document.getElementById('cancel-task-btn').addEventListener('click', hideModal);
-  document.querySelector('#task-modal .modal-backdrop').addEventListener('click', hideModal);
+  setupModalCloseHandlers('task-modal', hideModal);
 
   // Column modal
   document.getElementById('column-form').addEventListener('submit', async (e) => {
@@ -689,13 +723,12 @@ export function initializeModalHandlers() {
     renderBoard();
   });
 
-  document.getElementById('cancel-column-btn').addEventListener('click', hideColumnModal);
-  document.querySelector('#column-modal .modal-backdrop').addEventListener('click', hideColumnModal);
+  setupModalCloseHandlers('column-modal', hideColumnModal);
 
   // Labels modal
   document.getElementById('manage-labels-btn').addEventListener('click', showLabelsModal);
-  document.getElementById('labels-close-btn').addEventListener('click', hideLabelsModal);
   document.getElementById('add-label-btn').addEventListener('click', () => showLabelModal());
+  setupModalCloseHandlers('labels-modal', hideLabelsModal);
 
   const labelNameInput = document.getElementById('label-name');
   labelNameInput?.addEventListener('beforeinput', (e) => {
@@ -792,10 +825,8 @@ export function initializeModalHandlers() {
       hideLabelsModal();
     }
   });
-  
-  document.getElementById('cancel-label-btn').addEventListener('click', hideLabelModal);
-  document.querySelector('#labels-modal .modal-backdrop').addEventListener('click', hideLabelsModal);
-  document.querySelector('#label-modal .modal-backdrop').addEventListener('click', hideLabelModal);
+
+  setupModalCloseHandlers('label-modal', hideLabelModal);
 
   // Boards modal
   document.getElementById('manage-boards-btn')?.addEventListener('click', showBoardsModal);
@@ -812,8 +843,7 @@ export function initializeModalHandlers() {
     if (!ok) return;
     document.getElementById('import-file')?.click();
   });
-  document.getElementById('boards-close-btn')?.addEventListener('click', hideBoardsModal);
-  document.querySelector('#boards-modal .modal-backdrop')?.addEventListener('click', hideBoardsModal);
+  setupModalCloseHandlers('boards-modal', hideBoardsModal);
 
   // Board rename modal
   document.getElementById('board-rename-form')?.addEventListener('submit', (e) => {
@@ -840,13 +870,11 @@ export function initializeModalHandlers() {
     }
   });
 
-  document.getElementById('cancel-board-rename-btn')?.addEventListener('click', hideBoardRenameModal);
-  document.querySelector('#board-rename-modal .modal-backdrop')?.addEventListener('click', hideBoardRenameModal);
+  setupModalCloseHandlers('board-rename-modal', hideBoardRenameModal);
 
   // Help modal
   document.getElementById('help-btn').addEventListener('click', showHelpModal);
-  document.getElementById('help-close-btn').addEventListener('click', hideHelpModal);
-  document.querySelector('#help-modal .modal-backdrop').addEventListener('click', hideHelpModal);
+  setupModalCloseHandlers('help-modal', hideHelpModal);
 
   // Add column button
   document.getElementById('add-column-btn').addEventListener('click', showColumnModal);

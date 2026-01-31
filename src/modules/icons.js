@@ -29,7 +29,9 @@ import {
   ArrowUpDown,
   X,
   Bell,
-  BellRing
+  BellRing,
+  Maximize2,
+  Minimize2
 } from 'lucide';
 
 // Map of all icons used in the app (PascalCase keys for createIcons)
@@ -59,7 +61,9 @@ const icons = {
   ArrowUpDown,
   X,
   Bell,
-  BellRing
+  BellRing,
+  Maximize2,
+  Minimize2
 };
 
 /**

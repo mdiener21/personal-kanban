@@ -7,9 +7,9 @@
   <title>Personal Kanban Board</title>
   <!-- Kanban favicon (inline SVG data URI) -->
   <link rel="icon" href="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='2' y='3' width='6' height='18' rx='1.5' fill='%233b82f6'/%3E%3Crect x='9' y='3' width='6' height='12' rx='1.5' fill='%2360a5fa'/%3E%3Crect x='16' y='3' width='6' height='8' rx='1.5' fill='%2393c5fd'/%3E%3C/svg%3E">
-  <script type="module" crossorigin src="./assets/index-z2vB7jEE.js"></script>
-  <link rel="modulepreload" crossorigin href="./assets/storage-gHWR1jxx.js">
-  <link rel="stylesheet" crossorigin href="./assets/storage-D0zpVtPC.css">
+  <script type="module" crossorigin src="./assets/index-D7D6KyJk.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/storage-DdxH02QY.js">
+  <link rel="stylesheet" crossorigin href="./assets/storage-BQaxe-xH.css">
 </head>
 <body>
   <!-- Skip link for accessibility -->
@@ -69,7 +69,6 @@
         </button>
         <button id="theme-toggle-btn" class="control-btn" type="button" aria-pressed="false" aria-label="Toggle dark mode">
           <span data-lucide="moon" aria-hidden="true"></span>
-          <span>Dark</span>
         </button>
          <button id="show-reports-btn" class="control-btn" type="button" aria-pressed="false" aria-label="Show Reports">
           <span data-lucide="chart-column" aria-hidden="true"></span>
@@ -112,9 +111,14 @@
     <article class="modal-content">
       <header class="modal-header-row">
         <h3 id="task-modal-title">Add New Task</h3>
-        <button id="task-fullpage-btn" type="button" class="btn-small hidden" aria-pressed="false" title="Open in full page">
-          <span data-lucide="fullscreen" aria-hidden="true"></span>
-        </button>
+        <div class="modal-header-actions">
+          <button id="task-fullpage-btn" type="button" class="btn-small hidden" aria-pressed="false" title="Open in full page">
+            <span data-lucide="maximize-2" aria-hidden="true"></span>
+          </button>
+          <button id="task-close-btn" type="button" class="btn-small" aria-label="Close task editor" title="Close">
+            <span data-lucide="x" aria-hidden="true"></span>
+          </button>
+        </div>
       </header>
       <form id="task-form" novalidate>
         <div class="form-group">
@@ -169,7 +173,12 @@
   <div id="column-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="column-modal-title">
     <div class="modal-backdrop" data-close-modal></div>
     <article class="modal-content">
-      <h3 id="column-modal-title">Add New Column</h3>
+      <header class="modal-header-row">
+        <h3 id="column-modal-title">Add New Column</h3>
+        <button id="column-close-btn" type="button" class="icon-btn" aria-label="Close" title="Close">
+          <span data-lucide="x" aria-hidden="true"></span>
+        </button>
+      </header>
       <form id="column-form" novalidate>
         <div class="form-group">
           <label for="column-name">Column Name <span aria-hidden="true">*</span></label>
@@ -192,7 +201,12 @@
   <div id="labels-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="labels-modal-title">
     <div class="modal-backdrop" data-close-modal></div>
     <article class="modal-content">
-      <h3 id="labels-modal-title">Manage Labels</h3>
+      <header class="modal-header-row">
+        <h3 id="labels-modal-title">Manage Labels</h3>
+        <button id="labels-close-modal-btn" type="button" class="icon-btn" aria-label="Close" title="Close">
+          <span data-lucide="x" aria-hidden="true"></span>
+        </button>
+      </header>
       <div class="form-group task-label-search-row">
         <input type="text" id="labels-search" placeholder="Search labels…" autocomplete="off" aria-label="Filter labels">
       </div>
@@ -210,7 +224,12 @@
   <div id="boards-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="boards-modal-title">
     <div class="modal-backdrop" data-close-modal></div>
     <article class="modal-content">
-      <h3 id="boards-modal-title">Manage Boards</h3>
+      <header class="modal-header-row">
+        <h3 id="boards-modal-title">Manage Boards</h3>
+        <button id="boards-close-modal-btn" type="button" class="icon-btn" aria-label="Close" title="Close">
+          <span data-lucide="x" aria-hidden="true"></span>
+        </button>
+      </header>
       <div id="boards-list" class="labels-list" aria-label="Boards list"></div>
       <div class="form-actions">
         <button id="add-board-btn" type="button" class="btn btn-primary">
@@ -230,7 +249,12 @@
   <div id="settings-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="settings-modal-title">
     <div class="modal-backdrop" data-close-modal></div>
     <article class="modal-content">
-      <h3 id="settings-modal-title">Settings</h3>
+      <header class="modal-header-row">
+        <h3 id="settings-modal-title">Settings</h3>
+        <button id="settings-close-modal-btn" type="button" class="icon-btn" aria-label="Close" title="Close">
+          <span data-lucide="x" aria-hidden="true"></span>
+        </button>
+      </header>
       <form id="settings-form" novalidate>
         <div class="form-group checkbox-group">
           <label>
@@ -243,6 +267,18 @@
             <input id="settings-show-due-date" type="checkbox">
             Show task due date
           </label>
+        </div>
+        <div class="form-group">
+          <label for="settings-notification-days">Notifications: upcoming window (days)</label>
+          <input
+            id="settings-notification-days"
+            type="number"
+            min="0"
+            max="365"
+            step="1"
+            inputmode="numeric"
+            aria-label="Number of days ahead to include for notifications"
+          >
         </div>
         <div class="form-group checkbox-group">
           <label>
@@ -279,7 +315,12 @@
   <div id="board-rename-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="board-rename-modal-title">
     <div class="modal-backdrop" data-close-modal></div>
     <article class="modal-content">
-      <h3 id="board-rename-modal-title">Rename Board</h3>
+      <header class="modal-header-row">
+        <h3 id="board-rename-modal-title">Rename Board</h3>
+        <button id="board-rename-close-btn" type="button" class="icon-btn" aria-label="Close" title="Close">
+          <span data-lucide="x" aria-hidden="true"></span>
+        </button>
+      </header>
       <form id="board-rename-form" novalidate>
         <div class="form-group">
           <label for="board-rename-name">Board Name <span aria-hidden="true">*</span></label>
@@ -297,7 +338,12 @@
   <div id="board-create-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="board-create-modal-title">
     <div class="modal-backdrop" data-close-modal></div>
     <article class="modal-content">
-      <h3 id="board-create-modal-title">Create New Board</h3>
+      <header class="modal-header-row">
+        <h3 id="board-create-modal-title">Create New Board</h3>
+        <button id="board-create-close-btn" type="button" class="icon-btn" aria-label="Close" title="Close">
+          <span data-lucide="x" aria-hidden="true"></span>
+        </button>
+      </header>
       <form id="board-create-form" novalidate>
         <div class="form-group">
           <label for="board-create-name">Board Name <span aria-hidden="true">*</span></label>
@@ -315,7 +361,12 @@
   <div id="dialog-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="dialog-modal-title">
     <div class="modal-backdrop" data-close-modal></div>
     <article class="modal-content">
-      <h3 id="dialog-modal-title">Confirm</h3>
+      <header class="modal-header-row">
+        <h3 id="dialog-modal-title">Confirm</h3>
+        <button id="dialog-close-btn" type="button" class="icon-btn" aria-label="Close" title="Close">
+          <span data-lucide="x" aria-hidden="true"></span>
+        </button>
+      </header>
       <p id="dialog-modal-message"></p>
       <div class="form-actions">
         <button type="button" id="dialog-cancel-btn" class="btn btn-secondary">Cancel</button>
@@ -328,7 +379,12 @@
   <div id="label-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="label-modal-title">
     <div class="modal-backdrop" data-close-modal></div>
     <article class="modal-content">
-      <h3 id="label-modal-title">Add Label</h3>
+      <header class="modal-header-row">
+        <h3 id="label-modal-title">Add Label</h3>
+        <button id="label-close-btn" type="button" class="icon-btn" aria-label="Close" title="Close">
+          <span data-lucide="x" aria-hidden="true"></span>
+        </button>
+      </header>
       <form id="label-form" novalidate>
         <div class="form-group">
           <label for="label-name">Label Name <span aria-hidden="true">*</span></label>
@@ -350,7 +406,12 @@
   <div id="help-modal" class="modal modal-large hidden" role="dialog" aria-modal="true" aria-labelledby="help-modal-title">
     <div class="modal-backdrop" data-close-modal></div>
     <article class="modal-content">
-      <h3 id="help-modal-title">Personal Kanban Board Help</h3>
+      <header class="modal-header-row">
+        <h3 id="help-modal-title">Personal Kanban Board Help</h3>
+        <button id="help-close-modal-btn" type="button" class="icon-btn" aria-label="Close" title="Close">
+          <span data-lucide="x" aria-hidden="true"></span>
+        </button>
+      </header>
       <div class="help-content">
         <section>
           <h4>About This Board</h4>
@@ -452,7 +513,12 @@
   <div id="notifications-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="notifications-modal-title">
     <div class="modal-backdrop" data-close-modal></div>
     <article class="modal-content">
-      <h3 id="notifications-modal-title">Upcoming & Overdue Tasks</h3>
+      <header class="modal-header-row">
+        <h3 id="notifications-modal-title">Upcoming & Overdue Tasks</h3>
+        <button id="notifications-close-modal-btn" type="button" class="icon-btn" aria-label="Close" title="Close">
+          <span data-lucide="x" aria-hidden="true"></span>
+        </button>
+      </header>
       <div class="notifications-controls checkbox-group" aria-label="Notification settings">
         <label for="notification-banner-visibility-toggle">
           <input id="notification-banner-visibility-toggle" type="checkbox">
