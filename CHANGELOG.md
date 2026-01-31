@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added (unreleased)
 
 - Reports dashboard: Cumulative Flow Diagram (CFD) stacked area chart showing task count by column over time.
+- Task edit modal now includes a small X close button in the top-right.
 
 
 ### Changed (unreleased)

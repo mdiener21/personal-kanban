@@ -125,6 +125,7 @@
 - **New task placement**: Newly created tasks are inserted at the top of the selected column (order `1`).
 - **Edit**: Click task title/description, modal pre-filled with current data
 - **Edit (full page)**: In the Edit Task modal, an "Open in full page" button (fullscreen icon) expands the modal to full-screen size on larger screens
+- **Edit (close)**: The Edit Task modal includes a small **×** button in the top-right that closes the modal (same behavior as Cancel)
 - **Delete**: Click X button, confirm deletion
 - **Move**: Drag between columns, auto-saves new column and order
 - **Display**: Title (clickable), optional description (clamped to ~2 lines), labels (colored badges), optional meta row (priority and/or due date depending on Settings), delete button

@@ -109,9 +109,14 @@
     <article class="modal-content">
       <header class="modal-header-row">
         <h3 id="task-modal-title">Add New Task</h3>
-        <button id="task-fullpage-btn" type="button" class="btn-small hidden" aria-pressed="false" title="Open in full page">
-          <span data-lucide="fullscreen" aria-hidden="true"></span>
-        </button>
+        <div class="modal-header-actions">
+          <button id="task-fullpage-btn" type="button" class="btn-small hidden" aria-pressed="false" title="Open in full page">
+            <span data-lucide="maximize-2" aria-hidden="true"></span>
+          </button>
+          <button id="task-close-btn" type="button" class="btn-small" aria-label="Close task editor" title="Close">
+            <span data-lucide="x" aria-hidden="true"></span>
+          </button>
+        </div>
       </header>
       <form id="task-form" novalidate>
         <div class="form-group">

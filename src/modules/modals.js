@@ -671,6 +671,7 @@ export function initializeModalHandlers() {
   });
 
   document.getElementById('cancel-task-btn').addEventListener('click', hideModal);
+  document.getElementById('task-close-btn')?.addEventListener('click', hideModal);
   document.querySelector('#task-modal .modal-backdrop').addEventListener('click', hideModal);
 
   // Column modal
