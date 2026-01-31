@@ -5,68 +5,88 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Personal Kanban Reports">
   <title>Kanban Reports</title>
-  <script type="module" crossorigin src="./assets/reports-Csai25XO.js"></script>
-  <link rel="modulepreload" crossorigin href="./assets/storage-gHWR1jxx.js">
-  <link rel="stylesheet" crossorigin href="./assets/storage-D0zpVtPC.css">
+  <script type="module" crossorigin src="./assets/reports-l36TJ8ed.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/storage-DdxH02QY.js">
+  <link rel="stylesheet" crossorigin href="./assets/storage-BQaxe-xH.css">
 </head>
-<body>
-  <header>
-    <nav class="controls" role="toolbar" aria-label="Reports controls">
-      <div class="brand">
-        <span data-lucide="square-kanban" aria-hidden="true" class="brand-icon"></span>
-        <span class="brand-text" id="reports-title">Reports</span>
+<body class="reports-page">
+  <header class="rpt-header" role="banner">
+    <div class="rpt-header-left">
+      <span data-lucide="square-kanban" aria-hidden="true" class="rpt-logo"></span>
+      <div class="rpt-header-titles">
+        <h1 class="rpt-title" id="reports-title">Reports</h1>
+        <div class="rpt-subtitle">Dashboard</div>
       </div>
+    </div>
 
-      <div class="controls-actions" style="display:flex; position:static; box-shadow:none; border:none; padding:0; background:transparent;">
-        <a class="control-btn" href="./index.html" style="text-decoration:none;">
-          Back to Board
-        </a>
-      </div>
-    </nav>
+    <div class="rpt-header-right" role="group" aria-label="Reports actions">
+      <div class="rpt-badge" id="reports-board-badge" title="Active board">?</div>
+      <a class="rpt-link" href="./index.html">Back to Board</a>
+    </div>
   </header>
 
-  <main class="container reports-dashboard">
-    <section class="task-column reports-kpis" aria-label="Weekly completion summary">
-      <div class="column-header" style="justify-content: space-between;">
-        <h2 style="text-align:left;">Weekly completion</h2>
-        <div class="task-counter" id="reports-board-badge" title="Active board">?</div>
+  <main class="rpt-main" aria-label="Reports dashboard">
+    <section class="reports-kpis" aria-label="Weekly completion summary">
+      <div class="rpt-card-header">
+        <h2 class="rpt-card-title">Weekly completion</h2>
       </div>
 
-      <div class="reports-kpi-grid" role="group" aria-label="Completion KPIs">
-        <div class="reports-kpi">
-          <div class="reports-kpi-label">Completed this week</div>
-          <div class="reports-kpi-value" id="reports-completed-this-week">0</div>
+      <div class="rpt-kpi-grid" role="group" aria-label="Completion KPIs">
+        <div class="rpt-kpi">
+          <div class="rpt-kpi-label">Completed this week</div>
+          <div class="rpt-kpi-value" id="reports-completed-this-week">0</div>
         </div>
-        <div class="reports-kpi">
-          <div class="reports-kpi-label">Completed last week</div>
-          <div class="reports-kpi-value" id="reports-completed-last-week">0</div>
+        <div class="rpt-kpi">
+          <div class="rpt-kpi-label">Completed last week</div>
+          <div class="rpt-kpi-value" id="reports-completed-last-week">0</div>
         </div>
-        <div class="reports-kpi">
-          <div class="reports-kpi-label">Avg lead time (last 12 weeks)</div>
-          <div class="reports-kpi-value" id="reports-avg-leadtime-12w">–</div>
+        <div class="rpt-kpi">
+          <div class="rpt-kpi-label">Avg lead time (last 12 weeks)</div>
+          <div class="rpt-kpi-value" id="reports-avg-leadtime-12w">–</div>
         </div>
       </div>
 
-      <div class="reports-spark" aria-label="Tasks completed per week sparkline">
-        <div class="reports-spark-title">Tasks completed per week (last 12 weeks)</div>
-        <div id="reports-completed-spark" style="width: 100%; height: 120px;"></div>
+      <div class="rpt-spark" aria-label="Tasks completed per week sparkline">
+        <div class="rpt-spark-title">Completed per week (last 12 weeks)</div>
+        <div id="reports-completed-spark" class="rpt-chart"></div>
       </div>
     </section>
 
-    <section class="task-column" style="min-width: 0; margin: 10px 0;">
-      <div class="column-header" style="justify-content: space-between;">
-        <h2 style="text-align:left;">Lead time (creation → done)</h2>
-        <div class="task-counter" id="reports-leadtime-badge" title="Completed tasks (last 12 weeks)">0</div>
+    <section class="reports-kpis" aria-label="Lead time report">
+      <div class="rpt-card-header">
+        <h2 class="rpt-card-title">Lead time (creation → done)</h2>
+        <div class="rpt-badge" id="reports-leadtime-badge" title="Completed tasks (last 12 weeks)">0</div>
       </div>
-      <div id="reports-leadtime-chart" style="width: 100%; height: 360px;"></div>
+      <div id="reports-leadtime-chart" class="rpt-chart"></div>
     </section>
 
-    <section class="task-column" style="min-width: 0; margin: 10px 0;">
-      <div class="column-header" style="justify-content: space-between;">
-        <h2 style="text-align:left;">Daily updates (last 365 days)</h2>
-        <div class="task-counter" title="Active board" style="visibility:hidden;">?</div>
+    <section class="reports-kpis" aria-label="Daily updates report">
+      <div class="rpt-card-header">
+        <h2 class="rpt-card-title">Daily updates (365d)</h2>
       </div>
-      <div id="reports-chart" style="width: 100%; height: 520px;"></div>
+      <div id="reports-chart" class="rpt-chart"></div>
+    </section>
+
+    <section class="reports-kpis" aria-label="Cumulative flow diagram">
+      <div class="rpt-card-header">
+        <h2 class="rpt-card-title">Cumulative flow (WIP)</h2>
+        <div class="rpt-controls" role="group" aria-label="Cumulative flow controls">
+          <label class="rpt-control">
+            <input type="checkbox" id="reports-cfd-include-done" checked>
+            Include Done
+          </label>
+          <label class="rpt-control">
+            <span class="rpt-control-label">Range</span>
+            <select id="reports-cfd-range" class="rpt-select" aria-label="Cumulative flow range">
+              <option value="30">30d</option>
+              <option value="90" selected>90d</option>
+              <option value="180">180d</option>
+              <option value="365">365d</option>
+            </select>
+          </label>
+        </div>
+      </div>
+      <div id="reports-cfd-chart" class="rpt-chart"></div>
     </section>
   </main>
 
