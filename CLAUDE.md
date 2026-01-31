@@ -14,6 +14,11 @@ npm run build    # Production build to dist/
 npm run preview  # Preview production build
 ```
 
+## Specification
+
+The specification files include core data structures and details to be maintained at all times.
+- `docs/specification-kanban.md` - Detailed description of the kanban board functionality, features, models, to be always updated after making changes to any functionality.
+
 ## Architecture
 
 ### Entry Points

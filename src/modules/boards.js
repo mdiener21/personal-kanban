@@ -1,5 +1,6 @@
 import { generateUUID } from './utils.js';
 import { renderBoard } from './render.js';
+import { setupModalCloseHandlers } from './modals.js';
 import {
   ensureBoardsInitialized,
   listBoards,
@@ -100,6 +101,8 @@ export function initializeBoardsUI() {
   if (cancelCreateBtn) {
     cancelCreateBtn.addEventListener('click', hideBoardCreateModal);
   }
+
+  setupModalCloseHandlers('board-create-modal', hideBoardCreateModal);
 
   if (createForm) {
     createForm.addEventListener('submit', async (e) => {

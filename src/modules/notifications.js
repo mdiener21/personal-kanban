@@ -1,5 +1,5 @@
 import { loadTasks, loadSettings } from './storage.js';
-import { showEditModal } from './modals.js';
+import { showEditModal, setupModalCloseHandlers } from './modals.js';
 import { renderIcons } from './icons.js';
 
 const NOTIFICATION_BANNER_HIDDEN_KEY = 'kanbanNotificationBannerHidden';
@@ -382,9 +382,7 @@ export function initializeNotifications() {
   const closeBtn = document.getElementById('notifications-close-btn');
   closeBtn?.addEventListener('click', hideNotificationsModal);
 
-  // Backdrop click handler
-  const backdrop = document.querySelector('#notifications-modal .modal-backdrop');
-  backdrop?.addEventListener('click', hideNotificationsModal);
+  setupModalCloseHandlers('notifications-modal', hideNotificationsModal);
 
   // Escape key handler
   document.addEventListener('keydown', (e) => {

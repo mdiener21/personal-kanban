@@ -1,3 +1,5 @@
+import { setupModalCloseHandlers } from './modals.js';
+
 let currentResolver = null;
 
 function getEl(id) {
@@ -45,7 +47,8 @@ function ensureDialogHandlers() {
 
   confirmBtn?.addEventListener('click', () => closeDialog(true));
   cancelBtn?.addEventListener('click', () => closeDialog(false));
-  backdrop?.addEventListener('click', () => closeDialog(false));
+  
+  setupModalCloseHandlers('dialog-modal', () => closeDialog(false));
 
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && isDialogOpen()) {
