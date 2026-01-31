@@ -68,7 +68,9 @@ function setupModalCloseHandlers(modalId, closeHandler) {
   backdrop?.addEventListener('click', closeHandler);
 
   // Close buttons (X icons) and cancel buttons - match by ID pattern
-  const closeButtons = modal.querySelectorAll('[id$="-close-btn"], [id$="-close-modal-btn"], [id$="-cancel-btn"]');
+  const closeButtons = modal.querySelectorAll(
+    '[id$="-close-btn"], [id$="-close-modal-btn"], [id$="-cancel-btn"], [id^="cancel-"]'
+  );
   closeButtons.forEach((btn) => {
     btn.addEventListener('click', closeHandler);
   });
