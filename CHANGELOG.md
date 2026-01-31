@@ -9,11 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added (unreleased)
 
+### Changed (unreleased)
+
+### Removed (unreleased)
+
+## [1.0.6] - 2026-01-31
+
+### Added (1.0.6)
+
 - Reports dashboard: Cumulative Flow Diagram (CFD) stacked area chart showing task count by column over time.
 - Task edit modal now includes a small X close button in the top-right.
 
-
-### Changed (unreleased)
+### Changed (1.0.6)
 
 - Tasks now track `columnHistory` to support cumulative flow reporting.
 - Reports page layout redesigned as a fixed dashboard grid with reports-specific styles (no page scrolling).
@@ -24,8 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Notification banner now refits its task count when the window is resized
 - update bump version automagically
 
-
-### Removed (unreleased)
+### Removed (1.0.6)
 
 ## [1.0.5] - 2026-01-25
 
