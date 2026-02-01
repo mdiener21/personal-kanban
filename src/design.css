@@ -1906,6 +1906,30 @@ fieldset.form-group legend {
   text-align: center;
 }
 
+.labels-empty-button {
+  width: 100%;
+  padding: 8px;
+  font-size: 13px;
+  color: var(--text-muted);
+  text-align: center;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.labels-empty-button:hover {
+  color: var(--color-primary);
+  background-color: var(--input-focus-ring);
+  border-radius: 6px;
+}
+
+.labels-empty-button:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
 #labels-list {
   overflow-y: auto;
 }

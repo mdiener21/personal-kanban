@@ -320,7 +320,7 @@ function hideHelpModal() {
   modal.classList.add('hidden');
 }
 
-function showLabelModal(labelId = null, { openedFromTaskEditor = false } = {}) {
+function showLabelModal(labelId = null, { openedFromTaskEditor = false, initialName = '' } = {}) {
   editingLabelId = labelId;
   hasShownLabelMaxLengthAlert = false;
   selectCreatedLabelInTaskEditor = !!openedFromTaskEditor;
@@ -342,7 +342,7 @@ function showLabelModal(labelId = null, { openedFromTaskEditor = false } = {}) {
   } else {
     modalTitle.textContent = 'Add Label';
     submitBtn.textContent = 'Add Label';
-    nameInput.value = '';
+    nameInput.value = initialName || '';
     colorInput.value = '#3b82f6';
   }
   
@@ -627,10 +627,25 @@ function updateTaskLabelsSelection() {
     : labels;
 
   if (filteredLabels.length === 0) {
-    const empty = document.createElement('div');
-    empty.classList.add('labels-empty');
-    empty.textContent = 'No matching labels';
-    container.appendChild(empty);
+    if (query) {
+      // Show a button to create the label
+      const createBtn = document.createElement('button');
+      createBtn.type = 'button';
+      createBtn.classList.add('labels-empty-button');
+      createBtn.textContent = `No label found "${query}" - Create label`;
+      createBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        showLabelModal(null, { openedFromTaskEditor: true, initialName: query });
+      });
+      container.appendChild(createBtn);
+    } else {
+      // Show the empty message div
+      const empty = document.createElement('div');
+      empty.classList.add('labels-empty');
+      empty.textContent = 'No matching labels';
+      container.appendChild(empty);
+    }
     return;
   }
 

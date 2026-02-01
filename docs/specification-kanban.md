@@ -140,6 +140,7 @@
   - Each selected label pill has a small **×** button to remove it from the task
   - Label list supports a compact **search/filter** field to quickly find labels
   - The label search field includes a small **+** icon button that opens the **Add Label** modal directly so users can create a new label without leaving task editing; the task modal remains open behind it and preserves in-progress edits
+  - When a search returns no matching labels, a full-width button is displayed with the text: `No label found "[search term]" - Create label` which opens the label creation modal with the search term pre-filled in the name field, allowing users to create and customize the new label
 - **Task Limit**: If >12 tasks in column, show scrollbar (max-height 600px). "Show all tasks (N)" button expands to 80vh with scrollbar
 
 ### Labels
