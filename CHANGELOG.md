@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added (unreleased)
 
 - Label search in task editor now shows a full-width "No label found 'X' - Create label" button when no matches are found, allowing users to quickly create a new label with the search term as the pre-filled name
+- Form validation for task title and column name fields: both fields are now required and display a red error state with explanatory message when submitted empty
+- Validation module (`src/modules/validation.js`) for reusable form field validation functions
 
 ### Changed (unreleased)
 
