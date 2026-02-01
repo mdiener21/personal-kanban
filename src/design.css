@@ -1234,6 +1234,28 @@ fieldset.form-group legend {
   box-shadow: 0 0 0 3px var(--input-focus-ring);
 }
 
+/* Error state for form fields */
+.form-group.error input[type="text"],
+.form-group.error textarea {
+  border-color: var(--color-danger);
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+.form-group.error label {
+  color: var(--color-danger);
+}
+
+.form-group.error-message {
+  font-size: 12px;
+  color: var(--color-danger);
+  margin-top: 4px;
+  display: none;
+}
+
+.form-group.error .error-message {
+  display: block;
+}
+
 .form-actions {
   display: flex;
   gap: 10px;
@@ -1904,6 +1926,30 @@ fieldset.form-group legend {
   font-size: 13px;
   color: var(--text-muted);
   text-align: center;
+}
+
+.labels-empty-button {
+  width: 100%;
+  padding: 8px;
+  font-size: 13px;
+  color: var(--text-muted);
+  text-align: center;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.labels-empty-button:hover {
+  color: var(--color-primary);
+  background-color: var(--input-focus-ring);
+  border-radius: 6px;
+}
+
+.labels-empty-button:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: 6px;
 }
 
 #labels-list {

@@ -14,6 +14,7 @@ import {
 import { confirmDialog, alertDialog } from './dialog.js';
 import { renderIcons } from './icons.js';
 import { exportBoard } from './importexport.js';
+import { validateAndShowTaskTitleError, validateAndShowColumnNameError, clearFieldError } from './validation.js';
 
 // Modal state
 let currentColumn = 'todo';
@@ -168,6 +169,9 @@ export function showModal(columnName) {
   const modalTitle = document.getElementById('task-modal-title');
   const submitBtn = document.getElementById('task-submit-btn');
   
+  // Clear error state on the title field
+  clearFieldError(taskTitle);
+  
   modalTitle.textContent = 'Add New Task';
   submitBtn.textContent = 'Add Task';
   columnSelect.value = currentColumn;
@@ -210,6 +214,9 @@ export function showEditModal(taskId) {
   const modalTitle = document.getElementById('task-modal-title');
   const submitBtn = document.getElementById('task-submit-btn');
   
+  // Clear error state on the title field
+  clearFieldError(taskTitle);
+  
   modalTitle.textContent = 'Edit Task';
   submitBtn.textContent = 'Save Changes';
   columnSelect.value = task.column;
@@ -250,6 +257,9 @@ export function showColumnModal() {
   const modalTitle = document.getElementById('column-modal-title');
   const submitBtn = document.getElementById('column-submit-btn');
   
+  // Clear error state on the name field
+  clearFieldError(columnName);
+  
   modalTitle.textContent = 'Add New Column';
   submitBtn.textContent = 'Add Column';
   columnName.value = '';
@@ -269,6 +279,9 @@ export function showEditColumnModal(columnId) {
   const columnColor = document.getElementById('column-color');
   const modalTitle = document.getElementById('column-modal-title');
   const submitBtn = document.getElementById('column-submit-btn');
+  
+  // Clear error state on the name field
+  clearFieldError(columnName);
   
   modalTitle.textContent = 'Edit Column';
   submitBtn.textContent = 'Save Changes';
@@ -320,7 +333,7 @@ function hideHelpModal() {
   modal.classList.add('hidden');
 }
 
-function showLabelModal(labelId = null, { openedFromTaskEditor = false } = {}) {
+function showLabelModal(labelId = null, { openedFromTaskEditor = false, initialName = '' } = {}) {
   editingLabelId = labelId;
   hasShownLabelMaxLengthAlert = false;
   selectCreatedLabelInTaskEditor = !!openedFromTaskEditor;
@@ -342,7 +355,7 @@ function showLabelModal(labelId = null, { openedFromTaskEditor = false } = {}) {
   } else {
     modalTitle.textContent = 'Add Label';
     submitBtn.textContent = 'Add Label';
-    nameInput.value = '';
+    nameInput.value = initialName || '';
     colorInput.value = '#3b82f6';
   }
   
@@ -627,10 +640,25 @@ function updateTaskLabelsSelection() {
     : labels;
 
   if (filteredLabels.length === 0) {
-    const empty = document.createElement('div');
-    empty.classList.add('labels-empty');
-    empty.textContent = 'No matching labels';
-    container.appendChild(empty);
+    if (query) {
+      // Show a button to create the label
+      const createBtn = document.createElement('button');
+      createBtn.type = 'button';
+      createBtn.classList.add('labels-empty-button');
+      createBtn.textContent = `No label found "${query}" - Create label`;
+      createBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        showLabelModal(null, { openedFromTaskEditor: true, initialName: query });
+      });
+      container.appendChild(createBtn);
+    } else {
+      // Show the empty message div
+      const empty = document.createElement('div');
+      empty.classList.add('labels-empty');
+      empty.textContent = 'No matching labels';
+      container.appendChild(empty);
+    }
     return;
   }
 
@@ -691,7 +719,14 @@ export function initializeModalHandlers() {
   // Task modal
   document.getElementById('task-form').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const title = document.getElementById('task-title').value;
+    const titleInput = document.getElementById('task-title');
+    
+    // Validate title is not empty
+    if (!validateAndShowTaskTitleError(titleInput)) {
+      return;
+    }
+    
+    const title = titleInput.value.trim();
     const description = document.getElementById('task-description').value;
     const priority = document.getElementById('task-priority')?.value;
     const dueDate = document.getElementById('task-due-date')?.value;
@@ -712,7 +747,14 @@ export function initializeModalHandlers() {
   // Column modal
   document.getElementById('column-form').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const name = document.getElementById('column-name').value;
+    const nameInput = document.getElementById('column-name');
+    
+    // Validate name is not empty
+    if (!validateAndShowColumnNameError(nameInput)) {
+      return;
+    }
+    
+    const name = nameInput.value.trim();
     const color = document.getElementById('column-color')?.value;
     
     if (editingColumnId) {

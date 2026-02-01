@@ -95,7 +95,9 @@
 
 ### Column Features
 
-- **Create**: Modal form with column name input + color picker
+- **Create**: Modal form with column name (required) input + color picker
+  - If submitted without a name, the name field displays a red error border, red label, and "Column name is required" message below the field
+  - Error state is cleared when the modal is reopened
 - **New column placement**: Newly created column are inserted to the far right of the board but before column `done` (order `-1`).
 - **Edit**: Open column menu (ellipsis) → pencil, edit name + color in modal
 - **Delete**: Open column menu (ellipsis) → trash, confirm if tasks exist
@@ -121,7 +123,9 @@
 
 ### Task Features
 
-- **Create**: Click plus icon in column header, modal with Title, Description, Priority, Due Date, column select, label checkboxes
+- **Create**: Click plus icon in column header, modal with Title (required), Description, Priority, Due Date, column select, label checkboxes
+  - If submitted without a title, the title field displays a red error border, red label, and "Task title is required" message below the field
+  - Error state is cleared when the modal is reopened or when a valid title is entered
 - **New task placement**: Newly created tasks are inserted at the top of the selected column (order `1`).
 - **Edit**: Click task title/description, modal pre-filled with current data
 - **Edit (full page)**: In the Edit Task modal, an "Open in full page" button (fullscreen icon) expands the modal to full-screen size on larger screens
@@ -140,6 +144,7 @@
   - Each selected label pill has a small **×** button to remove it from the task
   - Label list supports a compact **search/filter** field to quickly find labels
   - The label search field includes a small **+** icon button that opens the **Add Label** modal directly so users can create a new label without leaving task editing; the task modal remains open behind it and preserves in-progress edits
+  - When a search returns no matching labels, a full-width button is displayed with the text: `No label found "[search term]" - Create label` which opens the label creation modal with the search term pre-filled in the name field, allowing users to create and customize the new label
 - **Task Limit**: If >12 tasks in column, show scrollbar (max-height 600px). "Show all tasks (N)" button expands to 80vh with scrollbar
 
 ### Labels
