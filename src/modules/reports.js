@@ -1,7 +1,32 @@
-import * as echarts from 'echarts';
+import * as echarts from 'echarts/core';
+import {
+  CalendarComponent,
+  DataZoomComponent,
+  GridComponent,
+  LegendComponent,
+  TitleComponent,
+  TooltipComponent,
+  VisualMapComponent
+} from 'echarts/components';
+import { BarChart, HeatmapChart, LineChart } from 'echarts/charts';
+import { CanvasRenderer } from 'echarts/renderers';
 import { renderIcons } from './icons.js';
 import { ensureBoardsInitialized, getActiveBoardId, getActiveBoardName } from './storage.js';
 import { loadColumns, loadTasks } from './storage.js';
+
+echarts.use([
+  CalendarComponent,
+  DataZoomComponent,
+  GridComponent,
+  LegendComponent,
+  TitleComponent,
+  TooltipComponent,
+  VisualMapComponent,
+  BarChart,
+  HeatmapChart,
+  LineChart,
+  CanvasRenderer
+]);
 
 function isoDateOnly(value) {
   const s = (value || '').toString().trim();

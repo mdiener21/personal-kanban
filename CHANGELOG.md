@@ -34,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Notifications refresh only when tasks move between columns (not on reorder)
 - `createTaskElement()` now accepts pre-loaded labels map as optional parameter for performance
 - Task card layout: due date and age render together in the footer bottom row
+- Reports bundle size reduced by switching ECharts to modular imports (only required charts/components)
 
 ### Removed (1.0.11)
 

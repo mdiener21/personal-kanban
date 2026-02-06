@@ -6,10 +6,12 @@
 - Minimal dependencies:
   - **Lucide icons**: Tree-shaken ES module import (not CDN) via `src/modules/icons.js`
   - **SortableJS**: Drag-and-drop library for tasks and columns
+  - **Apache ECharts (Reports only)**: Modular import via `echarts/core` + explicit `echarts.use()` registration in `src/modules/reports.js`
 - Storage: browser localStorage only
 - Data persistence: JSON import/export to local disk
 - No server, no frameworks
 - Build tooling: Vite (ES modules)
+  - Reports bundling: Rollup chunk splitting keeps ECharts and ZRender in dedicated vendor chunks (`vendor-echarts`, `vendor-zrender`) to avoid oversized entry chunks.
 
 ## AI LLM Rules
 
