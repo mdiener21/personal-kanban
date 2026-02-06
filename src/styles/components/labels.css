@@ -1,0 +1,215 @@
+/* ==========================================================================
+   Label Components
+   ========================================================================== */
+
+/* Task labels container */
+.task-labels {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+/* Individual label badge */
+.task-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: white;
+}
+
+/* Label management list */
+.label-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  background-color: var(--surface-muted);
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+
+.label-name {
+  flex: 1;
+  font-size: 14px;
+  color: var(--text-subtle);
+}
+
+.label-actions {
+  display: flex;
+  gap: 4px;
+}
+
+/* Label checkbox in task modal */
+.label-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  margin-bottom: 6px;
+  background-color: var(--surface-muted);
+  border-radius: 6px;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color var(--transition-fast);
+}
+
+.label-checkbox:hover {
+  background-color: var(--btn-small-hover-bg);
+}
+
+.label-checkbox input[type="checkbox"] {
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
+}
+
+.label-checkbox input[type="checkbox"]:checked + .label-color-swatch,
+.label-checkbox input[type="checkbox"]:checked + .task-label {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Active labels row (in modal) */
+.active-labels {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 4px 0;
+  margin-bottom: 8px;
+}
+
+.active-labels .task-label {
+  flex-shrink: 0;
+}
+
+.active-label-remove {
+  border: none;
+  background: rgba(255, 255, 255, 0.25);
+  color: white;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1;
+  transition: background-color var(--transition-fast);
+}
+
+.active-label-remove:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+/* Label search */
+.task-label-search-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.task-label-search-row input[type="text"] {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+/* Task modal: create label (+) button */
+#task-add-label-btn {
+  opacity: 0.75;
+}
+
+#task-add-label-btn:hover {
+  opacity: 1;
+  background-color: rgba(59, 130, 246, 0.12);
+}
+
+#task-add-label-btn:focus-visible {
+  opacity: 1;
+  background-color: rgba(59, 130, 246, 0.16);
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Checkbox group (e.g., Settings modal) */
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.checkbox-group input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+}
+
+.labels-empty {
+  padding: 8px;
+  font-size: 13px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.labels-empty-button {
+  width: 100%;
+  padding: 8px;
+  font-size: 13px;
+  color: var(--text-muted);
+  text-align: center;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.labels-empty-button:hover {
+  color: var(--color-primary);
+  background-color: var(--input-focus-ring);
+  border-radius: 6px;
+}
+
+.labels-empty-button:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Label group headers */
+.label-group-header {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  padding: 10px 8px 4px 8px;
+  margin-top: 4px;
+  border-bottom: 1px solid var(--border);
+}
+
+.label-group-header-picker {
+  padding: 8px 8px 2px 8px;
+  margin-top: 2px;
+  font-size: 10px;
+}
+
+#labels-list {
+  overflow-y: auto;
+}
+
+#task-labels-selection {
+  max-height: 150px;
+  overflow-y: auto;
+  padding: 8px;
+  background-color: var(--surface-muted);
+  border-radius: 6px;
+  margin-bottom: 16px;
+}

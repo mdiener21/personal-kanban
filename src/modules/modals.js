@@ -15,6 +15,7 @@ import { confirmDialog, alertDialog } from './dialog.js';
 import { renderIcons } from './icons.js';
 import { exportBoard } from './importexport.js';
 import { validateAndShowTaskTitleError, validateAndShowColumnNameError, clearFieldError } from './validation.js';
+import { createAccordionSection } from './accordion.js';
 
 // Modal state
 let currentColumn = 'todo';
@@ -494,19 +495,16 @@ function renderLabelsList() {
 
   const { ungrouped, groupMap, sortedGroups } = groupLabels(filtered);
 
-  ungrouped.forEach(label => {
-    container.appendChild(createLabelListItem(label));
-  });
+  let firstSection = true;
+
+  if (ungrouped.length > 0) {
+    container.appendChild(createAccordionSection('Ungrouped', ungrouped, firstSection, createLabelListItem));
+    firstSection = false;
+  }
 
   sortedGroups.forEach(groupName => {
-    const header = document.createElement('div');
-    header.classList.add('label-group-header');
-    header.textContent = groupName;
-    container.appendChild(header);
-
-    groupMap.get(groupName).forEach(label => {
-      container.appendChild(createLabelListItem(label));
-    });
+    container.appendChild(createAccordionSection(groupName, groupMap.get(groupName), firstSection, createLabelListItem));
+    firstSection = false;
   });
 
   renderIcons();
@@ -529,7 +527,7 @@ function renderBoardsSelect() {
 
   if (active) selectEl.value = active;
 
-  const brandEl = document.getElementById('brand-text') || document.querySelector('.brand-text');
+  const brandEl =  ('brand-text') || document.querySelector('.brand-text');
   if (brandEl) brandEl.textContent = getActiveBoardName();
 }
 
