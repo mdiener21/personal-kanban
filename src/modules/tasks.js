@@ -120,7 +120,111 @@ export function getCurrentTaskOrder() {
   return tasks;
 }
 
-// Update task positions after drag
+/**
+ * Update task positions from a drag-drop event (optimized for performance).
+ * Only updates the moved task and reorders tasks in affected columns.
+ * @param {object} evt - Sortable event with oldIndex, newIndex, from, to, item
+ * @returns {object} - { movedTaskId, fromColumn, toColumn, didChangeColumn }
+ */
+export function updateTaskPositionsFromDrop(evt) {
+  const movedTaskId = evt.item?.dataset?.taskId;
+  if (!movedTaskId) return null;
+
+  const fromColumnEl = evt.from.closest('.task-column');
+  const toColumnEl = evt.to.closest('.task-column');
+  if (!fromColumnEl || !toColumnEl) return null;
+
+  const fromColumn = fromColumnEl.dataset.column;
+  const toColumn = toColumnEl.dataset.column;
+  const didChangeColumn = fromColumn !== toColumn;
+
+  const tasks = loadTasks();
+  const nowIso = new Date().toISOString();
+
+  // Find the moved task
+  const movedTaskIndex = tasks.findIndex(t => t.id === movedTaskId);
+  if (movedTaskIndex === -1) return null;
+
+  const movedTask = tasks[movedTaskIndex];
+
+  // Build order maps for affected columns from DOM
+  const affectedColumns = new Set([fromColumn, toColumn]);
+  const orderByColumn = new Map();
+
+  affectedColumns.forEach(columnId => {
+    const columnEl = document.querySelector(`.task-column[data-column="${columnId}"]`);
+    if (!columnEl) return;
+    
+    const taskEls = columnEl.querySelectorAll('.task');
+    const order = [];
+    taskEls.forEach((el, idx) => {
+      const taskId = el.dataset.taskId;
+      if (taskId) {
+        order.push({ id: taskId, order: idx + 1 });
+      }
+    });
+    orderByColumn.set(columnId, order);
+  });
+
+  // Update tasks
+  const updatedTasks = tasks.map(task => {
+    // Update the moved task
+    if (task.id === movedTaskId) {
+      const nextTask = {
+        ...task,
+        column: toColumn
+      };
+
+      // Update order
+      const toOrder = orderByColumn.get(toColumn);
+      const orderEntry = toOrder?.find(o => o.id === movedTaskId);
+      if (orderEntry) {
+        nextTask.order = orderEntry.order;
+      }
+
+      // Only update history/dates if column changed
+      if (didChangeColumn) {
+        nextTask.changeDate = nowIso;
+
+        const history = Array.isArray(task.columnHistory) && task.columnHistory.length
+          ? [...task.columnHistory]
+          : [{ column: task.column, at: task.creationDate || task.changeDate || nowIso }];
+        history.push({ column: toColumn, at: nowIso });
+        nextTask.columnHistory = history;
+
+        if (task.column !== 'done' && toColumn === 'done') {
+          nextTask.doneDate = nowIso;
+        } else if (task.column === 'done' && toColumn !== 'done') {
+          delete nextTask.doneDate;
+        }
+      }
+
+      return nextTask;
+    }
+
+    // Update order for other tasks in affected columns
+    if (affectedColumns.has(task.column)) {
+      const columnOrder = orderByColumn.get(task.column);
+      const orderEntry = columnOrder?.find(o => o.id === task.id);
+      if (orderEntry && orderEntry.order !== task.order) {
+        return { ...task, order: orderEntry.order };
+      }
+    }
+
+    return task;
+  });
+
+  saveTasks(updatedTasks);
+
+  return {
+    movedTaskId,
+    fromColumn,
+    toColumn,
+    didChangeColumn
+  };
+}
+
+// Update task positions after drag (legacy - kept for compatibility)
 export function updateTaskPositions() {
   const currentOrder = getCurrentTaskOrder();
   const tasks = loadTasks();

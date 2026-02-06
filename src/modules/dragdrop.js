@@ -1,5 +1,5 @@
 import Sortable from 'sortablejs';
-import { updateTaskPositions } from './tasks.js';
+import { updateTaskPositionsFromDrop } from './tasks.js';
 import { updateColumnPositions } from './columns.js';
 
 // Store Sortable instances for cleanup
@@ -109,12 +109,23 @@ function initTaskSortables() {
         document.removeEventListener('touchmove', trackPointer);
         document.removeEventListener('mousemove', trackPointer);
         
-        // Update task positions in storage
-        updateTaskPositions();
+        // Update task positions in storage (optimized - no full re-render)
+        const dropResult = updateTaskPositionsFromDrop(evt);
         
-        // Re-render to ensure consistency
-        const { renderBoard } = await import('./render.js');
-        renderBoard();
+        if (dropResult) {
+          // Import helpers dynamically to avoid circular dependencies
+          const { syncTaskCounters, syncCollapsedTitles } = await import('./render.js');
+          const { refreshNotifications } = await import('./notifications.js');
+          
+          // Update UI elements that depend on task positions without full re-render
+          syncTaskCounters();
+          
+          // If column changed, update collapsed titles and notifications
+          if (dropResult.didChangeColumn) {
+            syncCollapsedTitles();
+            refreshNotifications();
+          }
+        }
       }
     });
     
