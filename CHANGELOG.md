@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed (unreleased)
 
+- Added preload hints for the main CSS and entry scripts to reduce critical request chaining on initial load
+
 ### Removed (unreleased)
 
 ## [1.0.11] - 2026-02-06
