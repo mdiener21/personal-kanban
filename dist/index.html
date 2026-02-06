@@ -7,9 +7,9 @@
   <title>Personal Kanban Board</title>
   <!-- Kanban favicon (inline SVG data URI) -->
   <link rel="icon" href="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='2' y='3' width='6' height='18' rx='1.5' fill='%233b82f6'/%3E%3Crect x='9' y='3' width='6' height='12' rx='1.5' fill='%2360a5fa'/%3E%3Crect x='16' y='3' width='6' height='8' rx='1.5' fill='%2393c5fd'/%3E%3C/svg%3E">
-  <script type="module" crossorigin src="./assets/index-Cgi_3E5f.js"></script>
-  <link rel="modulepreload" crossorigin href="./assets/storage-oGbS4rzY.js">
-  <link rel="stylesheet" crossorigin href="./assets/storage-D0Mewtpr.css">
+  <script type="module" crossorigin src="./assets/index-B-vJoTGL.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/storage-CAWtgQEU.js">
+  <link rel="stylesheet" crossorigin href="./assets/storage-Bp48LjRa.css">
 </head>
 <body>
   <!-- Skip link for accessibility -->
@@ -389,6 +389,11 @@
         <div class="form-group">
           <label for="label-name">Label Name <span aria-hidden="true">*</span></label>
           <input type="text" id="label-name" required maxlength="40" placeholder="Enter label name..." aria-required="true">
+        </div>
+        <div class="form-group">
+          <label for="label-group">Group</label>
+          <input type="text" id="label-group" placeholder="e.g. People, Status, Activity…" list="label-group-suggestions" autocomplete="off">
+          <datalist id="label-group-suggestions"></datalist>
         </div>
         <div class="form-group">
           <label for="label-color">Color</label>
