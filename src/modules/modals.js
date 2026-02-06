@@ -333,6 +333,19 @@ function hideHelpModal() {
   modal.classList.add('hidden');
 }
 
+const HEX_COLOR_RE = /^#[0-9a-fA-F]{6}$/;
+
+function isValidHexColor(value) {
+  return HEX_COLOR_RE.test(value);
+}
+
+function updateLabelColorHex(color) {
+  const hexInput = document.getElementById('label-color-hex');
+  if (!hexInput) return;
+  hexInput.value = color;
+  hexInput.classList.remove('invalid');
+}
+
 function showLabelModal(labelId = null, { openedFromTaskEditor = false, initialName = '' } = {}) {
   editingLabelId = labelId;
   hasShownLabelMaxLengthAlert = false;
@@ -342,7 +355,7 @@ function showLabelModal(labelId = null, { openedFromTaskEditor = false, initialN
   const nameInput = document.getElementById('label-name');
   const colorInput = document.getElementById('label-color');
   const submitBtn = document.getElementById('label-submit-btn');
-  
+
   if (labelId) {
     const labels = loadLabels();
     const label = labels.find(l => l.id === labelId);
@@ -358,7 +371,8 @@ function showLabelModal(labelId = null, { openedFromTaskEditor = false, initialN
     nameInput.value = initialName || '';
     colorInput.value = '#3b82f6';
   }
-  
+
+  updateLabelColorHex(colorInput.value);
   modal.classList.remove('hidden');
   nameInput.focus();
 }
@@ -796,6 +810,24 @@ export function initializeModalHandlers() {
     });
   });
 
+  const labelColorInput = document.getElementById('label-color');
+  labelColorInput?.addEventListener('input', (e) => {
+    updateLabelColorHex(e.target.value);
+  });
+
+  const labelColorHexInput = document.getElementById('label-color-hex');
+  labelColorHexInput?.addEventListener('input', (e) => {
+    let val = e.target.value;
+    // Auto-prepend '#' if the user types raw hex digits
+    if (val && !val.startsWith('#')) val = '#' + val;
+    if (isValidHexColor(val)) {
+      labelColorInput.value = val;
+      e.target.classList.remove('invalid');
+    } else {
+      e.target.classList.toggle('invalid', val.length > 0);
+    }
+  });
+
   // Fallback: if a browser bypasses beforeinput (or maxlength), clamp and alert.
   labelNameInput?.addEventListener('input', (e) => {
     const input = e.target;
@@ -815,7 +847,27 @@ export function initializeModalHandlers() {
   document.getElementById('label-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const name = document.getElementById('label-name').value;
-    const color = document.getElementById('label-color').value;
+    const hexInput = document.getElementById('label-color-hex');
+    const hexVal = (hexInput?.value || '').trim();
+
+    // If the user typed a hex value, validate and sync it to the color picker
+    let color;
+    if (hexVal && hexVal !== document.getElementById('label-color').value) {
+      const normalized = hexVal.startsWith('#') ? hexVal : '#' + hexVal;
+      if (!isValidHexColor(normalized)) {
+        hexInput?.classList.add('invalid');
+        await alertDialog({
+          title: 'Invalid Hex Color',
+          message: 'Please enter a valid hex color code (e.g. #3b82f6).'
+        });
+        hexInput?.focus();
+        return;
+      }
+      document.getElementById('label-color').value = normalized;
+      color = normalized;
+    } else {
+      color = document.getElementById('label-color').value;
+    }
 
     const trimmedName = (name || '').trim();
     if (trimmedName.length > MAX_LABEL_NAME_LENGTH) {
