@@ -362,7 +362,7 @@ The notification system alerts users to tasks with approaching or past due dates
 - Lucide icons: tree-shaken npm package (`lucide`), icons registered in `src/modules/icons.js`
 - SortableJS: npm package (`sortablejs`) for drag-and-drop
 - localStorage only (no server, no database)
-- Single HTML entry + CSS + JS modules
+- Two HTML entry points (`index.html`, `reports.html`) + modular CSS (`styles/index.css`) + JS modules
 
 ## Export/Import Logic
 
@@ -374,6 +374,24 @@ The notification system alerts users to tasks with approaching or past due dates
 
 ## CSS Architecture
 
+- **Modular file structure**: CSS is organized under `src/styles/` with an `index.css` entry point that uses `@import` to load files in cascade order:
+  - `tokens.css` — CSS custom properties for light and dark themes
+  - `base.css` — HTML/body element resets
+  - `utilities.css` — Utility classes (`.hidden`, `.sr-only`)
+  - `layout.css` — App shell: controls bar, brand, search, board container, footer
+  - `responsive.css` — All media query overrides (must come last)
+  - `components/buttons.css` — Button variants (`.btn`, `.control-btn`)
+  - `components/icons.css` — Icon buttons, collapsed column bar, drag handle
+  - `components/column.css` — Column card, header, menu, submenu, tasks list, scrollbar
+  - `components/card.css` — Task card, title, description, meta, footer, priority badges
+  - `components/forms.css` — Form groups, inputs, color picker, hex display, error states
+  - `components/modals.css` — Modal, backdrop, content, fullscreen toggle, help content
+  - `components/labels.css` — Label badge, management list, checkbox, group headers
+  - `components/notifications.css` — Notification banner, items, modal list, badge
+  - `components/dragdrop.css` — SortableJS ghost/chosen/drag states, placeholders
+  - `components/reports.css` — Reports page layout, KPIs, chart containers
+- Vite resolves and bundles all `@import` statements into a single CSS output
+- **Theming**: Light/dark mode via `html[data-theme]` attribute; all colors use CSS custom properties defined in `tokens.css`
 - Flexbox layouts throughout
 - Column width: flex: 1 (equal width)
 - Task cards: flex-direction column (text above labels)

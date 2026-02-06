@@ -7,9 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
-### Added (unreleased)
-
 ### Changed (unreleased)
+
+- Refactored monolithic `design.css` (2,285 lines) into a modular CSS architecture under `src/styles/` with 16 focused files organized by concern (tokens, base, layout, utilities, responsive, and 10 component files)
 
 ### Removed (unreleased)
 
