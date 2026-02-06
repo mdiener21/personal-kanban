@@ -34,8 +34,10 @@ function taskMatchesFilter(task, queryLower, labelsById) {
 
   const labelIds = Array.isArray(task?.labels) ? task.labels : [];
   for (const id of labelIds) {
-    const name = labelsById.get(id);
-    if (name && name.includes(queryLower)) return true;
+    const label = labelsById.get(id);
+    if (!label) continue;
+    if (label.name.includes(queryLower)) return true;
+    if (label.group.includes(queryLower)) return true;
   }
 
   return false;
@@ -602,7 +604,7 @@ export function renderBoard() {
   const tasks = loadTasks();
   const labels = loadLabels();
   const settings = loadSettings();
-  const labelsById = new Map(labels.map((l) => [l.id, (l.name || '').toString().trim().toLowerCase()]));
+  const labelsById = new Map(labels.map((l) => [l.id, { name: (l.name || '').toString().trim().toLowerCase(), group: (l.group || '').toString().trim().toLowerCase() }]));
   const queryLower = (boardFilterQuery || '').toString().trim().toLowerCase();
   const visibleTasks = queryLower
     ? tasks.filter((t) => taskMatchesFilter(t, queryLower, labelsById))

@@ -31,6 +31,7 @@ The specification files include core data structures and details to be maintaine
 - **storage.js** - Multi-board localStorage persistence. Keys: `kanbanBoards`, `kanbanActiveBoardId`, `kanbanBoard:<boardId>:columns|tasks|labels|settings`
 - **icons.js** - Lucide icons tree-shaking. To add an icon: import from `lucide`, add to `icons` object, call `renderIcons()` after dynamic DOM changes.
 - **dragdrop.js** - SortableJS-based drag/drop for tasks and columns
+- **accordion.js** - Reusable collapsible accordion. `createAccordionSection(title, items, expanded, renderItem)` builds a section with chevron toggle, count badge, and a body populated via the `renderItem` callback.
 - **modals.js** - Modal UX (close via Escape/backdrop). Uses DOM ids from index.html.
 - **dialog.js** - `confirmDialog()` / `alertDialog()` instead of `window.confirm`
 - **importexport.js** - Per-board JSON export/import. Must update if data shapes change.

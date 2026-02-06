@@ -152,14 +152,16 @@
 
 - **Manage**: Dedicated modal listing all labels with color swatch, name, edit/delete buttons
   - Includes a search field to filter labels by name or group (case-insensitive substring match)
-  - Labels are organized by group: ungrouped labels appear first, then grouped labels under uppercase group headers
+  - Labels are organized by group in collapsible accordion sections: each group (plus "Ungrouped" for labels without a group) has a clickable header with a chevron icon and label count badge
+  - First section is expanded by default, remaining sections are collapsed
+  - Multi-expand: each section toggles independently
 - **Create/Edit**: Modal with name input, group input (with datalist autocomplete of existing groups), color picker, and editable hex color code field
   - The hex color field displays the current color as a `#rrggbb` value and updates the color picker in real time when edited
   - Invalid hex values show a red error border; form submission is blocked with an alert until corrected
   - The color picker and hex field stay in sync bidirectionally
 - **Groups**: Labels can optionally belong to a group (a simple string property, not a separate entity)
   - Default is no group (empty string)
-  - Groups are shown as section headers in the Manage Labels modal and task modal label picker
+  - Groups are shown as collapsible accordion sections in the Manage Labels modal and as flat section headers in the task modal label picker
   - Task cards do NOT display group names — only the label name and color are shown
 - **Delete**: Removes from all tasks, confirms deletion
 - **Assign**: Checkboxes in task modal, multiple labels per task, organized by group
@@ -169,7 +171,7 @@
 
 - Toolbar includes a **board-level task search** input (with a search icon) placed beside the brand area.
   - Filtering is **in-memory** (no persistence) and applies to the currently rendered board.
-  - A task matches if the search string appears in **task title**, **task description**, **task priority** (low/medium/high), or the **label name** of any label assigned to the task (case-insensitive substring match).
+  - A task matches if the search string appears in **task title**, **task description**, **task priority** (low/medium/high), the **label name**, or the **label group name** of any label assigned to the task (case-insensitive substring match).
 
 - Single menu button (ellipsis) that opens a dropdown containing:
   - Board selector dropdown (shows all boards)
@@ -386,6 +388,7 @@ The notification system alerts users to tasks with approaching or past due dates
   - `components/card.css` — Task card, title, description, meta, footer, priority badges
   - `components/forms.css` — Form groups, inputs, color picker, hex display, error states
   - `components/modals.css` — Modal, backdrop, content, fullscreen toggle, help content
+  - `components/accordion.css` — Reusable collapsible accordion sections (`.accordion-*`)
   - `components/labels.css` — Label badge, management list, checkbox, group headers
   - `components/notifications.css` — Notification banner, items, modal list, badge
   - `components/dragdrop.css` — SortableJS ghost/chosen/drag states, placeholders

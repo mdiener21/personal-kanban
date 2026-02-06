@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed (unreleased)
 
 - Refactored monolithic `design.css` (2,285 lines) into a modular CSS architecture under `src/styles/` with 16 focused files organized by concern (tokens, base, layout, utilities, responsive, and 10 component files)
+- Manage Labels modal now uses an accordion to group labels; first group expanded by default, others collapsed
+- Extracted reusable accordion component (`src/modules/accordion.js`, `src/styles/components/accordion.css`) with generic `createAccordionSection(title, items, expanded, renderItem)` API
+- Board-level task search now also matches label group names (e.g., searching "People" shows all tasks with labels in the People group)
 
 ### Removed (unreleased)
 
