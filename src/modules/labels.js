@@ -31,7 +31,7 @@ function labelNameExists(labels, normalizedName, excludeLabelId = null) {
 /**
  * Add a new label (prevents duplicates, case-insensitive).
  */
-export function addLabel(name, color) {
+export function addLabel(name, color, group = '') {
   if (!name || name.trim() === '') {
     return { success: false, reason: 'EMPTY_NAME' };
   }
@@ -54,7 +54,8 @@ export function addLabel(name, color) {
     '-' +
     generateUUID().substring(0, 8);
 
-  const newLabel = { id, name: trimmedName, color };
+  const trimmedGroup = typeof group === 'string' ? group.trim() : '';
+  const newLabel = { id, name: trimmedName, color, group: trimmedGroup };
   labels.push(newLabel);
   saveLabels(labels);
 
@@ -64,7 +65,7 @@ export function addLabel(name, color) {
 /**
  * Update an existing label (prevents duplicates, case-insensitive).
  */
-export function updateLabel(labelId, name, color) {
+export function updateLabel(labelId, name, color, group = '') {
   if (!name || name.trim() === '') {
     return { success: false, reason: 'EMPTY_NAME' };
   }
@@ -89,6 +90,7 @@ export function updateLabel(labelId, name, color) {
 
   labels[labelIndex].name = trimmedName;
   labels[labelIndex].color = color;
+  labels[labelIndex].group = typeof group === 'string' ? group.trim() : '';
   saveLabels(labels);
 
   return { success: true, label: labels[labelIndex] };

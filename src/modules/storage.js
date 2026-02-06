@@ -95,9 +95,9 @@ function defaultColumns() {
 
 function defaultLabels() {
   return [
-    { id: 'urgent', name: 'Urgent', color: '#ef4444' },
-    { id: 'feature', name: 'Feature', color: '#3b82f6' },
-    { id: 'task', name: 'Task', color: '#f59e0b' }
+    { id: 'urgent', name: 'Urgent', color: '#ef4444', group: '' },
+    { id: 'feature', name: 'Feature', color: '#3b82f6', group: '' },
+    { id: 'task', name: 'Task', color: '#f59e0b', group: '' }
   ];
 }
 
@@ -445,7 +445,12 @@ export function loadLabels() {
   const boardId = getActiveBoardId() || DEFAULT_BOARD_ID;
   const stored = localStorage.getItem(keyFor(boardId, 'labels'));
   const parsed = safeParseArray(stored);
-  if (parsed) return parsed;
+  if (parsed) {
+    return parsed.map(label => ({
+      ...label,
+      group: typeof label.group === 'string' ? label.group : ''
+    }));
+  }
 
   return defaultLabels();
 }

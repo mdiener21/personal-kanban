@@ -67,7 +67,8 @@
 {
   id: "label-id",
   name: "Label Name", // max 40 characters
-  color: "#hexcolor"
+  color: "#hexcolor",
+  group: "Group Name" // optional, defaults to "" (no group)
 }
 ```
 
@@ -150,14 +151,19 @@
 ### Labels
 
 - **Manage**: Dedicated modal listing all labels with color swatch, name, edit/delete buttons
-  - Includes a search field to filter labels by name (case-insensitive substring match)
-- **Create/Edit**: Modal with name input, color picker, and editable hex color code field
+  - Includes a search field to filter labels by name or group (case-insensitive substring match)
+  - Labels are organized by group: ungrouped labels appear first, then grouped labels under uppercase group headers
+- **Create/Edit**: Modal with name input, group input (with datalist autocomplete of existing groups), color picker, and editable hex color code field
   - The hex color field displays the current color as a `#rrggbb` value and updates the color picker in real time when edited
   - Invalid hex values show a red error border; form submission is blocked with an alert until corrected
   - The color picker and hex field stay in sync bidirectionally
+- **Groups**: Labels can optionally belong to a group (a simple string property, not a separate entity)
+  - Default is no group (empty string)
+  - Groups are shown as section headers in the Manage Labels modal and task modal label picker
+  - Task cards do NOT display group names — only the label name and color are shown
 - **Delete**: Removes from all tasks, confirms deletion
-- **Assign**: Checkboxes in task modal, multiple labels per task
-- **Display**: Colored badges with label names on tasks
+- **Assign**: Checkboxes in task modal, multiple labels per task, organized by group
+- **Display**: Colored badges with label names on tasks (group not shown)
 
 ### Controls Bar
 

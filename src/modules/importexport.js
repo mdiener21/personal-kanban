@@ -235,7 +235,8 @@ function normalizeImportedLabels(labels) {
     const id = typeof l?.id === 'string' ? l.id : String(l?.id ?? '');
     const name = typeof l?.name === 'string' ? l.name : String(l?.name ?? '');
     const color = isHexColor(l?.color) ? l.color.trim() : '#3b82f6';
-    return { id: id.trim(), name: name.trim(), color };
+    const group = typeof l?.group === 'string' ? l.group.trim() : '';
+    return { id: id.trim(), name: name.trim(), color, group };
   });
 
   const isValid = normalized.every((l) => l.id && l.name && l.color);

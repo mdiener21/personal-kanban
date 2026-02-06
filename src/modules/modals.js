@@ -346,6 +346,21 @@ function updateLabelColorHex(color) {
   hexInput.classList.remove('invalid');
 }
 
+function populateLabelGroupSuggestions() {
+  const datalist = document.getElementById('label-group-suggestions');
+  if (!datalist) return;
+  datalist.innerHTML = '';
+  const labels = loadLabels();
+  const groups = [...new Set(
+    labels.map(l => (l.group || '').trim()).filter(g => g.length > 0)
+  )].sort((a, b) => a.localeCompare(b));
+  groups.forEach(g => {
+    const option = document.createElement('option');
+    option.value = g;
+    datalist.appendChild(option);
+  });
+}
+
 function showLabelModal(labelId = null, { openedFromTaskEditor = false, initialName = '' } = {}) {
   editingLabelId = labelId;
   hasShownLabelMaxLengthAlert = false;
@@ -354,6 +369,7 @@ function showLabelModal(labelId = null, { openedFromTaskEditor = false, initialN
   const modalTitle = document.getElementById('label-modal-title');
   const nameInput = document.getElementById('label-name');
   const colorInput = document.getElementById('label-color');
+  const groupInput = document.getElementById('label-group');
   const submitBtn = document.getElementById('label-submit-btn');
 
   if (labelId) {
@@ -364,14 +380,17 @@ function showLabelModal(labelId = null, { openedFromTaskEditor = false, initialN
       submitBtn.textContent = 'Update Label';
       nameInput.value = label.name;
       colorInput.value = label.color;
+      if (groupInput) groupInput.value = label.group || '';
     }
   } else {
     modalTitle.textContent = 'Add Label';
     submitBtn.textContent = 'Add Label';
     nameInput.value = initialName || '';
     colorInput.value = '#3b82f6';
+    if (groupInput) groupInput.value = '';
   }
 
+  populateLabelGroupSuggestions();
   updateLabelColorHex(colorInput.value);
   modal.classList.remove('hidden');
   nameInput.focus();
@@ -384,17 +403,84 @@ function hideLabelModal() {
   selectCreatedLabelInTaskEditor = false;
 }
 
+function createLabelListItem(label) {
+  const labelItem = document.createElement('div');
+  labelItem.classList.add('label-item');
+  labelItem.style.display = 'flex';
+  labelItem.style.alignItems = 'center';
+  labelItem.style.justifyContent = 'space-between';
+
+  const labelSpan = document.createElement('span');
+  labelSpan.classList.add('task-label');
+  labelSpan.style.backgroundColor = label.color;
+  labelSpan.textContent = label.name;
+
+  const actionsDiv = document.createElement('div');
+  actionsDiv.classList.add('label-actions');
+  actionsDiv.style.display = 'flex';
+  actionsDiv.style.gap = '4px';
+
+  const editBtn = document.createElement('button');
+  editBtn.classList.add('btn-small');
+  const editIcon = document.createElement('span');
+  editIcon.dataset.lucide = 'pencil';
+  editBtn.appendChild(editIcon);
+  editBtn.title = 'Edit label';
+  editBtn.addEventListener('click', () => showLabelModal(label.id));
+
+  const deleteBtn = document.createElement('button');
+  deleteBtn.classList.add('btn-small', 'btn-danger');
+  const deleteIcon = document.createElement('span');
+  deleteIcon.dataset.lucide = 'trash-2';
+  deleteBtn.appendChild(deleteIcon);
+  deleteBtn.title = 'Delete label';
+  deleteBtn.addEventListener('click', async () => {
+    const ok = await confirmDialog({
+      title: 'Delete Label',
+      message: `Delete label "${label.name}"? This will remove it from all tasks.`,
+      confirmText: 'Delete'
+    });
+    if (ok) {
+      deleteLabel(label.id);
+      renderLabelsList();
+      const { renderBoard } = await import('./render.js');
+      renderBoard();
+    }
+  });
+
+  actionsDiv.appendChild(editBtn);
+  actionsDiv.appendChild(deleteBtn);
+
+  labelItem.appendChild(labelSpan);
+  labelItem.appendChild(actionsDiv);
+  return labelItem;
+}
+
+function groupLabels(labels) {
+  const ungrouped = labels.filter(l => !(l.group || '').trim());
+  const groupMap = new Map();
+  labels.forEach(label => {
+    const group = (label.group || '').trim();
+    if (!group) return;
+    if (!groupMap.has(group)) groupMap.set(group, []);
+    groupMap.get(group).push(label);
+  });
+  const sortedGroups = [...groupMap.keys()].sort((a, b) => a.localeCompare(b));
+  return { ungrouped, groupMap, sortedGroups };
+}
+
 function renderLabelsList() {
   const container = document.getElementById('labels-list');
   container.innerHTML = '';
-  
+
   const labels = loadLabels();
   const query = getLabelsManagerSearchQuery();
   const filtered = query
     ? labels.filter((label) => {
         const name = (label.name || '').toLowerCase();
         const id = (label.id || '').toLowerCase();
-        return name.includes(query) || id.includes(query);
+        const group = (label.group || '').toLowerCase();
+        return name.includes(query) || id.includes(query) || group.includes(query);
       })
     : labels;
 
@@ -406,57 +492,21 @@ function renderLabelsList() {
     return;
   }
 
-  filtered.forEach(label => {
-    const labelItem = document.createElement('div');
-    labelItem.classList.add('label-item');
-    labelItem.style.display = 'flex';
-    labelItem.style.alignItems = 'center';
-    labelItem.style.justifyContent = 'space-between';
+  const { ungrouped, groupMap, sortedGroups } = groupLabels(filtered);
 
-    const labelSpan = document.createElement('span');
-    labelSpan.classList.add('task-label');
-    labelSpan.style.backgroundColor = label.color;
-    labelSpan.textContent = label.name;
+  ungrouped.forEach(label => {
+    container.appendChild(createLabelListItem(label));
+  });
 
-    const actionsDiv = document.createElement('div');
-    actionsDiv.classList.add('label-actions');
-    actionsDiv.style.display = 'flex';
-    actionsDiv.style.gap = '4px';
+  sortedGroups.forEach(groupName => {
+    const header = document.createElement('div');
+    header.classList.add('label-group-header');
+    header.textContent = groupName;
+    container.appendChild(header);
 
-    const editBtn = document.createElement('button');
-    editBtn.classList.add('btn-small');
-    const editIcon = document.createElement('span');
-    editIcon.dataset.lucide = 'pencil';
-    editBtn.appendChild(editIcon);
-    editBtn.title = 'Edit label';
-    editBtn.addEventListener('click', () => showLabelModal(label.id));
-
-    const deleteBtn = document.createElement('button');
-    deleteBtn.classList.add('btn-small', 'btn-danger');
-    const deleteIcon = document.createElement('span');
-    deleteIcon.dataset.lucide = 'trash-2';
-    deleteBtn.appendChild(deleteIcon);
-    deleteBtn.title = 'Delete label';
-    deleteBtn.addEventListener('click', async () => {
-      const ok = await confirmDialog({
-        title: 'Delete Label',
-        message: `Delete label "${label.name}"? This will remove it from all tasks.`,
-        confirmText: 'Delete'
-      });
-      if (ok) {
-        deleteLabel(label.id);
-        renderLabelsList();
-        const { renderBoard } = await import('./render.js');
-        renderBoard();
-      }
+    groupMap.get(groupName).forEach(label => {
+      container.appendChild(createLabelListItem(label));
     });
-
-    actionsDiv.appendChild(editBtn);
-    actionsDiv.appendChild(deleteBtn);
-
-    labelItem.appendChild(labelSpan);
-    labelItem.appendChild(actionsDiv);
-    container.appendChild(labelItem);
   });
 
   renderIcons();
@@ -638,24 +688,51 @@ function hideBoardRenameModal() {
   editingBoardId = null;
 }
 
+function createLabelCheckboxItem(label) {
+  const labelEl = document.createElement('label');
+  labelEl.classList.add('label-checkbox');
+
+  const checkbox = document.createElement('input');
+  checkbox.type = 'checkbox';
+  checkbox.value = label.id;
+  checkbox.checked = selectedTaskLabels.includes(label.id);
+  checkbox.addEventListener('change', (e) => {
+    if (e.target.checked) {
+      if (!selectedTaskLabels.includes(label.id)) selectedTaskLabels.push(label.id);
+    } else {
+      selectedTaskLabels = selectedTaskLabels.filter(id => id !== label.id);
+    }
+    renderActiveTaskLabels();
+  });
+
+  const labelPill = document.createElement('span');
+  labelPill.classList.add('task-label', 'label-color-swatch');
+  labelPill.style.backgroundColor = label.color;
+  labelPill.textContent = label.name;
+
+  labelEl.appendChild(checkbox);
+  labelEl.appendChild(labelPill);
+  return labelEl;
+}
+
 function updateTaskLabelsSelection() {
   renderActiveTaskLabels();
   const container = document.getElementById('task-labels-selection');
   container.innerHTML = '';
-  
+
   const query = getTaskLabelSearchQuery();
   const labels = loadLabels();
   const filteredLabels = query
     ? labels.filter(label => {
         const name = (label.name || '').toLowerCase();
         const id = (label.id || '').toLowerCase();
-        return name.includes(query) || id.includes(query);
+        const group = (label.group || '').toLowerCase();
+        return name.includes(query) || id.includes(query) || group.includes(query);
       })
     : labels;
 
   if (filteredLabels.length === 0) {
     if (query) {
-      // Show a button to create the label
       const createBtn = document.createElement('button');
       createBtn.type = 'button';
       createBtn.classList.add('labels-empty-button');
@@ -667,7 +744,6 @@ function updateTaskLabelsSelection() {
       });
       container.appendChild(createBtn);
     } else {
-      // Show the empty message div
       const empty = document.createElement('div');
       empty.classList.add('labels-empty');
       empty.textContent = 'No matching labels';
@@ -676,31 +752,21 @@ function updateTaskLabelsSelection() {
     return;
   }
 
-  filteredLabels.forEach(label => {
-    const labelEl = document.createElement('label');
-    labelEl.classList.add('label-checkbox');
-    
-    const checkbox = document.createElement('input');
-    checkbox.type = 'checkbox';
-    checkbox.value = label.id;
-    checkbox.checked = selectedTaskLabels.includes(label.id);
-    checkbox.addEventListener('change', (e) => {
-      if (e.target.checked) {
-        if (!selectedTaskLabels.includes(label.id)) selectedTaskLabels.push(label.id);
-      } else {
-        selectedTaskLabels = selectedTaskLabels.filter(id => id !== label.id);
-      }
-      renderActiveTaskLabels();
+  const { ungrouped, groupMap, sortedGroups } = groupLabels(filteredLabels);
+
+  ungrouped.forEach(label => {
+    container.appendChild(createLabelCheckboxItem(label));
+  });
+
+  sortedGroups.forEach(groupName => {
+    const header = document.createElement('div');
+    header.classList.add('label-group-header', 'label-group-header-picker');
+    header.textContent = groupName;
+    container.appendChild(header);
+
+    groupMap.get(groupName).forEach(label => {
+      container.appendChild(createLabelCheckboxItem(label));
     });
-    
-    const labelPill = document.createElement('span');
-    labelPill.classList.add('task-label', 'label-color-swatch');
-    labelPill.style.backgroundColor = label.color;
-    labelPill.textContent = label.name;
-    
-    labelEl.appendChild(checkbox);
-    labelEl.appendChild(labelPill);
-    container.appendChild(labelEl);
   });
 }
 
@@ -878,11 +944,12 @@ export function initializeModalHandlers() {
       return;
     }
 
+    const group = (document.getElementById('label-group')?.value || '').trim();
     const wasCreating = !editingLabelId;
 
     const result = editingLabelId
-      ? updateLabel(editingLabelId, trimmedName, color)
-      : addLabel(trimmedName, color);
+      ? updateLabel(editingLabelId, trimmedName, color, group)
+      : addLabel(trimmedName, color, group);
 
     if (!result?.success) {
       let title = 'Unable to Save Label';
