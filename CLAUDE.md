@@ -62,6 +62,28 @@ Many modules use `await import('./render.js')` to call `renderBoard()` and avoid
 - **New tasks**: Inserted at top of column (order 1).
 - **New columns**: Inserted before the Done column.
 
+## Release Process
+
+When asked to create a release/tag for unreleased changes:
+
+1. **Determine next version** — read `package.json` `"version"`, bump patch (e.g. 1.0.10 → 1.0.11). Ask only if minor/major bump seems warranted.
+2. **Verify unreleased entries** — read `CHANGELOG.md` top, confirm entries exist under Unreleased sections.
+3. **Update `package.json`** — bump `"version"`.
+4. **Update `CHANGELOG.md`** — move Unreleased entries into a new `## [X.Y.Z] - YYYY-MM-DD` section. Rename headers from `(unreleased)` to `(X.Y.Z)`. Keep empty Unreleased placeholders at top.
+5. **Build** — `npm run build` must succeed.
+6. **Commit** — `git add package.json CHANGELOG.md && git commit -m "Bump version to vX.Y.Z and update changelog"` (include Co-Authored-By).
+7. **Tag** — `git tag -a vX.Y.Z -m "vX.Y.Z – short summary"`.
+8. **Verify** — `git log --oneline -3 && git tag -l --sort=-v:refname | head -3`.
+9. **Do NOT push** unless explicitly asked.
+
+### Release conventions
+
+- **Version source of truth**: `package.json` → Vite injects as `__APP_VERSION__` → footer displays it
+- **Changelog format**: Keep a Changelog. Sections: `### Added/Changed/Removed (version)`
+- **Commit message**: `Bump version to vX.Y.Z and update changelog`
+- **Tag**: Annotated `vX.Y.Z` with brief comma-separated summary
+- **Docs to update on feature changes**: `CHANGELOG.md`, `docs/specification-kanban.md`, `CLAUDE.md` (if module structure changes)
+
 ## Vite Configuration
 
 - Root: `src/`
