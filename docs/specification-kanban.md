@@ -151,7 +151,10 @@
 
 - **Manage**: Dedicated modal listing all labels with color swatch, name, edit/delete buttons
   - Includes a search field to filter labels by name (case-insensitive substring match)
-- **Create/Edit**: Modal with name input and color picker
+- **Create/Edit**: Modal with name input, color picker, and editable hex color code field
+  - The hex color field displays the current color as a `#rrggbb` value and updates the color picker in real time when edited
+  - Invalid hex values show a red error border; form submission is blocked with an alert until corrected
+  - The color picker and hex field stay in sync bidirectionally
 - **Delete**: Removes from all tasks, confirms deletion
 - **Assign**: Checkboxes in task modal, multiple labels per task
 - **Display**: Colored badges with label names on tasks
