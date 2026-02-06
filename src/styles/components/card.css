@@ -52,25 +52,32 @@
 .task-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   gap: 8px;
 }
 
 .task-actions {
   display: flex;
+  align-items: center;
   gap: 4px;
   flex-shrink: 0;
+}
+
+.task-priority-header {
+  cursor: default;
 }
 
 /* Task title */
 .task-title {
   flex: 1;
+  min-width: 0;
   font-size: 14px;
   font-weight: 600;
   line-height: 1.4;
   cursor: pointer;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   transition: color var(--transition-fast);
 }
 
@@ -101,25 +108,21 @@
   color: var(--text-subtle);
 }
 
-/* Task meta (priority + date) */
-.task-meta {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-  font-size: 12px;
-  color: var(--text-muted);
-  margin-top: 4px;
-}
-
-/* Task footer (changeDate + age) */
+/* Task footer (changeDate + bottom row) */
 .task-footer {
   display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* Bottom row: due date + age */
+.task-footer-row {
+  display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 10px;
-  font-size: 12px;
-  color: var(--text-muted);
 }
 
 .task-change-date,
@@ -158,9 +161,11 @@
 /* Legacy task-text support */
 .task-text {
   flex: 1;
+  min-width: 0;
   cursor: pointer;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   line-height: 1.4;
 }
 
