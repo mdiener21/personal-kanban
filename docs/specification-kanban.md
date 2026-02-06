@@ -6,10 +6,12 @@
 - Minimal dependencies:
   - **Lucide icons**: Tree-shaken ES module import (not CDN) via `src/modules/icons.js`
   - **SortableJS**: Drag-and-drop library for tasks and columns
+  - **Apache ECharts (Reports only)**: Modular import via `echarts/core` + explicit `echarts.use()` registration in `src/modules/reports.js`
 - Storage: browser localStorage only
 - Data persistence: JSON import/export to local disk
 - No server, no frameworks
 - Build tooling: Vite (ES modules)
+  - Reports bundling: Rollup chunk splitting keeps ECharts and ZRender in dedicated vendor chunks (`vendor-echarts`, `vendor-zrender`) to avoid oversized entry chunks.
 
 ## AI LLM Rules
 
@@ -133,7 +135,12 @@
 - **Edit (close)**: The Edit Task modal includes a small **×** button in the top-right that closes the modal (same behavior as Cancel)
 - **Delete**: Click X button, confirm deletion
 - **Move**: Drag between columns, auto-saves new column and order
-- **Display**: Title (clickable), optional description (clamped to ~2 lines), labels (colored badges), optional meta row (priority and/or due date depending on Settings), delete button
+- **Display**:
+  - Title (clickable, clamped to 1 line)
+  - Header row: title left-aligned; priority badge + delete button right-aligned
+  - Optional description (clamped to ~2 lines)
+  - Labels (colored badges)
+  - Footer: optional updated timestamp; bottom row shows due date + age in the same row (depending on Settings)
 - **Footer**: Can show `changeDate` ("Updated …") and task age ("Age …") depending on Settings toggles.
   - `changeDate` is displayed using the user-selected locale (via `toLocaleString(locale)`)
   - Age is based on `creationDate` and displayed as `1y 6M 40d` for larger than 1 year,  `0d` for < 1 day, `Nd` for days, and `NM` for months (30 days per month, floor)
@@ -273,10 +280,21 @@ The notification system alerts users to tasks with approaching or past due dates
 - **Tasks**: Draggable within and between columns, placeholder shows drop location
 - **Columns**: Draggable via grip handle only, placeholder shows drop position
 - **Order Tracking**: Both tasks and columns have order property (1-based), updated on drop
-- **Auto-save**: On drop, recalculates all positions and saves to localStorage, then re-renders board
+- **Performance Optimization**: Task drops use incremental updates instead of full board re-render:
+  - `updateTaskPositionsFromDrop()` updates only the moved task and recomputes order for affected columns
+  - Only updates `columnHistory` and timestamps when task changes columns (not for reorders within same column)
+  - Syncs task counters and collapsed column titles without rebuilding the entire DOM
+  - Notifications refresh only when tasks move between columns
+- **Auto-save**: On drop, recalculates positions for affected columns and saves to localStorage
 
 ### Rendering
 
+- **Main render**: `renderBoard()` clears and rebuilds the board container
+- **Done Column Virtualization**: Performance optimization for large Done columns (300+ tasks):
+  - Initially renders 50 tasks; subsequent batches load 50 more via "Show more" button
+  - Virtualization applies only to Done column when task count exceeds initial batch size
+  - Newly dropped tasks into Done remain visible in the rendered slice
+- **Label Loading Optimization**: Pre-loads labels into a Map once per render, passed to all `createTaskElement()` calls to avoid repeated `loadLabels()` calls
 - `renderBoard()` clears container, recreates all columns/tasks from localStorage
 - Sorts columns by order property
 - Sorts tasks within each column by order property
@@ -424,3 +442,32 @@ The notification system alerts users to tasks with approaching or past due dates
 - Keyboard shortcuts (Escape to close modals)
 
 The canonical Help modal copy lives in `docs/help-how-to.md`.
+
+## Testing
+
+### E2E Testing with Playwright
+
+- **Framework**: Playwright (`@playwright/test`)
+- **Configuration**: `playwright.config.js` with local dev server setup
+- **Test Location**: `tests/e2e/`
+- **Fixture Data**: `tests/fixtures/performance-board.json` (300+ tasks for performance testing)
+- **Test Scripts**:
+  - `npm test`: Run all Playwright tests
+  - `npm run test:ui`: Open Playwright UI mode
+  - `npm run test:debug`: Run tests in debug mode
+
+### Performance Tests
+
+- **Drag-drop performance**: Measures time to drag a task into Done column with 300+ existing tasks
+  - **Target**: <1 second per drop
+  - **Fixture**: Pre-populated board with 300 tasks in Done, 10 in In Progress
+  - **Assertions**: Drop duration, task counter updates, task visibility in Done
+- **Multiple consecutive drops**: Tests average performance across 3 consecutive drops
+  - **Target Average**: <800ms per drop
+- **Done column virtualization**: Verifies Done column renders initial batch (50 tasks) with "Show more" button when total exceeds batch size
+
+### Test Fixtures
+
+- **Generator Script**: `tests/fixtures/generate-fixture.js` creates performance test boards
+- **Fixture Structure**: Compatible with import/export format (columns, tasks, labels, settings)
+- **Task Distribution**: 300 tasks in Done, 10 in In Progress, with varied labels and priorities

@@ -11,6 +11,11 @@ let columnMenuCloseHandlerAttached = false;
 
 let boardFilterQuery = '';
 
+// Done column virtualization state
+const DONE_INITIAL_BATCH_SIZE = 50;
+const DONE_LOAD_MORE_SIZE = 50;
+let doneVisibleCount = DONE_INITIAL_BATCH_SIZE;
+
 export function setBoardFilterQuery(query) {
   boardFilterQuery = (query || '').toString();
 }
@@ -173,7 +178,7 @@ function formatTaskAge(task) {
 
 
 // Create a task element
-function createTaskElement(task, settings) {
+function createTaskElement(task, settings, labelsMap = null) {
   const li = document.createElement('li');
   li.classList.add('task');
   li.draggable = true;
@@ -187,10 +192,11 @@ function createTaskElement(task, settings) {
   labelsContainer.setAttribute('role', 'list');
   labelsContainer.setAttribute('aria-label', 'Task labels');
   
-  const labels = loadLabels();
+  // Use pre-loaded labels map for performance
+  const labels = labelsMap || new Map(loadLabels().map(l => [l.id, l]));
   if (task.labels && task.labels.length > 0) {
     task.labels.forEach(labelId => {
-      const label = labels.find(l => l.id === labelId);
+      const label = labels instanceof Map ? labels.get(labelId) : labels.find(l => l.id === labelId);
       if (label) {
         const labelEl = document.createElement('span');
         labelEl.classList.add('task-label');
@@ -204,6 +210,9 @@ function createTaskElement(task, settings) {
   
   const header = document.createElement('div');
   header.classList.add('task-header');
+
+  const showPriority = settings?.showPriority !== false;
+  const showDueDate = settings?.showDueDate !== false;
 
   const titleEl = document.createElement('div');
   titleEl.classList.add('task-title');
@@ -221,6 +230,15 @@ function createTaskElement(task, settings) {
 
   const actions = document.createElement('div');
   actions.classList.add('task-actions');
+
+  if (showPriority) {
+    const priority = typeof task.priority === 'string' ? task.priority : 'medium';
+    const priorityEl = document.createElement('span');
+    priorityEl.classList.add('task-priority', `priority-${priority}`, 'task-priority-header');
+    priorityEl.textContent = priority;
+    priorityEl.setAttribute('aria-label', `Priority: ${priority}`);
+    actions.appendChild(priorityEl);
+  }
 
   const deleteBtn = document.createElement('button');
   deleteBtn.classList.add('delete-task-btn');
@@ -252,37 +270,9 @@ function createTaskElement(task, settings) {
   descriptionEl.style.display = descriptionValue ? 'block' : 'none';
   descriptionEl.addEventListener('click', () => showEditModal(task.id));
 
-  const meta = document.createElement('div');
-  meta.classList.add('task-meta');
-
-  const showPriority = settings?.showPriority !== false;
-  const showDueDate = settings?.showDueDate !== false;
-
-  if (showPriority) {
-    const priority = typeof task.priority === 'string' ? task.priority : 'medium';
-    const priorityEl = document.createElement('span');
-    priorityEl.classList.add('task-priority', `priority-${priority}`);
-    priorityEl.textContent = priority;
-    priorityEl.setAttribute('aria-label', `Priority: ${priority}`);
-    meta.appendChild(priorityEl);
-  }
-
-  if (showDueDate) {
-    const dueDateRaw = typeof task.dueDate === 'string' ? task.dueDate.trim() : '';
-    const dueDateEl = document.createElement('span');
-    dueDateEl.classList.add('task-date');
-    if (!dueDateRaw) {
-      dueDateEl.textContent = 'No due date';
-    } else {
-      dueDateEl.textContent = 'Due ' + formatDisplayDate(dueDateRaw, settings?.locale);
-    }
-    meta.appendChild(dueDateEl);
-  }
-
   li.appendChild(header);
   li.appendChild(descriptionEl);
   li.appendChild(labelsContainer);
-  if (meta.childNodes.length > 0) li.appendChild(meta);
 
   const showChangeDate = settings?.showChangeDate !== false;
   const showAge = settings?.showAge !== false;
@@ -299,13 +289,32 @@ function createTaskElement(task, settings) {
     footer.appendChild(changeDateEl);
   }
 
+  // Bottom row: due date + age
+  const footerRow = document.createElement('div');
+  footerRow.classList.add('task-footer-row');
+
+  if (showDueDate) {
+    const dueDateRaw = typeof task.dueDate === 'string' ? task.dueDate.trim() : '';
+    const dueDateEl = document.createElement('span');
+    dueDateEl.classList.add('task-date');
+    if (!dueDateRaw) {
+      dueDateEl.textContent = 'No due date';
+    } else {
+      dueDateEl.textContent = 'Due ' + formatDisplayDate(dueDateRaw, settings?.locale);
+    }
+    footerRow.appendChild(dueDateEl);
+  }
+
   if (showAge) {
     const ageEl = document.createElement('span');
     ageEl.classList.add('task-age');
     const ageText = formatTaskAge(task);
     ageEl.textContent = ageText ? `Age ${ageText}` : '';
-    footer.appendChild(ageEl);
+    footerRow.appendChild(ageEl);
   }
+
+  const hasFooterRowContent = Array.from(footerRow.childNodes).some((n) => (n.textContent || '').trim() !== '');
+  if (hasFooterRowContent) footer.appendChild(footerRow);
 
   const hasFooterContent = Array.from(footer.childNodes).some((n) => (n.textContent || '').trim() !== '');
   if (hasFooterContent) li.appendChild(footer);
@@ -598,13 +607,54 @@ function updateColumnSelect() {
   });
 }
 
+/**
+ * Sync task counters without full re-render (performance optimization)
+ */
+export function syncTaskCounters() {
+  const tasks = loadTasks();
+  const labelsById = new Map(loadLabels().map((l) => [l.id, { name: (l.name || '').toString().trim().toLowerCase(), group: (l.group || '').toString().trim().toLowerCase() }]));
+  const queryLower = (boardFilterQuery || '').toString().trim().toLowerCase();
+  
+  document.querySelectorAll('.task-counter').forEach(counter => {
+    const columnId = counter.dataset.columnId;
+    if (!columnId) return;
+    
+    const columnTasks = tasks.filter(t => {
+      if (t.column !== columnId) return false;
+      if (!queryLower) return true;
+      return taskMatchesFilter(t, queryLower, labelsById);
+    });
+    
+    counter.textContent = columnTasks.length;
+  });
+}
+
+/**
+ * Sync collapsed column titles without full re-render (performance optimization)
+ */
+export function syncCollapsedTitles() {
+  document.querySelectorAll('.task-column.is-collapsed').forEach(columnEl => {
+    const columnId = columnEl.dataset.column;
+    const h2 = columnEl.querySelector('h2');
+    if (!columnId || !h2) return;
+    
+    const taskCount = getTaskCountInColumn(columnId);
+    const columnName = h2.textContent.replace(/\s*\(\d+\)$/, ''); // Remove existing count
+    h2.textContent = `${columnName} (${taskCount})`;
+  });
+}
+
 // Render all columns and tasks
 export function renderBoard() {
   const columns = loadColumns();
   const tasks = loadTasks();
   const labels = loadLabels();
   const settings = loadSettings();
+  
+  // Pre-build labels map for performance (avoid repeated loadLabels calls in createTaskElement)
+  const labelsMap = new Map(labels.map(l => [l.id, l]));
   const labelsById = new Map(labels.map((l) => [l.id, { name: (l.name || '').toString().trim().toLowerCase(), group: (l.group || '').toString().trim().toLowerCase() }]));
+  
   const queryLower = (boardFilterQuery || '').toString().trim().toLowerCase();
   const visibleTasks = queryLower
     ? tasks.filter((t) => taskMatchesFilter(t, queryLower, labelsById))
@@ -621,12 +671,32 @@ export function renderBoard() {
     
     const tasksList = columnEl.querySelector('.tasks');
     const taskCounter = columnEl.querySelector('.task-counter');
+    
     // Sort tasks by order within each column
     const columnTasks = visibleTasks.filter(t => t.column === column.id)
       .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
-    columnTasks.forEach(task => {
-      tasksList.appendChild(createTaskElement(task, settings));
+    
+    // Apply virtualization for Done column (performance optimization)
+    const isDoneColumn = column.id === 'done';
+    const shouldVirtualize = isDoneColumn && columnTasks.length > DONE_INITIAL_BATCH_SIZE;
+    const tasksToRender = shouldVirtualize ? columnTasks.slice(0, doneVisibleCount) : columnTasks;
+    
+    tasksToRender.forEach(task => {
+      tasksList.appendChild(createTaskElement(task, settings, labelsMap));
     });
+    
+    // Add "Show more" button for virtualized Done column
+    if (shouldVirtualize && doneVisibleCount < columnTasks.length) {
+      const showMoreBtn = document.createElement('button');
+      showMoreBtn.classList.add('show-more-btn');
+      showMoreBtn.type = 'button';
+      showMoreBtn.textContent = `Show more (${columnTasks.length - doneVisibleCount} remaining)`;
+      showMoreBtn.addEventListener('click', () => {
+        doneVisibleCount += DONE_LOAD_MORE_SIZE;
+        renderBoard();
+      });
+      tasksList.appendChild(showMoreBtn);
+    }
     
     // Update task counter
     taskCounter.textContent = columnTasks.length;

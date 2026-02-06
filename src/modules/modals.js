@@ -527,7 +527,7 @@ function renderBoardsSelect() {
 
   if (active) selectEl.value = active;
 
-  const brandEl =  ('brand-text') || document.querySelector('.brand-text');
+  const brandEl = document.getElementById('brand-text') || document.querySelector('.brand-text');
   if (brandEl) brandEl.textContent = getActiveBoardName();
 }
 
