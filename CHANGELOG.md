@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added (unreleased)
 
+- Label groups: labels can now have an optional group field for organizational grouping (e.g. People, Activities)
+- Manage Labels modal displays labels organized by group with uppercase section headers
+- Task modal label picker shows labels organized by group
+- Label create/edit modal includes a group input with autocomplete suggestions from existing groups
+- Label search now matches against group names in both Manage Labels and task label picker
+
 ### Changed (unreleased)
 
 ### Removed (unreleased)
