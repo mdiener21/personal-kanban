@@ -7,7 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Added (unreleased)
+
+- **Performance optimization**: Incremental task drop updates avoid full board re-render, dramatically improving drag-drop speed into columns with 100+ tasks
+- **Done column virtualization**: Initially renders 50 tasks with "Show more" button to load additional batches, enabling smooth performance with 300+ completed tasks
+- **Test infrastructure**: Playwright E2E tests with performance fixtures (300+ tasks) to ensure drag-drop completes in <1 second
+- Test scripts: `npm test`, `npm run test:ui`, `npm run test:debug`
+- Test fixture generator: `tests/fixtures/generate-fixture.js` creates performance test boards with 300+ tasks
+- "Show more" button styling for virtualized task lists in Done column
+- Task title now clamps to a single line with ellipsis on cards
+
 ### Changed (unreleased)
+
+- Drag-drop now uses `updateTaskPositionsFromDrop()` for targeted updates instead of full `renderBoard()`, reducing post-drop work from O(n*m) to O(affected columns only)
+- Task `columnHistory` only updates when task changes columns (not for reorders within same column), reducing unnecessary data writes
+- Label loading optimized: pre-loads labels into Map once per render instead of repeated `loadLabels()` calls per task
+- Task counters and collapsed column titles sync incrementally after drop without DOM rebuild
+- Notifications refresh only when tasks move between columns (not on reorder)
+- `createTaskElement()` now accepts pre-loaded labels map as optional parameter for performance
+- Task card layout: due date and age render together in the footer bottom row
 
 ### Removed (unreleased)
 
