@@ -9,12 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added (unreleased)
 
-- Label create/edit modal now shows an editable hex color code field next to the color picker, kept in bidirectional sync
-- Hex color input validation prevents saving labels with invalid color codes
-
 ### Changed (unreleased)
 
 ### Removed (unreleased)
+
+## [1.0.8] - 2026-02-06
+
+### Added (1.0.8)
+
+- Label create/edit modal now shows an editable hex color code field next to the color picker, kept in bidirectional sync
+- Hex color input validation prevents saving labels with invalid color codes
 
 ## [1.0.7] - 2026-02-01
 
