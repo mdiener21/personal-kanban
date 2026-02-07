@@ -4,6 +4,16 @@ This file is the canonical user-facing text for the in-app **Help** modal.
 
 ## Personal Kanban Board Help
 
+## Support & Community
+
+Loving Personal Kanban Board? Help us grow!
+
+- **⭐ Star the Repo**: Show your support on [GitHub](https://github.com/mdiener21/personal-kanban) to help others discover it!
+- **📚 Full Documentation**: Dive deeper with guides, templates, and specs at [docs/](https://github.com/mdiener21/personal-kanban/tree/main/docs).
+- **🐛 Report Issues**: Found a bug? Suggest features on [GitHub Issues](https://github.com/mdiener21/personal-kanban/issues).
+
+Your feedback keeps the app improving! 🚀
+
 ### About This App
 
 This is a fully local personal Kanban board.
@@ -157,3 +167,7 @@ Using strong action verbs is key to creating clear, actionable, and results-orie
 - **Assemble**: Gather components or data
 - **Reconcile**: Match records or accounts
 - **Screen**: Filter applicants or information for relevance
+
+---
+
+
