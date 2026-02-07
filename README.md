@@ -1,101 +1,109 @@
 # Personal Kanban Board
 
-Live Demo-Site make it yours:  https://mdiener21.github.io/personal-kanban/
+[![GitHub stars](https://img.shields.io/github/stars/mdiener21/personal-kanban.svg?style=social)](https://github.com/mdiener21/personal-kanban/stargazers)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Visit%20Now-blue)](https://mdiener21.github.io/personal-kanban/)
 
-Documentation: /docs  [documentation](https://github.com/mdiener21/personal-kanban/tree/main/docs)
+> **Transform your productivity with a sleek, local-first Kanban board.** No servers, no tracking—just pure efficiency in your browser.
 
-A beautiful, modern designed, No backend, No tracking, No Cloud, fully local in your browser only, no-server-required personal kanban board with localStorage browser persistence.
+A beautiful, modern-designed personal Kanban board that runs entirely in your browser. No backend, no cloud, no data tracking. Everything stays local with browser `localStorage` persistence. Perfect for personal task management, work tracking, and staying organized.
 
-## Features
+## 🚀 Live Demo
 
-- 🚀 Fast, Simple, Beautiful Design, custom colors, custom settings
-- 🔎 Search by label, label-group name, title, description super FAST
-- 📊 Reports to track your productivity Cumulative Flow Diagrams, how much you completed per week.
-- 🔔 Notifications for items with due dates, customize how many days in advance you get notified, toggle on off display notifications.  View them as a list to get done.
-- 💻 Local-first (no server, no backend, no cloud involved)
-- 🎨 Drag & drop tasks and columns for your todo or work tracking
-- 🏷️ Custom labels, label grouping for better organization and columns with customizable colors
-- 💾 Export/Import to local file (format: JSON) simply backup to your OneDrive, Google Drive or Dropbox
-- 📱 Responsive design Mobile and Desktop
-- 🥇 Fast and free
+Experience it firsthand: **[Try the Live Demo](https://mdiener21.github.io/personal-kanban/)**
 
-The board data is stored only in your browser (ex. Chrome, Edge, Safari). The data is persistent from session to session even
-if you delete all your cache the data is safe in your localStorage in the browser itself.  Safest is it use the export button
-that saves the board to a local file you can backup to your cloud storage, drop box, one drive, google drive etc.
+## 📸 Screenshots
 
-<img width="2543" height="1267" alt="image" src="https://github.com/user-attachments/assets/7f3a1a83-84ef-41fa-a099-728e45ad3418" />
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/7f3a1a83-84ef-41fa-a099-728e45ad3418" alt="Personal Kanban Board Interface" width="80%">
+  <br><br>
+  <img src="https://github.com/user-attachments/assets/9faa275b-16b0-4b38-b890-c4b503710e70" alt="Kanban Board Features" width="80%">
+</div>
 
-<img width="2550" height="1270" alt="image" src="https://github.com/user-attachments/assets/9faa275b-16b0-4b38-b890-c4b503710e70" />
+## ✨ Key Features
 
+- **🚀 Blazing Fast & Simple**: Lightning-quick performance with a clean, intuitive interface.
+- **🔍 Powerful Search**: Find tasks instantly by label, title, description, or label groups.
+- **📊 Productivity Reports**: Visualize your progress with Cumulative Flow Diagrams and weekly completion stats.
+- **🔔 Smart Notifications**: Get reminded of due dates with customizable advance notices. Toggle on/off and view as a prioritized list.
+- **💻 100% Local-First**: No servers, no backend, no cloud. Your data never leaves your device.
+- **🎨 Drag & Drop**: Effortlessly move tasks and columns for seamless workflow management.
+- **🏷️ Custom Labels & Colors**: Organize with personalized labels, groups, and column colors.
+- **💾 Easy Backup**: Export/import boards as JSON files to your favorite cloud storage (OneDrive, Google Drive, Dropbox).
+- **📱 Fully Responsive**: Optimized for mobile and desktop—work from anywhere.
+- **🥇 Free & Open Source**: Always free, no hidden costs or subscriptions.
 
-## Data Persistence
+## 🛡️ Data Security & Persistence
 
-All data is stored in browser localStorage. **Remember to export regularly** to avoid data loss when clearing browser data.
+Your data is stored securely in your browser's `localStorage`. It persists across sessions and survives cache clears. For extra safety, use the built-in export feature to save backups to your preferred cloud storage.
 
+## 🚀 Quick Start
 
+Get up and running in minutes!
 
-## Super Quick Start Host Yourself
+### For Users: Try It Now
+1. Visit the **[Live Demo](https://mdiener21.github.io/personal-kanban/)**.
+2. Start creating boards, tasks, and labels immediately.
+3. Export your data anytime for backup.
 
-The repo includes the built static site already to deploy, simply copy and then upload/publish the `dist/` directory to your webhost.
+### For Developers: Host Your Own
+The repository includes a pre-built static site in `dist/`. Simply upload it to any web host.
 
-1. Hetzner: https://www.hetzner.com/de/webhosting
+1. Copy the `dist/` folder.
+2. Upload to your web host (e.g., [Hetzner](https://www.hetzner.com/de/webhosting), Netlify, Vercel).
+3. Done! Your personal Kanban board is live.
 
-
-## Deploy (Static Site)
-
-This app builds to a static site. Deploy the contents of `dist/` to any static host.
-
-```bash
-npm ci
-npm run build
-```
-
-- Upload/publish the `dist/` directory.
-
-## Quick Start
-
-From the repository root:
-
-```bash
-npm install
-npm run dev
-```
-
-Vite will open the app (default: `http://localhost:3000`).
-
-## Development Setup
+## 🛠️ Development
 
 ### Prerequisites
-
 - Node.js (v18 or higher)
 - npm or yarn
 
 ### Installation
+1. Clone the repo:
+   ```bash
+   git clone https://github.com/mdiener21/personal-kanban.git
+   cd personal-kanban
+   ```
 
-1. Install dependencies:
-
+2. Install dependencies:
    ```bash
    npm install
    ```
 
-1. Start the development server:
-
+3. Start the dev server:
    ```bash
    npm run dev
    ```
-
-The app will open in your browser at `http://localhost:3000`.
+   The app will open at `http://localhost:3000`.
 
 ### Build for Production
-
 ```bash
 npm run build
 ```
-
-The built files will be in the `dist` directory.
+Built files are in `dist/`.
 
 ### Preview Production Build
-
 ```bash
 npm run preview
 ```
+
+## 📚 Documentation
+
+Dive deeper with our comprehensive docs: **[View Documentation](https://github.com/mdiener21/personal-kanban/tree/main/docs)**
+
+## 🤝 Contributing
+
+We love contributions! Whether it's bug fixes, features, or docs—every star and fork helps grow the community.
+
+- **Star this repo** ⭐ to show your support!
+- **Fork and contribute** code or ideas.
+- **Report issues** for bugs or suggestions.
+
+## 📄 License
+
+Licensed under the MIT License. See [LICENSE.md](LICENSE.md) for details.
+
+---
+
+**Made with ❤️ for productivity enthusiasts. Star us on GitHub to stay updated!**
