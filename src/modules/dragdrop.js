@@ -8,6 +8,23 @@ let columnSortable = null;
 let autoScrollInterval = null;
 let lastTouchX = 0;
 
+function shouldForceFallbackForTasks() {
+  // Sortable's JS fallback is required on most mobile/touch environments
+  // (native HTML5 drag/drop is unreliable or unavailable), but it also
+  // makes Playwright's locator.dragTo() ineffective. Prefer native DnD
+  // on fine pointers (mouse/trackpad).
+  const hasTouchPoints =
+    typeof navigator !== 'undefined' &&
+    (navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0);
+
+  const isCoarsePointer =
+    typeof window !== 'undefined' &&
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(pointer: coarse)').matches;
+
+  return hasTouchPoints || isCoarsePointer;
+}
+
 // Initialize all drag and drop functionality
 export function initDragDrop() {
   destroySortables();
@@ -71,6 +88,7 @@ function trackPointer(evt) {
 // Initialize sortable for tasks within columns
 function initTaskSortables() {
   const taskLists = document.querySelectorAll('.tasks:not(.hidden)');
+  const forceFallback = shouldForceFallbackForTasks();
   
   taskLists.forEach(taskList => {
     const sortable = new Sortable(taskList, {
@@ -87,7 +105,7 @@ function initTaskSortables() {
       chosenClass: 'task-chosen',
       dragClass: 'task-drag',
       draggable: '.task',
-      forceFallback: true, // Use JS-based drag for consistent mobile behavior
+      forceFallback, // Fallback on touch; native HTML5 DnD on desktop
       fallbackClass: 'task-fallback',
       fallbackOnBody: true,
       fallbackTolerance: 0,

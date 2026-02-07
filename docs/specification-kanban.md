@@ -450,11 +450,19 @@ The canonical Help modal copy lives in `docs/help-how-to.md`.
 - **Framework**: Playwright (`@playwright/test`)
 - **Configuration**: `playwright.config.js` with local dev server setup
 - **Test Location**: `tests/e2e/`
+- **Browser project**: Currently runs **Firefox only** (`Desktop Firefox`) via `projects` in `playwright.config.js`
 - **Fixture Data**: `tests/fixtures/performance-board.json` (300+ tasks for performance testing)
 - **Test Scripts**:
   - `npm test`: Run all Playwright tests
   - `npm run test:ui`: Open Playwright UI mode
   - `npm run test:debug`: Run tests in debug mode
+
+#### Coverage
+
+- **Boards**: board management modal scenarios
+- **Task creation**: happy-path creation with due dates and labels
+- **Validation**: required-title validation on task creation
+- **Drag/drop performance**: moving tasks into Done with 300+ existing Done tasks
 
 ### Performance Tests
 

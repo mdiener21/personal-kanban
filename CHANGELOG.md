@@ -9,7 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added (unreleased)
 
+- Playwright E2E test suite (`npm test`) covering boards, task creation/validation, and drag/drop performance scenarios.
+
 ### Changed (unreleased)
+
+- Drag/drop now prefers native HTML5 drag-and-drop on non-touch pointers (keeps SortableJS fallback for touch/coarse pointers) to improve first-drag reliability on desktop and compatibility with Playwright automation.
 
 ### Removed (unreleased)
 
