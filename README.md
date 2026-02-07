@@ -17,6 +17,9 @@ Experience it firsthand: **[Try the Live Demo](https://mdiener21.github.io/perso
 <div align="center">
    <a href="https://mdiener21.github.io/personal-kanban/"><img src="https://github.com/user-attachments/assets/7f3a1a83-84ef-41fa-a099-728e45ad3418" alt="Personal Kanban Board Interface" width="80%"></a>
   <br><br>
+   <a href="https://mdiener21.github.io/personal-kanban/"><img width="1462" height="895" alt="image" src="https://github.com/user-attachments/assets/0d0ade47-e931-4caa-b1ec-4e0148733d5b"></a>
+
+  <br><br>
    <a href="https://mdiener21.github.io/personal-kanban/"><img src="https://github.com/user-attachments/assets/9faa275b-16b0-4b38-b890-c4b503710e70" alt="Kanban Board Features" width="80%"></a>
    <br><br>Label Manager
    <a href="https://mdiener21.github.io/personal-kanban/"><img width="582" height="703" alt="image" src="https://github.com/user-attachments/assets/dec3484f-2156-4163-8b87-b30d2a837c4d"></a>
@@ -24,6 +27,9 @@ Experience it firsthand: **[Try the Live Demo](https://mdiener21.github.io/perso
    <a href="https://mdiener21.github.io/personal-kanban/"><img width="273" height="556" alt="image" src="https://github.com/user-attachments/assets/2fbc476d-226a-4c5f-a1bd-a2d6713e5c01"></a>
    <br><br>Settings Customization
    <a href="https://mdiener21.github.io/personal-kanban/"><img width="794" height="636" alt="image" src="https://github.com/user-attachments/assets/8c743e44-6810-4497-b93c-7dcdade8a820"></a>
+   <br><br>
+   <a href="https://mdiener21.github.io/personal-kanban/"><img width="1092" height="745" alt="image" src="https://github.com/user-attachments/assets/dc143944-bff6-47aa-b71a-0db6788c6b19"></a>
+
 </div>
 
 ## ✨ Key Features
