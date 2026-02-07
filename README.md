@@ -15,9 +15,9 @@ Experience it firsthand: **[Try the Live Demo](https://mdiener21.github.io/perso
 ## 📸 Screenshots
 
 <div align="center">
-  <a href="https://mdiener21.github.io/personal-kanban/" <img src="https://github.com/user-attachments/assets/7f3a1a83-84ef-41fa-a099-728e45ad3418" alt="Personal Kanban Board Interface" width="80%"></a>
+   <a href="https://mdiener21.github.io/personal-kanban/"><img src="https://github.com/user-attachments/assets/7f3a1a83-84ef-41fa-a099-728e45ad3418" alt="Personal Kanban Board Interface" width="80%"></a>
   <br><br>
-  <a href="https://mdiener21.github.io/personal-kanban/" <img src="https://github.com/user-attachments/assets/9faa275b-16b0-4b38-b890-c4b503710e70" alt="Kanban Board Features" width="80%"></a>
+   <a href="https://mdiener21.github.io/personal-kanban/"><img src="https://github.com/user-attachments/assets/9faa275b-16b0-4b38-b890-c4b503710e70" alt="Kanban Board Features" width="80%"></a>
 </div>
 
 ## ✨ Key Features
