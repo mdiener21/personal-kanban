@@ -18,6 +18,7 @@ Welcome to the comprehensive documentation for Personal Kanban Board—a sleek, 
 | [📊 boards.md](boards.md) | Board templates and use cases |
 | [🏷️ labels.md](labels.md) | Label taxonomy and organization strategies |
 | [🌐 kanban-ecosystem.md](kanban-ecosystem.md) | Comparison with other kanban tools |
+| [🔒 security.md](security.md) | How secure is your data in the browser locally? |
 
 ## 📁 Quick Example Boards
 
