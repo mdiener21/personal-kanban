@@ -4,7 +4,20 @@ Live Demo-Site make it yours:  https://mdiener21.github.io/personal-kanban/
 
 Documentation: /docs  [documentation](https://github.com/mdiener21/personal-kanban/tree/main/docs)
 
-No backend. No tracking. No cloud, fully local in your browser, no-server-required personal kanban board with localStorage persistence.
+A beautiful, modern designed, No backend, No tracking, No Cloud, fully local in your browser only, no-server-required personal kanban board with localStorage browser persistence.
+
+## Features
+
+- 🚀 Fast, Simple, Beautiful Design, custom colors, custom settings
+- 🔎 Search by label, label-group name, title, description super FAST
+- 📊 Reports to track your productivity Cumulative Flow Diagrams, how much you completed per week.
+- 🔔 Notifications for items with due dates, customize how many days in advance you get notified, toggle on off display notifications.  View them as a list to get done.
+- 💻 Local-first (no server, no backend, no cloud involved)
+- 🎨 Drag & drop tasks and columns for your todo or work tracking
+- 🏷️ Custom labels, label grouping for better organization and columns with customizable colors
+- 💾 Export/Import to local file (format: JSON) simply backup to your OneDrive, Google Drive or Dropbox
+- 📱 Responsive design Mobile and Desktop
+- 🥇 Fast and free
 
 The board data is stored only in your browser (ex. Chrome, Edge, Safari). The data is persistent from session to session even
 if you delete all your cache the data is safe in your localStorage in the browser itself.  Safest is it use the export button
@@ -19,13 +32,7 @@ that saves the board to a local file you can backup to your cloud storage, drop 
 
 All data is stored in browser localStorage. **Remember to export regularly** to avoid data loss when clearing browser data.
 
-## Features
 
-- ✅ Local-first (no server, no backend, no cloud involved)
-- 🎨 Drag & drop tasks and columns
-- 🏷️ Custom labels and columns with colors
-- 💾 Export/Import to local file (format: JSON)
-- 📱 Responsive design Mobile and Desktop
 
 ## Super Quick Start Host Yourself
 
