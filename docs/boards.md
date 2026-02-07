@@ -1,78 +1,95 @@
-# Example Kanban Board Groups, Use Cases & Standard Columns
+# 📊 Kanban Board Templates & Use Cases: Build Your Perfect Workflow
 
-This page describes common **Kanban board groups**, what they are used for, and the **recommended basic column structure** to use on each board.  
-These columns complement the label taxonomy and provide a ready-to-use board layout.
+[![GitHub stars](https://img.shields.io/github/stars/mdiener21/personal-kanban.svg?style=social)](https://github.com/mdiener21/personal-kanban/stargazers)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Visit%20Now-blue)](https://mdiener21.github.io/personal-kanban/)
 
-### Status / Workflow stages **Recommended columns:**
+> **Transform ideas into action!** Discover board templates tailored for projects, life, and creativity—paired with smart columns and labels for ultimate productivity.
 
-- **To Do**
-- **In Progress**
-- **Review**
-- **Blocked**
-- **Done**
+Personal Kanban Boards adapt to any workflow. Below, explore common board types with recommended columns and labels. These templates provide a solid foundation—customize as you go!
 
----
+**🚀 [Try the Live Demo](https://mdiener21.github.io/personal-kanban/) and experiment with boards!**
 
-## 1. Project Management Board
+## 📁 Quick Example Boards
 
-**Used for:**  
-Tracking software projects, tasks, bugs, and feature development.
+Jumpstart with these pre-built boards:
 
-**Recommended columns:**
+- **[Eisenhower-Method-Board.json](example-boards/Eisenhower-Method-Board.json)** — Priority matrix for decisions.
+- **[Getting-Things-Done-Template.json](example-boards/Getting-Things-Done-Template.json)** — GTD productivity system.
+- **[Personal-Work-Kanban-Template.json](example-boards/Personal-Work-Kanban-Template.json)** — Balance personal and work tasks.
+- **[Personal_Demo_board.json](example-boards/Personal_Demo_board.json)** — Sample board with basics.
+- **[Development_board.json](example-boards/Development_board.json)** — Software dev workflow.
 
+**Import Tip**: Click **Import** in the app and select a JSON file!
+
+## 🎯 Standard Workflow Columns
+
+Most boards use these core stages for progress tracking:
+
+- **To Do** — Tasks awaiting action
+- **In Progress** — Active work
+- **Review** — Quality checks or feedback
+- **Blocked** — Stuck, needs resolution
+- **Done** — Completed successfully
+
+Adjust based on your needs—add, rename, or reorder columns anytime.
+
+## 🏢 Board Templates by Use Case
+
+### 1. 🛠️ Project Management Board
+
+**Perfect for:** Software projects, bugs, features, and agile teams.
+
+**Recommended Columns:**
 - Backlog
 - To Do
 - In Progress
 - Review
 - Done
 
-**Typical labels:**  
-Bug, Feature Request, Research, High Priority, Blocked.
+**Typical Labels:** Bug, Feature Request, Research, High Priority, Blocked.
+
+**Why it works:** Keeps development streamlined and visible.
 
 ---
 
-## 2. Personal Life Board
+### 2. 🏠 Personal Life Board
 
-**Used for:**  
-Managing daily life responsibilities and household organization.
+**Perfect for:** Daily chores, errands, and home organization.
 
-**Recommended columns:**
-
+**Recommended Columns:**
 - Ideas
 - To Do
 - This Week
 - Done
 
-**Typical labels:**  
-Groceries, Weekly Activity, Travel Checklist, Cleaning Supplies.
+**Typical Labels:** Groceries, Weekly Activity, Travel Checklist, Cleaning Supplies.
+
+**Why it works:** Turns household chaos into manageable tasks.
 
 ---
 
-## 3. Student Board
+### 3. 🎓 Student Board
 
-**Used for:**  
-Organizing coursework, exams, and academic deadlines.
+**Perfect for:** Coursework, exams, and academic planning.
 
-**Recommended columns:**
-
+**Recommended Columns:**
 - Upcoming
 - In Study
 - Ready for Submission
 - Submitted
 - Done
 
-**Typical labels:**  
-Homework, Exam Preparation, Assignment Due, Thesis.
+**Typical Labels:** Homework, Exam Preparation, Assignment Due, Thesis.
+
+**Why it works:** Helps students stay ahead of deadlines.
 
 ---
 
-## 4. Sales Pipeline Board
+### 4. 💼 Sales Pipeline Board
 
-**Used for:**  
-Tracking leads and deals from first contact to close.
+**Perfect for:** Lead tracking from contact to close.
 
-**Recommended columns:**
-
+**Recommended Columns:**
 - New Leads
 - Contacted
 - Qualified
@@ -80,36 +97,34 @@ Tracking leads and deals from first contact to close.
 - Negotiation
 - Done
 
-**Typical labels:**  
-New Lead, Follow Up, Demo, Won, Lost.
+**Typical Labels:** New Lead, Follow Up, Demo, Won, Lost.
+
+**Why it works:** Visualizes the sales funnel for better conversions.
 
 ---
 
-## 5. Content Creators Creation Board
+### 5. 🎥 Content Creation Board
 
-**Used for:**  
-Managing blogs, videos, and social media content.
+**Perfect for:** Blogs, videos, and social media content.
 
-**Recommended columns:**
-
+**Recommended Columns:**
 - Ideas
 - Draft
 - Editing
 - Ready to Publish
 - Published
 
-**Typical labels:**  
-Blog, Video, Social Media, SEO.
+**Typical Labels:** Blog, Video, Social Media, SEO.
+
+**Why it works:** Organizes the creative process from idea to audience.
 
 ---
 
-## 6. Marketing Campaign Board
+### 6. 📢 Marketing Campaign Board
 
-**Used for:**  
-Managing marketing and advertising initiatives.
+**Perfect for:** Ads, promotions, and campaign management.
 
-**Recommended columns:**
-
+**Recommended Columns:**
 - Campaign Ideas
 - Planning
 - In Production
@@ -117,70 +132,66 @@ Managing marketing and advertising initiatives.
 - Live
 - Review
 
-**Typical labels:**  
-Ad Copy, Design, Promotion, Performance Review.
+**Typical Labels:** Ad Copy, Design, Promotion, Performance Review.
+
+**Why it works:** Tracks campaigns from concept to results.
 
 ---
 
-## 7. Startup / Business Operations Board
+### 7. 🏢 Startup / Business Operations Board
 
-**Used for:**  
-Tracking internal business tasks and operations.
+**Perfect for:** Internal tasks, finance, and operations.
 
-**Recommended columns:**
-
+**Recommended Columns:**
 - Backlog
 - In Progress
 - Waiting / External
 - Completed
 
-**Typical labels:**  
-Finance, Legal, HR, Invoices, Strategy.
+**Typical Labels:** Finance, Legal, HR, Invoices, Strategy.
+
+**Why it works:** Keeps business ops efficient and accountable.
 
 ---
 
-## 8. Creative / Vision Board
+### 8. 🎨 Creative / Vision Board
 
-**Used for:**  
-Capturing personal inspiration and long-term goals.
+**Perfect for:** Inspiration, goals, and personal growth.
 
-**Recommended columns:**
-
+**Recommended Columns:**
 - Ideas
 - In Focus
 - In Progress
 - Achieved
 
-**Typical labels:**  
-Goals, Future, Wellness, Travel, Creativity.
+**Typical Labels:** Goals, Future, Wellness, Travel, Creativity.
+
+**Why it works:** Fuels motivation and long-term vision.
 
 ---
 
-## 9. Event Planning Board
+### 9. 🎉 Event Planning Board
 
-**Used for:**  
-Organizing conferences, parties, and workshops.
+**Perfect for:** Weddings, conferences, and parties.
 
-**Recommended columns:**
-
+**Recommended Columns:**
 - Ideas
 - Planning
 - Booked
 - Ready
 - Event Done
 
-**Typical labels:**  
-Venue, Catering, Invitations, Schedule.
+**Typical Labels:** Venue, Catering, Invitations, Schedule.
+
+**Why it works:** Ensures no detail is overlooked.
 
 ---
 
-## 10. Product Development Board
+### 10. 🚀 Product Development Board
 
-**Used for:**  
-Managing product roadmaps and releases.
+**Perfect for:** Roadmaps, releases, and product teams.
 
-**Recommended columns:**
-
+**Recommended Columns:**
 - Idea Backlog
 - Planned
 - In Development
@@ -188,5 +199,106 @@ Managing product roadmaps and releases.
 - Ready for Release
 - Shipped
 
+**Typical Labels:** Backlog, Roadmap, Feature, Bug, Release.
+
+**Why it works:** Aligns teams on product evolution.
+
+---
+
+**Mix & Match**: Combine elements from different boards to fit your unique needs. Labels add extra filtering power!
+
+**Loved these templates? ⭐ [Star the repo](https://github.com/mdiener21/personal-kanban) to support and inspire more!** Share your custom boards in discussions. 🚀
+
 **Typical labels:**  
-Backlog, Roadmap, Feature, Bug, Release.
+Blog, Video, Social Media, SEO.
+
+---
+
+## 6. 📢 Marketing Campaign Board
+
+**Perfect for:** Ads, promotions, and campaign management.
+
+**Recommended Columns:**
+- Campaign Ideas
+- Planning
+- In Production
+- Scheduled
+- Live
+- Review
+
+**Typical Labels:** Ad Copy, Design, Promotion, Performance Review.
+
+**Why it works:** Tracks campaigns from concept to results.
+
+---
+
+## 7. 🏢 Startup / Business Operations Board
+
+**Perfect for:** Internal tasks, finance, and operations.
+
+**Recommended Columns:**
+- Backlog
+- In Progress
+- Waiting / External
+- Completed
+
+**Typical Labels:** Finance, Legal, HR, Invoices, Strategy.
+
+**Why it works:** Keeps business ops efficient and accountable.
+
+---
+
+## 8. 🎨 Creative / Vision Board
+
+**Perfect for:** Inspiration, goals, and personal growth.
+
+**Recommended Columns:**
+- Ideas
+- In Focus
+- In Progress
+- Achieved
+
+**Typical Labels:** Goals, Future, Wellness, Travel, Creativity.
+
+**Why it works:** Fuels motivation and long-term vision.
+
+---
+
+## 9. 🎉 Event Planning Board
+
+**Perfect for:** Weddings, conferences, and parties.
+
+**Recommended Columns:**
+- Ideas
+- Planning
+- Booked
+- Ready
+- Event Done
+
+**Typical Labels:** Venue, Catering, Invitations, Schedule.
+
+**Why it works:** Ensures no detail is overlooked.
+
+---
+
+## 10. 🚀 Product Development Board
+
+**Perfect for:** Roadmaps, releases, and product teams.
+
+**Recommended Columns:**
+- Idea Backlog
+- Planned
+- In Development
+- Testing
+- Ready for Release
+- Shipped
+
+**Typical Labels:** Backlog, Roadmap, Feature, Bug, Release.
+
+**Why it works:** Aligns teams on product evolution.
+
+---
+
+**Mix & Match**: Combine elements from different boards to fit your unique needs. Labels add extra filtering power!
+
+**Loved these templates? ⭐ [Star the repo](https://github.com/mdiener21/personal-kanban) to support and inspire more!** Share your custom boards in discussions. 🚀
