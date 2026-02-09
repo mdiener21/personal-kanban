@@ -12,7 +12,7 @@ Test plan for creating tasks with multiple labels and specific priority settings
 
 #### 1.1. Create task with 2 existing labels and medium priority in To Do column
 
-**File:** `tests/task-creation/create-task-with-existing-labels.spec.ts`
+**File:** `tests/e2e/create-task.spec.ts`
 
 **Steps:**
   1. Navigate to the kanban board application
@@ -52,7 +52,7 @@ Test plan for creating tasks with multiple labels and specific priority settings
 
 #### 1.2. Create task with 2 existing labels and medium priority in In Progress column
 
-**File:** `tests/task-creation/create-task-in-progress-column.spec.ts`
+**File:** `tests/e2e/create-task.spec.ts`
 
 **Steps:**
   1. Click the 'Add task to In Progress' button
@@ -73,7 +73,7 @@ Test plan for creating tasks with multiple labels and specific priority settings
 
 #### 1.3. Create task with due date, 2 labels, and medium priority
 
-**File:** `tests/task-creation/create-task-with-due-date.spec.ts`
+**File:** `tests/e2e/create-task.spec.ts`
 
 **Steps:**
   1. Click 'Add task to To Do' button
@@ -98,7 +98,7 @@ Test plan for creating tasks with multiple labels and specific priority settings
 
 #### 2.1. Create task with 2 new custom labels and medium priority
 
-**File:** `tests/task-creation/create-task-with-new-labels.spec.ts`
+**File:** `tests/e2e/create-task.spec.ts`
 
 **Steps:**
   1. Click 'Add task to To Do' button
@@ -135,7 +135,7 @@ Test plan for creating tasks with multiple labels and specific priority settings
 
 #### 2.2. Create task with 1 existing and 1 new label, medium priority
 
-**File:** `tests/task-creation/create-task-mixed-labels.spec.ts`
+**File:** (not implemented)
 
 **Steps:**
   1. Click 'Add task to In Progress' button
@@ -157,7 +157,7 @@ Test plan for creating tasks with multiple labels and specific priority settings
 
 #### 2.3. Filter and select labels using search functionality
 
-**File:** `tests/task-creation/filter-labels-search.spec.ts`
+**File:** (not implemented)
 
 **Steps:**
   1. Click 'Add task to Done' button

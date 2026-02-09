@@ -100,6 +100,20 @@ Built files are in `dist/`.
 npm run preview
 ```
 
+### Run Tests
+
+Run all Playwright E2E tests:
+
+```bash
+npm test
+```
+
+Run only the create-task tests ([tests/e2e/create-task.spec.ts](tests/e2e/create-task.spec.ts)):
+
+```bash
+npm test -- tests/e2e/create-task.spec.ts
+```
+
 ## 📚 Documentation
 
 Dive deeper with our comprehensive docs: **[View Documentation](https://github.com/mdiener21/personal-kanban/tree/main/docs)**
