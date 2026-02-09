@@ -338,7 +338,7 @@ The notification system alerts users to tasks with approaching or past due dates
 
 - **Fields** include:
   - Title (required)
-  - Description (optional)
+  - Description (optional, textarea with vertical resize capability)
   - Priority (low/medium/high)
   - Due Date (optional, YYYY-MM-DD)
   - Column selection

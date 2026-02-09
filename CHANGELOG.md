@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed (unreleased)
 
+- Task description textarea in task modal now supports vertical resizing (user can drag to expand height while width stays fixed)
 
 ### Removed (unreleased)
 
