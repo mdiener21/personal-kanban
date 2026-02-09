@@ -303,7 +303,8 @@ The notification system alerts users to tasks with approaching or past due dates
 
 ### Modals
 
-- **Mobile Behavior**: Full-screen modals with scrollable form and sticky footer. "Manage Labels" list expands to fill the screen. Task editor label list is height-capped with a scrollbar.
+- **Scrolling & actions**: If a modal’s content is taller than the viewport, the modal shows a vertical scrollbar while keeping the action row (e.g. Cancel/Save/Close) sticky at the bottom so it is always visible.
+- **Mobile Behavior**: Modals are full-screen on mobile. Task editor label list is height-capped with a scrollbar.
 - Task modal (add/edit)
 - Column modal (add/edit)
 - Labels management modal

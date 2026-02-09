@@ -115,22 +115,18 @@
       border-radius: 0;
       display: flex;
       flex-direction: column;
-      padding: 16px;
+      padding: 16px 16px 0;
       margin: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
   }
 
   .modal-content form,
   #labels-list {
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-      overflow-y: auto;
       max-height: none !important;
   }
 
   .form-actions {
-      margin-top: auto;
-      padding-top: 16px;
       padding-bottom: 24px; /* Extra padding for touch targets/safe area */
   }
 

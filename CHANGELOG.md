@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed (unreleased)
 
 - Drag/drop now prefers native HTML5 drag-and-drop on non-touch pointers (keeps SortableJS fallback for touch/coarse pointers) to improve first-drag reliability on desktop and compatibility with Playwright automation.
+- Modals now keep the action buttons (Cancel/Save/Close) sticky at the bottom while the modal content scrolls, preventing the actions from flowing off-screen.
 
 ### Removed (unreleased)
 
