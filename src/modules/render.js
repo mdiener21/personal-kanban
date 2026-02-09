@@ -79,13 +79,13 @@ function sortTasksByDueDate(tasks) {
 }
 
 /**
- * Sort tasks by priority (descending: high → medium → low).
+ * Sort tasks by priority (descending: urgent → high → medium → low → none).
  */
 function sortTasksByPriority(tasks) {
-  const priorityOrder = { high: 0, medium: 1, low: 2 };
+  const priorityOrder = { urgent: 0, high: 1, medium: 2, low: 3, none: 4 };
   return [...tasks].sort((a, b) => {
-    const prioA = priorityOrder[a.priority] ?? 2;
-    const prioB = priorityOrder[b.priority] ?? 2;
+    const prioA = priorityOrder[a.priority] ?? 4;
+    const prioB = priorityOrder[b.priority] ?? 4;
     return prioA - prioB;
   });
 }
@@ -232,11 +232,27 @@ function createTaskElement(task, settings, labelsMap = null) {
   actions.classList.add('task-actions');
 
   if (showPriority) {
-    const priority = typeof task.priority === 'string' ? task.priority : 'medium';
+    const rawPriority = typeof task.priority === 'string' ? task.priority.toLowerCase().trim() : '';
+    const priority = (rawPriority === 'urgent' || rawPriority === 'high' || rawPriority === 'medium' || rawPriority === 'low' || rawPriority === 'none')
+      ? rawPriority
+      : 'none';
     const priorityEl = document.createElement('span');
     priorityEl.classList.add('task-priority', `priority-${priority}`, 'task-priority-header');
     priorityEl.textContent = priority;
     priorityEl.setAttribute('aria-label', `Priority: ${priority}`);
+    priorityEl.setAttribute('role', 'button');
+    priorityEl.setAttribute('tabindex', '0');
+    priorityEl.title = 'Edit task';
+    priorityEl.addEventListener('click', (e) => {
+      e.stopPropagation();
+      showEditModal(task.id);
+    });
+    priorityEl.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        showEditModal(task.id);
+      }
+    });
     actions.appendChild(priorityEl);
   }
 
@@ -517,7 +533,7 @@ function createColumnElement(column) {
   sortByPriorityBtn.type = 'button';
   sortByPriorityBtn.setAttribute('role', 'menuitem');
   sortByPriorityBtn.textContent = 'By Priority';
-  sortByPriorityBtn.title = 'Sort by priority (high to low)';
+  sortByPriorityBtn.title = 'Sort by priority (urgent to none)';
   sortByPriorityBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     closeAllColumnMenus();

@@ -15,7 +15,7 @@ test.describe('Task Creation - Happy Path Scenarios', () => {
     await page.getByRole('textbox', { name: 'Title' }).fill('Finalize quarterly report');
 
     // Select 'Medium' priority
-    await page.getByLabel('Priority', { exact: true }).selectOption(['Medium']);
+    await page.getByLabel('Priority', { exact: true }).selectOption(['medium']);
 
     // Click the Due Date field and enter a future date (e.g., 2026-02-15)
     await page.getByRole('textbox', { name: 'Due Date' }).fill('2026-02-15');

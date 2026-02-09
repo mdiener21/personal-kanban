@@ -5,7 +5,7 @@
 
 > **Unlock the power of smart organization!** Labels and groups help you categorize, filter, and find tasks effortlessly—turning chaos into clarity.
 
-Labels are your secret weapon for task management. Use columns to track progress (e.g., To Do → In Progress → Done), and labels for context, priority, and filtering. With **label groups**, you can organize labels into logical categories, making everything even more intuitive.
+Labels are your secret weapon for task management. Use columns to track status, state, progress (e.g., To Do → In Progress → Done), and labels for context,  and filtering. With **label groups**, you can organize labels into logical categories, making everything even more intuitive.
 
 **🚀 [Try the Live Demo](https://mdiener21.github.io/personal-kanban/) and see labels in action!**
 
@@ -23,12 +23,12 @@ Kickstart your setup with these ready-to-import boards featuring label examples:
 
 ## 🎯 How Labels & Groups Work
 
-- **Labels**: Colored tags you assign to tasks (e.g., "Urgent", "Bug", "Home"). Each label has a name, color, and optional group.
-- **Groups**: Organize labels into sections (e.g., "Priority", "Type", "Area"). Groups make the label picker and management modal cleaner and more searchable.
+- **Labels**: Colored tags you assign to tasks (e.g., "Feature", "Bug", "Home"). Each label has a name, color, and optional group.
+- **Groups**: Organize labels into sections (e.g., "Activity", "People", "Type", "Area"). Groups make the label picker and management modal cleaner and more searchable.
 - **Search & Filter**: Find tasks by label name or group name—super fast!
 - **Customization**: Create, edit, and delete labels/groups to fit your workflow.
 
-**Pro Tip**: Use groups to avoid label clutter. For example, group "Urgent" and "High Priority" under "Priority".
+**Pro Tip**: Use groups to avoid label clutter. For example, group "Meeting" and "Email" under "Activity" group.
 
 ## 🛠️ Managing Labels & Groups
 
@@ -44,22 +44,20 @@ Here are curated label groups and labels for different workflows. Mix and match 
 
 ### 🏢 For a Project Management (Kanban-Style) Board
 
-Group labels by type, priority, and status for agile project tracking.
-
-#### Priority
-- **Urgent** (Red) — Needs immediate attention
-- **High** (Orange) — Important, time-sensitive
-- **Medium** (Yellow) — Standard priority
-- **Low** (Green) — Nice to have
+Group labels by type, and status for agile project tracking.
 
 #### Type
+
 - **Bug** (Purple) — Issues to fix
 - **Feature** (Blue) — New functionality
 - **Research** (Teal) — Investigation needed
 - **Meeting Notes** (Gray) — Follow-ups from discussions
 - **Follow Up** (Pink) — Pending actions
 
-#### Status
+#### Status or State
+
+Normally the column represents the state of a `task` and here you could mix it up with a label.
+
 - **Blocked** (Red) — Stuck, needs unblocking
 - **In Review** (Yellow) — Awaiting feedback
 - **Approved** (Green) — Ready to proceed
@@ -71,6 +69,7 @@ Group labels by type, priority, and status for agile project tracking.
 Organize life areas with groups for home, errands, and personal goals.
 
 #### Home
+
 - **Kitchen** (Blue) — Cooking and appliances
 - **Pantry** (Green) — Food storage
 - **Cleaning Supplies** (Yellow) — Maintenance items
@@ -80,12 +79,14 @@ Organize life areas with groups for home, errands, and personal goals.
 - **Seasonal** (Orange) — Holiday decorations
 
 #### Errands
+
 - **Groceries** (Green) — Shopping lists
 - **To Do List** (Blue) — Daily tasks
 - **Weekly Activity** (Purple) — Recurring chores
 - **Travel Checklist** (Red) — Trip prep
 
 #### Personal
+
 - **Goals** (Gold) — Long-term aspirations
 - **Wellness** (Teal) — Health and fitness
 - **Finance** (Green) — Budget and savings
@@ -98,6 +99,7 @@ Organize life areas with groups for home, errands, and personal goals.
 Inspire your dreams with motivational labels grouped by themes.
 
 #### Inspiration
+
 - **Goals** (Gold) — What you want to achieve
 - **Future** (Blue) — Vision for tomorrow
 - **Achieve** (Green) — Milestones reached
@@ -107,6 +109,7 @@ Inspire your dreams with motivational labels grouped by themes.
 - **Creativity** (Purple) — Artistic pursuits
 
 #### Activities
+
 - **Brainstorm** (Yellow) — Idea generation
 - **Sketch** (Gray) — Initial designs
 - **Prototype** (Blue) — Testing concepts
@@ -119,6 +122,7 @@ Inspire your dreams with motivational labels grouped by themes.
 Stay on top of academics and life with structured groups.
 
 #### Courses
+
 - **Lecture** (Blue) — Class notes
 - **Seminar** (Green) — Discussion topics
 - **Lab** (Purple) — Hands-on work
@@ -128,6 +132,7 @@ Stay on top of academics and life with structured groups.
 - **Elective** (Teal) — Fun courses
 
 #### Study
+
 - **Homework** (Blue) — Daily assignments
 - **Reading** (Green) — Textbook chapters
 - **Revision** (Yellow) — Review sessions
@@ -136,6 +141,7 @@ Stay on top of academics and life with structured groups.
 - **Group Study** (Teal) — Collaborative learning
 
 #### Deadlines
+
 - **Assignment Due** (Red) — Upcoming submissions
 - **Exam Preparation** (Orange) — Study schedules
 - **Presentation** (Blue) — Speaking engagements
@@ -144,6 +150,7 @@ Stay on top of academics and life with structured groups.
 - **Submission Ready** (Green) — Completed items
 
 #### Life
+
 - **Enrollment** (Blue) — Registration tasks
 - **Timetable** (Green) — Schedule management
 - **Scholarship** (Gold) — Funding applications
@@ -152,6 +159,7 @@ Stay on top of academics and life with structured groups.
 - **Career Planning** (Teal) — Future steps
 
 #### Wellbeing
+
 - **Workout** (Green) — Exercise routines
 - **Mental Health** (Blue) — Self-care days
 - **Sleep** (Purple) — Rest tracking
@@ -166,6 +174,7 @@ Stay on top of academics and life with structured groups.
 Track leads and activities with sales-focused groups.
 
 #### Leads
+
 - **New Lead** (Blue) — Fresh prospects
 - **Contacted** (Yellow) — Initial outreach
 - **Qualified** (Green) — Viable opportunities
@@ -175,6 +184,7 @@ Track leads and activities with sales-focused groups.
 - **Lost** (Red) — Missed opportunities
 
 #### Activities
+
 - **Call** (Blue) — Phone conversations
 - **Email** (Green) — Written communication
 - **Meeting** (Purple) — In-person or virtual
@@ -186,30 +196,3 @@ Track leads and activities with sales-focused groups.
 **Customize to Fit**: These are starters—add, edit, or group as needed. Labels evolve with your workflow!
 
 **Loved this guide? ⭐ [Star the repo](https://github.com/mdiener21/personal-kanban) to support and get updates!** Share your label setups in issues or PRs. 🚀
-
-- **Workout**
-- **Mental Health**
-- **Sleep**
-- **Break Time**
-- **Social**
-- **Hobbies**
-
-### 💼 For a Sales Board
-
-Track leads and activities with sales-focused groups.
-
-#### Leads
-- **New Lead** (Blue) — Fresh prospects
-- **Contacted** (Yellow) — Initial outreach
-- **Qualified** (Green) — Viable opportunities
-- **Proposal Sent** (Purple) — Offers submitted
-- **Negotiation** (Orange) — Bargaining phase
-- **Won** (Gold) — Closed deals
-- **Lost** (Red) — Missed opportunities
-
-#### Activities
-- **Call** (Blue) — Phone conversations
-- **Email** (Green) — Written communication
-- **Meeting** (Purple) — In-person or virtual
-- **Follow Up** (Yellow) — Next steps
-- **Demo** (Orange) — Product showcases

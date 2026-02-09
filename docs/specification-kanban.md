@@ -37,7 +37,7 @@
   id: "uuid",
   title: "task title",
   description: "optional longer description",
-  priority: "low" | "medium" | "high",
+  priority: "urgent" | "high" | "medium" | "low" | "none",
   dueDate: "YYYY-MM-DD" | "",
   column: "column-id",
   order: number,
@@ -126,7 +126,7 @@
 
 ### Task Features
 
-- **Create**: Click plus icon in column header, modal with Title (required), Description, Priority, Due Date, column select, label checkboxes
+- **Create**: Click plus icon in column header, modal with Title (required), Description, Priority (urgent/high/medium/low/none), Due Date, column select, label checkboxes
   - If submitted without a title, the title field displays a red error border, red label, and "Task title is required" message below the field
   - Error state is cleared when the modal is reopened or when a valid title is entered
 - **New task placement**: Newly created tasks are inserted at the top of the selected column (order `1`).
@@ -201,9 +201,9 @@
   - Toggle to show/hide task age
   - Toggle to show/hide task updated date/time (`changeDate`)
   - Locale dropdown for formatting the updated timestamp
-  - Default task priority dropdown (low/medium/high) used when creating new tasks
+  - Default task priority dropdown (urgent/high/medium/low/none) used when creating new tasks
 - Default locale is initialized from the browser (e.g. `navigator.language`).
-- Default priority is `low`.
+- Default priority is `none`.
 
 ### Branding
 

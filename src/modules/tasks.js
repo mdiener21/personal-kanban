@@ -1,11 +1,11 @@
 import { generateUUID } from './utils.js';
 import { loadTasks, saveTasks } from './storage.js';
 
-const ALLOWED_PRIORITIES = new Set(['low', 'medium', 'high']);
+const ALLOWED_PRIORITIES = new Set(['urgent', 'high', 'medium', 'low', 'none']);
 
 function normalizePriority(priority) {
   const value = (priority || '').toString().trim().toLowerCase();
-  return ALLOWED_PRIORITIES.has(value) ? value : 'low';
+  return ALLOWED_PRIORITIES.has(value) ? value : 'none';
 }
 
 function normalizeDueDate(value) {

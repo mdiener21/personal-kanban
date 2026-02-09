@@ -70,11 +70,11 @@ function isHexColor(value) {
   return typeof value === 'string' && /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(value.trim());
 }
 
-const allowedPriorities = new Set(['low', 'medium', 'high']);
+const allowedPriorities = new Set(['urgent', 'high', 'medium', 'low', 'none']);
 
 function normalizePriority(value) {
   const v = (value || '').toString().trim().toLowerCase();
-  return allowedPriorities.has(v) ? v : 'low';
+  return allowedPriorities.has(v) ? v : 'none';
 }
 
 function normalizeSettingsForExport(settings) {

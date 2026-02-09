@@ -82,7 +82,7 @@ export function initializeSettingsUI() {
     // Ensure selection is set even if user stored something unusual.
     localeEl.value = settings.locale;
 
-    defaultPriorityEl.value = settings.defaultPriority || 'low';
+    defaultPriorityEl.value = settings.defaultPriority || 'none';
   }
 
   openBtn.addEventListener('click', () => {

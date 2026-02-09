@@ -49,6 +49,14 @@ All controls are in the header menu.
 - **Move**: drag and drop tasks between columns.
 - **Delete**: click the task **trash** button and confirm.
 
+#### Task Priority
+
+- **Urgent** (Bright Deep Red) — Needs immediate attention
+- **High** (Light Red) — Important, time-sensitive
+- **Medium** (Orange) — Standard priority
+- **Low** (Light Grey Blue) — Nice to have
+- **None** (Grey) — Not decided yet
+
 ### Columns
 
 - **Add**: click **Add Column**.
