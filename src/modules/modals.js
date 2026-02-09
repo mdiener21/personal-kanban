@@ -180,7 +180,7 @@ export function showModal(columnName) {
   taskDescription.value = '';
   if (taskPriority) {
     const settings = loadSettings();
-    taskPriority.value = settings.defaultPriority || 'low';
+    taskPriority.value = settings.defaultPriority || 'none';
   }
   if (taskDueDate) taskDueDate.value = '';
 
@@ -225,7 +225,7 @@ export function showEditModal(taskId) {
   const legacyTitle = typeof task.text === 'string' ? task.text : '';
   taskTitle.value = (typeof task.title === 'string' && task.title.trim() !== '') ? task.title : legacyTitle;
   taskDescription.value = typeof task.description === 'string' ? task.description : '';
-  if (taskPriority) taskPriority.value = typeof task.priority === 'string' ? task.priority : 'medium';
+  if (taskPriority) taskPriority.value = typeof task.priority === 'string' ? task.priority : 'none';
 
   const rawDue = typeof task.dueDate === 'string' ? task.dueDate : '';
   // If dueDate is ISO, reduce to YYYY-MM-DD for <input type="date">

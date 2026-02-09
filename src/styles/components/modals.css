@@ -28,14 +28,27 @@
 .modal-content {
   position: relative;
   background: var(--surface);
-  padding: 24px;
+  padding: 24px 24px 0;
   border-radius: 12px;
   width: 90%;
   max-width: 480px;
   max-height: 90vh;
   overflow-y: auto;
+  overflow-x: hidden;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
   animation: modal-appear 0.2s ease-out;
+}
+
+/* Keep modal actions visible: content scrolls, buttons stay pinned. */
+.modal-content .form-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  margin-top: 20px;
+  padding-top: 16px;
+  padding-bottom: 24px;
 }
 
 @keyframes modal-appear {
@@ -83,23 +96,10 @@
   border-radius: 0;
   display: flex;
   flex-direction: column;
-  padding: 16px;
+  padding: 16px 16px 0;
   margin: 0;
-  overflow: hidden;
-}
-
-#task-modal.fullscreen .modal-content form {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
   overflow-y: auto;
-  max-height: none !important;
-}
-
-#task-modal.fullscreen .form-actions {
-  margin-top: auto;
-  padding-top: 16px;
-  padding-bottom: 24px;
+  overflow-x: hidden;
 }
 
 /* Large modal variant */

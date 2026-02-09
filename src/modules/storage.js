@@ -87,7 +87,7 @@ export function setActiveBoardId(boardId) {
 
 function defaultColumns() {
   return [
-    { id: 'todo', name: 'To Do', color: '#3b82f6' },
+    { id: 'todo', name: 'To Do', color: '#3583ff' },
     { id: 'inprogress', name: 'In Progress', color: '#f59e0b' },
     { id: 'done', name: 'Done', color: '#16a34a' }
   ];
@@ -118,9 +118,9 @@ function defaultTasks() {
     },
     {
       id: generateUUID(),
-      title: 'Collect the Time Stone',
+      title: 'Steal the Time Stone',
       description: 'Coordinate with Dr. Strange and plan retrieval.',
-      priority: 'medium',
+      priority: 'urgent',
       dueDate: '',
       column: 'inprogress',
       labels: ['feature'],
@@ -142,9 +142,21 @@ function defaultTasks() {
     },
     {
       id: generateUUID(),
-      title: 'Collect the Reality Stone',
-      description: 'Negotiate with the Collector, avoid escalation.',
+      title: 'Hide the Reality Stone',
+      description: 'Dig a deep hole to hide the stone from the Collector, avoid escalation.',
       priority: 'low',
+      dueDate: '',
+      column: 'inprogress',
+      labels: ['task'],
+      creationDate: created,
+      changeDate: created,
+      columnHistory: [{ column: 'inprogress', at: created }]
+    },
+    {
+      id: generateUUID(),
+      title: 'Find a bag for stones',
+      description: 'A bag with good durability and space is needed to hold all the stones securely.',
+      priority: 'none',
       dueDate: '',
       column: 'inprogress',
       labels: ['task'],
@@ -192,11 +204,18 @@ function defaultSettings() {
     showAge: true,
     showChangeDate: true,
     locale,
-    defaultPriority: 'low',
+    defaultPriority: 'none',
     // Number of days ahead (inclusive) to consider tasks "upcoming" for notifications.
     // Overdue tasks are always included.
     notificationDays: 3
   };
+}
+
+const ALLOWED_PRIORITIES = new Set(['urgent', 'high', 'medium', 'low', 'none']);
+
+function normalizePriority(value) {
+  const v = (value || '').toString().trim().toLowerCase();
+  return ALLOWED_PRIORITIES.has(v) ? v : 'none';
 }
 
 function migrateLegacySingleBoardIntoDefault() {
@@ -357,6 +376,12 @@ export function loadTasks() {
       const task = t && typeof t === 'object' ? { ...t } : t;
       if (!task || typeof task !== 'object') return task;
 
+      const nextPriority = normalizePriority(task.priority);
+      if (task.priority !== nextPriority) {
+        task.priority = nextPriority;
+        didChange = true;
+      }
+
       const isDone = task.column === 'done';
       const hasDoneDate = typeof task.doneDate === 'string' && task.doneDate.trim() !== '';
       const changeDate = typeof task.changeDate === 'string' && task.changeDate.trim() ? task.changeDate.trim() : '';
@@ -470,7 +495,7 @@ function normalizeSettings(raw) {
   const showAge = obj.showAge !== false;
   const showChangeDate = obj.showChangeDate !== false;
   const priority = (obj.defaultPriority || '').toString().trim().toLowerCase();
-  const defaultPriority = (priority === 'low' || priority === 'medium' || priority === 'high') ? priority : 'low';
+  const defaultPriority = normalizePriority(priority);
   const rawNotificationDays = Number.parseInt((obj.notificationDays ?? '').toString(), 10);
   const notificationDays = Number.isFinite(rawNotificationDays)
     ? Math.min(365, Math.max(0, rawNotificationDays))

@@ -12,7 +12,7 @@ test.describe('Task Creation - Edge Cases and Error Handling', () => {
     await page.getByRole('button', { name: 'Add task to To Do' }).click();
 
     // Set priority to 'Medium' and select labels without entering title
-    await page.getByLabel('Priority', { exact: true }).selectOption(['Medium']);
+    await page.getByLabel('Priority', { exact: true }).selectOption(['medium']);
 
     // Select 'Urgent' label
     await page.getByRole('checkbox', { name: 'Urgent' }).click();
@@ -34,9 +34,10 @@ test.describe('Task Creation - Edge Cases and Error Handling', () => {
     await page.getByRole('button', { name: 'Add Task', exact: true }).click();
 
     // Verify task is created successfully
-    await expect(page.getByText('Valid task title')).toBeVisible();
-    await expect(page.getByText('medium')).toBeVisible();
-    await expect(page.getByText('Urgent')).toBeVisible();
-    await expect(page.getByText('Feature')).toBeVisible();
+    const task = page.getByRole('listitem', { name: /Task: Valid task title/i });
+    await expect(task).toBeVisible();
+    await expect(task.getByLabel('Priority: medium')).toBeVisible();
+    await expect(task.locator('.task-label', { hasText: 'Urgent' })).toBeVisible();
+    await expect(task.locator('.task-label', { hasText: 'Feature' })).toBeVisible();
   });
 });

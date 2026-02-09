@@ -64,7 +64,8 @@
 }
 
 .task-priority-header {
-  cursor: default;
+  cursor: pointer;
+  user-select: none;
 }
 
 /* Task title */
@@ -145,16 +146,26 @@
 
 .priority-high {
   background-color: rgba(239, 68, 68, 0.15);
-  color: #ef4444;
+  color: #d44545;
+}
+
+.priority-urgent {
+  background-color: rgba(239, 68, 68, 0.25);
+  color: #f30000;
 }
 
 .priority-medium {
   background-color: rgba(234, 179, 8, 0.15);
-  color: #eab308;
+  color: #c7980c;
 }
 
 .priority-low {
   background-color: rgba(107, 114, 128, 0.15);
+  color: #92a1b8;
+}
+
+.priority-none {
+  background-color: rgba(107, 114, 128, 0.08);
   color: #6b7280;
 }
 

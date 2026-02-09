@@ -9,13 +9,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added (unreleased)
 
-- Playwright E2E test suite (`npm test`) covering boards, task creation/validation, and drag/drop performance scenarios.
 
 ### Changed (unreleased)
 
-- Drag/drop now prefers native HTML5 drag-and-drop on non-touch pointers (keeps SortableJS fallback for touch/coarse pointers) to improve first-drag reliability on desktop and compatibility with Playwright automation.
 
 ### Removed (unreleased)
+
+
+## [1.0.12] - 2026-02-09
+
+### Added (1.0.12)
+
+- Playwright E2E test suite (`npm test`) covering boards, task creation/validation, and drag/drop performance scenarios.
+
+### Changed (1.0.12)
+
+- Drag/drop now prefers native HTML5 drag-and-drop on non-touch pointers (keeps SortableJS fallback for touch/coarse pointers) to improve first-drag reliability on desktop and compatibility with Playwright automation.
+- Modals now keep the action buttons (Cancel/Save/Close) sticky at the bottom while the modal content scrolls, preventing the actions from flowing off-screen.
+- Task priority now supports `urgent` (above high) and `none` (below low), and the default priority is now `none`.
+
+### Removed (1.0.12)
 
 ## [1.0.11] - 2026-02-06
 

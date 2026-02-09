@@ -276,7 +276,7 @@ function renderNotificationsModalContent() {
     dueSpan.classList.add(dueStatus.className);
     dueSpan.textContent = dueStatus.text;
 
-    const priority = typeof task.priority === 'string' ? task.priority : 'low';
+    const priority = typeof task.priority === 'string' ? task.priority : 'none';
     const prioritySpan = document.createElement('span');
     prioritySpan.classList.add('notification-item-priority', `priority-${priority}`);
     prioritySpan.textContent = priority;
