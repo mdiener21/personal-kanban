@@ -66,7 +66,8 @@ When asked to create a release/tag for unreleased changes:
 6. **Commit** — `git add package.json CHANGELOG.md && git commit -m "Bump version to vX.Y.Z and update changelog"` (include Co-Authored-By).
 7. **Tag** — `git tag -a vX.Y.Z -m "vX.Y.Z – short summary"`.
 8. **Verify** — `git log --oneline -3 && git tag -l --sort=-v:refname | head -3`.
-9. **Do NOT push** unless explicitly asked.
+9. **Push tag (only if explicitly asked)** — `git push origin vX.Y.Z` (example: `git push origin v1.0.12`).
+10. **Do NOT push** branches/commits unless explicitly asked.
 
 ### Release conventions
 
