@@ -4,6 +4,9 @@
 
 body.reports-page {
   padding: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
   overflow: hidden;
 }
 
@@ -97,17 +100,10 @@ body.reports-page .rpt-main {
   flex: 1 1 auto;
   min-height: 0;
   padding: 10px;
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 10px;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  grid-template-rows: repeat(2, minmax(0, 1fr));
-}
-
-@media (max-width: 900px) {
-  body.reports-page .rpt-main {
-    grid-template-columns: 1fr;
-    grid-template-rows: repeat(4, minmax(0, 1fr));
-  }
+  overflow: auto;
 }
 
 /* Full rewrite: reports-kpis is now a fixed-size dashboard card (no scrolling). */
@@ -120,7 +116,7 @@ body.reports-page .reports-kpis {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  min-height: 0;
+  min-height: 520px;
 }
 
 body.reports-page .rpt-card-header {
@@ -228,4 +224,192 @@ body.reports-page #reports-completed-spark {
   width: 100%;
   flex: 1 1 auto;
   min-height: 0;
+}
+
+@media (max-width: 900px) {
+  body.reports-page .rpt-main {
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 12px;
+  }
+
+  body.reports-page .reports-kpis {
+    min-width: 85vw;
+    max-width: 85vw;
+    height: 100%;
+    margin: 0 8px;
+    scroll-snap-align: center;
+    overflow: auto;
+    min-height: 0;
+  }
+}
+
+/* Calendar page uses the same visual language, but stays vertically stacked (no swipe paging). */
+body.calendar-page .rpt-main {
+  overflow: auto;
+}
+
+@media (max-width: 900px) {
+  body.calendar-page .rpt-main {
+    flex-direction: column;
+    overflow-x: hidden;
+    overflow-y: auto;
+    scroll-snap-type: none;
+    padding-bottom: 10px;
+  }
+
+  body.calendar-page .reports-kpis {
+    min-width: 0;
+    max-width: none;
+    height: auto;
+    margin: 0;
+    scroll-snap-align: unset;
+    overflow: hidden;
+  }
+}
+
+/* ==========================================================================
+   Due Dates Month Calendar
+   ========================================================================== */
+
+body.calendar-page .rpt-due-month {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+body.calendar-page .rpt-due-wrap {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+body.calendar-page .rpt-due-calendar {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+  flex: 0 0 auto;
+}
+
+body.calendar-page .rpt-due-dow {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 2px 0;
+}
+
+body.calendar-page .rpt-due-day {
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  background: var(--surface-muted);
+  color: var(--text);
+  padding: 6px;
+  min-height: 44px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+body.calendar-page .rpt-due-day:hover {
+  border-color: var(--border);
+}
+
+body.calendar-page .rpt-due-day[aria-pressed="true"] {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--input-focus-ring);
+}
+
+body.calendar-page .rpt-due-day.is-outside {
+  opacity: 0.5;
+}
+
+body.calendar-page .rpt-due-day.is-today {
+  border-style: dashed;
+}
+
+body.calendar-page .rpt-due-num {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+body.calendar-page .rpt-due-count {
+  align-self: flex-end;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--btn-secondary-bg);
+  color: var(--btn-secondary-fg);
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+body.calendar-page .rpt-due-list {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  background: var(--surface-muted);
+  padding: 8px;
+}
+
+body.calendar-page .rpt-due-list-title {
+  font-size: 12px;
+  font-weight: 900;
+  color: var(--text);
+  margin: 0 0 6px 0;
+}
+
+body.calendar-page .rpt-due-items {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+body.calendar-page .rpt-due-item {
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  background: var(--surface);
+  padding: 6px 8px;
+  font-size: 12px;
+  color: var(--text);
+}
+
+body.calendar-page .rpt-due-tasklink {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+body.calendar-page .rpt-due-tasklink:hover {
+  text-decoration: underline;
+}
+
+body.calendar-page .rpt-due-tasklink:focus {
+  outline: none;
+}
+
+body.calendar-page .rpt-due-tasklink:focus-visible {
+  box-shadow: 0 0 0 3px var(--input-focus-ring);
+  border-radius: 6px;
+}
+
+body.calendar-page .rpt-due-empty {
+  font-size: 12px;
+  color: var(--text-muted);
+  padding: 6px 0;
 }

@@ -9,10 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added (unreleased)
 
+- Calendar page (`calendar.html`) showing a one-month due-date calendar with per-day counts and a clickable list of tasks due on the selected date (each task link opens the task on the board); linked from the main menu
+
 
 ### Changed (unreleased)
 
 - Task description textarea in task modal now supports vertical resizing (user can drag to expand height while width stays fixed)
+
+- Reports page layout updated so each section has more space; on mobile, sections are swipeable like columns
 
 ### Removed (unreleased)
 

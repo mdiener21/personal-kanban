@@ -96,7 +96,7 @@ function eachWeekStartInclusive(rangeStart, rangeEnd) {
 function computeDailyUpdateCounts(tasks, startDate, endDate) {
   const counts = new Map();
 
-  for (const task of tasks) {
+  for (const task of tasks || []) {
     const day = isoDateOnly(task?.changeDate);
     if (!day) continue;
     counts.set(day, (counts.get(day) || 0) + 1);
@@ -112,7 +112,7 @@ function computeDailyUpdateCounts(tasks, startDate, endDate) {
   return { data, max };
 }
 
-function buildOption({ rangeStart, rangeEnd, data, maxValue, boardName }) {
+function buildDailyUpdatesOption({ rangeStart, rangeEnd, data, maxValue, boardName }) {
   const max = Math.max(1, maxValue || 0);
 
   return {
@@ -541,6 +541,25 @@ function main() {
   const tasks = loadTasks();
   const columns = loadColumns();
 
+  // Daily updates (last 365 days)
+  const dailyEnd = new Date();
+  const dailyStart = new Date();
+  dailyStart.setDate(dailyEnd.getDate() - 364); // inclusive range: 365 days
+
+  const daily = computeDailyUpdateCounts(tasks, dailyStart, dailyEnd);
+  const dailyDom = document.getElementById('reports-chart');
+  if (dailyDom) {
+    const dailyChart = echarts.init(dailyDom);
+    dailyChart.setOption(buildDailyUpdatesOption({
+      rangeStart: dailyStart,
+      rangeEnd: dailyEnd,
+      data: daily.data,
+      maxValue: daily.max,
+      boardName: boardName || (boardId || 'Active board')
+    }));
+    window.addEventListener('resize', () => dailyChart.resize());
+  }
+
   // Weekly completion + lead time (last 12 weeks)
   const now = new Date();
   const endWeekRange = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
@@ -579,27 +598,6 @@ function main() {
       completedCounts: weekly.completedCounts
     }));
     window.addEventListener('resize', () => leadChart.resize());
-  }
-
-  const end = new Date();
-  const start = new Date();
-  start.setDate(end.getDate() - 364); // inclusive range: 365 days
-
-  const { data, max } = computeDailyUpdateCounts(tasks, start, end);
-
-  const chartDom = document.getElementById('reports-chart');
-  if (chartDom) {
-    const chart = echarts.init(chartDom);
-    const option = buildOption({
-      rangeStart: start,
-      rangeEnd: end,
-      data,
-      maxValue: max,
-      boardName: boardName || (boardId || 'Active board')
-    });
-
-    chart.setOption(option);
-    window.addEventListener('resize', () => chart.resize());
   }
 
   // Cumulative Flow Diagram (CFD)
