@@ -426,3 +426,39 @@ body.calendar-page .rpt-due-empty {
   color: var(--text-muted);
   padding: 6px 0;
 }
+
+/* ==========================================================================
+   Landscape – reports & calendar on rotated phones
+   ========================================================================== */
+@media (orientation: landscape) and (max-height: 500px) {
+  body.reports-page .rpt-header {
+    padding: 4px 12px;
+  }
+
+  body.reports-page .rpt-main {
+    padding: 6px;
+    gap: 6px;
+  }
+
+  body.reports-page .reports-kpis {
+    min-height: 320px;
+  }
+
+  body.reports-page .rpt-kpi-grid {
+    gap: 4px;
+  }
+
+  body.reports-page .rpt-kpi {
+    padding: 6px;
+  }
+
+  /* Calendar: smaller day cells in landscape */
+  body.calendar-page .rpt-due-day {
+    min-height: 36px;
+    padding: 4px;
+  }
+
+  body.calendar-page .rpt-due-calendar {
+    gap: 3px;
+  }
+}

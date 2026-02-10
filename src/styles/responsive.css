@@ -91,7 +91,7 @@
     margin: 0 8px; /* Use horizontal margin for spacing */
     scroll-snap-align: center;
     /* Ensure column fits on screen vertically so internal scroll works */
-    height: calc(100vh - 180px);
+    height: calc(100dvh - 180px);
     display: flex;
     flex-direction: column;
     flex: 0 0 auto;
@@ -135,4 +135,59 @@
       max-height: 150px !important;
       overflow-y: auto;
     }
+}
+
+/* ==========================================================================
+   Mobile Landscape – vertical space is very limited when phone is rotated
+   ========================================================================== */
+@media (max-width: 920px) and (orientation: landscape) and (max-height: 500px) {
+  /* Compact header: single row, minimal padding */
+  .controls {
+    padding: 4px 8px;
+    gap: 6px;
+  }
+
+  /* Hide the search row in landscape to save vertical space */
+  .board-search {
+    grid-row: 1;
+    grid-column: 1;
+    max-width: 220px;
+  }
+
+  .brand {
+    font-size: 14px;
+  }
+
+  /* Columns fill the reduced viewport height */
+  .task-column {
+    height: calc(100dvh - 100px);
+  }
+
+  /* Compact footer */
+  .footer {
+    padding: 6px 16px;
+    font-size: 11px;
+    line-height: 1;
+  }
+
+  /* Notification banner: compact in landscape */
+  .notification-banner {
+    max-height: 80px;
+    padding: 6px 10px;
+    margin: 0 8px 4px 8px;
+  }
+
+  /* Modals: use full screen but allow scrolling */
+  .modal-content {
+    max-height: 100dvh;
+  }
+
+  /* Reduce form spacing for more content in landscape modals */
+  .form-group {
+    margin-bottom: 10px;
+  }
+
+  .form-actions {
+    padding-bottom: 12px;
+  }
 }

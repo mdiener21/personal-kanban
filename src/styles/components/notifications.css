@@ -167,38 +167,10 @@
 }
 
 .notification-banner-item .priority-badge {
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-weight: 700;
-  text-transform: uppercase;
-  font-size: 10px;
   flex-shrink: 0;
 }
 
-.notification-banner-item .priority-high {
-  background-color: rgba(239, 68, 68, 0.15);
-  color: #ef4444;
-}
-
-.notification-banner-item .priority-urgent {
-  background-color: rgba(239, 68, 68, 0.25);
-  color: #ef4444;
-}
-
-.notification-banner-item .priority-medium {
-  background-color: rgba(234, 179, 8, 0.15);
-  color: #eab308;
-}
-
-.notification-banner-item .priority-low {
-  background-color: rgba(107, 114, 128, 0.15);
-  color: #92a1b8;
-}
-
-.notification-banner-item .priority-none {
-  background-color: rgba(107, 114, 128, 0.08);
-  color: #6b7280;
-}
+/* Priority colors inherited from global .priority-* classes (card.css) */
 
 .notification-banner-item.notification-more {
   font-style: italic;
@@ -295,38 +267,9 @@
   font-weight: 600;
 }
 
-.notification-item-priority {
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-weight: 700;
-  text-transform: uppercase;
-  font-size: 10px;
-}
+/* Base badge styles inherited from card.css shared selector */
 
-.notification-item .priority-high {
-  background-color: rgba(239, 68, 68, 0.15);
-  color: #ef4444;
-}
-
-.notification-item .priority-urgent {
-  background-color: rgba(239, 68, 68, 0.25);
-  color: #ef4444;
-}
-
-.notification-item .priority-medium {
-  background-color: rgba(234, 179, 8, 0.15);
-  color: #eab308;
-}
-
-.notification-item .priority-low {
-  background-color: rgba(107, 114, 128, 0.15);
-  color: #92a1b8;
-}
-
-.notification-item .priority-none {
-  background-color: rgba(107, 114, 128, 0.08);
-  color: #6b7280;
-}
+/* Priority colors inherited from global .priority-* classes (card.css) */
 
 .notification-item-arrow {
   flex-shrink: 0;
