@@ -11,7 +11,8 @@ export default defineConfig({
     rollupOptions: {
       input: {
         index: 'src/index.html',
-        reports: 'src/reports.html'
+        reports: 'src/reports.html',
+        calendar: 'src/calendar.html'
       },
       output: {
         manualChunks(id) {

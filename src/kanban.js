@@ -3,15 +3,27 @@ import './modules/icons.js';
 
 import { renderBoard, setBoardFilterQuery } from './modules/render.js';
 import { initializeModalHandlers } from './modules/modals.js';
+import { showEditModal } from './modules/modals.js';
 import { exportTasks, importTasks } from './modules/importexport.js';
 import { initializeThemeToggle } from './modules/theme.js';
 import { initializeBoardsUI } from './modules/boards.js';
 import { confirmDialog } from './modules/dialog.js';
 import { initializeSettingsUI } from './modules/settings.js';
 import { initializeNotifications } from './modules/notifications.js';
+import { ensureBoardsInitialized, setActiveBoardId } from './modules/storage.js';
 
 // Add task button listeners
 document.addEventListener('DOMContentLoaded', () => {
+  // Deep-link support (e.g., from calendar.html): open a task modal by ID.
+  const urlParams = new URLSearchParams(window.location.search);
+  const openTaskId = (urlParams.get('openTaskId') || '').trim();
+  const openTaskBoardId = (urlParams.get('openTaskBoardId') || '').trim();
+
+  if (openTaskBoardId) {
+    ensureBoardsInitialized();
+    setActiveBoardId(openTaskBoardId);
+  }
+
   const versionEl = document.getElementById('app-version');
   if (versionEl && typeof __APP_VERSION__ !== 'undefined' && __APP_VERSION__) {
     versionEl.textContent = `v${__APP_VERSION__}`;
@@ -113,4 +125,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Initial render
   renderBoard();
+
+  if (openTaskId) {
+    // Open after first render so the board is visible behind the modal.
+    showEditModal(openTaskId);
+
+    // Clean up the URL so refresh doesn't re-open.
+    const nextUrl = `${window.location.pathname}${window.location.hash || ''}`;
+    window.history.replaceState({}, '', nextUrl);
+  }
 });

@@ -188,6 +188,7 @@
   - Settings button (opens Settings modal)
   - Notifications button (opens notifications modal, shows badge with count)
   - Add Column button
+  - View Calendar link (opens `calendar.html`)
   - Export button (downloads JSON)
   - Import button (file picker for JSON)
 
@@ -212,17 +213,18 @@
 ### Reports
 
 - Separate page: `reports.html`
-- Shows an Apache ECharts calendar heatmap for the **active board** covering the last 365 days.
-- Each day’s value is the count of tasks whose `changeDate` falls on that date (YYYY-MM-DD).
+- Shows a **daily updates** calendar heatmap for the **active board** covering the last 365 days.
+  - Each day’s value is the count of tasks whose `changeDate` falls on that date (`YYYY-MM-DD`).
 - Reports page uses an **independent, reports-only layout** (does not reuse the main board toolbar/column styling).
-- Reports dashboard is designed as a **fixed viewport grid** so sections are visible without page scrolling.
+- Reports dashboard sections are full-width; on mobile, each section behaves like a swipeable page (horizontal scroll-snap).
 
 #### Lead Time & Completion
 
 - Reports dashboard also shows **weekly lead time** for completed tasks (creation → done):
   - Uses `creationDate` and `doneDate` on tasks.
-  - Lead time is grouped by week (Monday-start), displayed as a **bar chart** of **average lead time (days)**.
+  - Lead time is grouped by week (Monday-start), displayed as **lines** for **average lead time (days)** and a **trend** (4-week moving average).
   - Includes a **trend line** (4-week moving average).
+  - Completed tasks per week are displayed as **blue bars**.
 - Reports dashboard also shows a **weekly completion summary**:
   - KPI tiles for "Completed this week", "Completed last week", and "Avg lead time (last 12 weeks)".
   - A small sparkline chart of tasks completed per week (last 12 weeks).
@@ -235,6 +237,17 @@
   - Series are **colored by column** and **ordered by workflow** (based on `column.order`, with Done last).
   - Uses `task.columnHistory` to determine which column each task was in on each day.
   - Legacy tasks without history are seeded with a single entry at the earliest known timestamp (creation/change date) using the task’s current column.
+
+### Calendar
+
+- Separate page: `calendar.html`
+- Shows a one-month calendar for the **active board**.
+- Each day cell shows the **count of tasks due** on that date (based on `task.dueDate`, `YYYY-MM-DD`).
+- If a day contains any **overdue** tasks (due date is before today and the task is not in Done), the count badge is shown in **red**.
+- Clicking a day shows the **list of tasks due** on that date.
+- Overdue tasks in the list are shown in **red**.
+- Tasks in the list are links that open the task edit modal on the board and return the user to `index.html`.
+- Accessible from the main board menu as “View Calendar”.
 
 ### Notification System
 
@@ -267,7 +280,7 @@ The notification system alerts users to tasks with approaching or past due dates
 
 - Lucide icons are tree-shaken via `src/modules/icons.js` to minimize bundle size.
 - Only icons used in the app are imported and registered.
-- Icons used: `SquareKanban`, `Search`, `Plus`, `Fullscreen`, `Settings`, `Columns3`, `Tag`, `SlidersHorizontal`, `Download`, `Upload`, `Moon`, `Sun`, `HelpCircle`, `EllipsisVertical`, `Trash2`, `GripVertical`, `Pencil`, `Kanban`, `ArrowUpDown`, `ChevronRight`, `Bell`, `BellRing`
+- Icons used: `SquareKanban`, `Search`, `Plus`, `Fullscreen`, `Settings`, `Columns3`, `Tag`, `SlidersHorizontal`, `Download`, `Upload`, `Moon`, `Sun`, `HelpCircle`, `EllipsisVertical`, `Trash2`, `GripVertical`, `Pencil`, `Kanban`, `ArrowUpDown`, `ChevronRight`, `Bell`, `BellRing`, `CalendarDays`
 - To add a new icon:
   1. Import it from `lucide` in `icons.js`
   2. Add it to the `icons` object (PascalCase key)

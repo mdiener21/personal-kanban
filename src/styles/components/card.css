@@ -25,7 +25,7 @@
 @media (min-width: 601px) {
   /* Desktop/tablet: keep the app within the viewport so columns scroll internally */
   body {
-    height: 100vh;
+    height: 100dvh;
     overflow: hidden;
   }
 }
@@ -133,9 +133,10 @@
 
 .task-date { white-space: nowrap; }
 
-/* Priority badge */
-.task-priority {
-  padding: 3px 8px;
+/* Priority badge – shared base for cards, notifications, and banners */
+.task-priority,
+.notification-banner-item .priority-badge,
+.notification-item-priority {
   border-radius: 4px;
   font-weight: 700;
   text-transform: uppercase;
@@ -144,29 +145,39 @@
   white-space: nowrap;
 }
 
+.task-priority {
+  padding: 3px 8px;
+}
+
+/* Compact badge for notification items */
+.notification-banner-item .priority-badge,
+.notification-item-priority {
+  padding: 2px 6px;
+}
+
 .priority-high {
-  background-color: rgba(239, 68, 68, 0.15);
-  color: #d44545;
+  background-color: var(--priority-high-bg);
+  color: var(--priority-high-fg);
 }
 
 .priority-urgent {
-  background-color: rgba(239, 68, 68, 0.25);
-  color: #f30000;
+  background-color: var(--priority-urgent-bg);
+  color: var(--priority-urgent-fg);
 }
 
 .priority-medium {
-  background-color: rgba(234, 179, 8, 0.15);
-  color: #c7980c;
+  background-color: var(--priority-medium-bg);
+  color: var(--priority-medium-fg);
 }
 
 .priority-low {
-  background-color: rgba(107, 114, 128, 0.15);
-  color: #92a1b8;
+  background-color: var(--priority-low-bg);
+  color: var(--priority-low-fg);
 }
 
 .priority-none {
-  background-color: rgba(107, 114, 128, 0.08);
-  color: #6b7280;
+  background-color: var(--priority-none-bg);
+  color: var(--priority-none-fg);
 }
 
 /* Legacy task-text support */

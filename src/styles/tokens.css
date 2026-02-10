@@ -42,6 +42,18 @@
   --btn-small-bg: #f3f4f6;
   --btn-small-hover-bg: #e5e7eb;
 
+  /* Priority badge colors */
+  --priority-high-bg: rgba(239, 68, 68, 0.15);
+  --priority-high-fg: #ef4444;
+  --priority-urgent-bg: rgba(239, 68, 68, 0.25);
+  --priority-urgent-fg: #dc2626;
+  --priority-medium-bg: rgba(234, 179, 8, 0.15);
+  --priority-medium-fg: #ca8a04;
+  --priority-low-bg: rgba(107, 114, 128, 0.15);
+  --priority-low-fg: #92a1b8;
+  --priority-none-bg: rgba(107, 114, 128, 0.08);
+  --priority-none-fg: #6b7280;
+
   /* Shadows */
   --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
@@ -72,4 +84,11 @@
   --btn-small-bg: #111827;
   --btn-small-hover-bg: #1f2937;
   --color-danger-bg: rgba(220, 38, 38, 0.15);
+
+  /* Priority badge colors – brighter for dark surfaces */
+  --priority-high-fg: #f87171;
+  --priority-urgent-fg: #ef4444;
+  --priority-medium-fg: #fbbf24;
+  --priority-low-fg: #9ca3af;
+  --priority-none-fg: #9ca3af;
 }

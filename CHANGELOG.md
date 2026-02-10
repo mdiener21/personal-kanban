@@ -9,13 +9,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added (unreleased)
 
-
 ### Changed (unreleased)
-
-- Task description textarea in task modal now supports vertical resizing (user can drag to expand height while width stays fixed)
 
 ### Removed (unreleased)
 
+
+## [1.0.13] - 2026-02-10
+
+### Added (1.0.13)
+
+- Calendar page (`calendar.html`) showing a one-month due-date calendar with per-day counts and a clickable list of tasks due on the selected date (each task link opens the task on the board); linked from the main menu
+
+### Changed (1.0.13)
+
+- Task description textarea in task modal now supports vertical resizing (user can drag to expand height while width stays fixed)
+- Reports page layout updated so each section has more space; on mobile, sections are swipeable like columns
+- Reports lead time chart now shows Completed as blue bars, with Avg lead time and Trend as lines
+- Calendar now highlights overdue due-date counts and overdue tasks in red
+- Reports and Calendar pages now honor the saved theme (including dark mode)
+
+### Removed (1.0.13)
 
 ## [1.0.12] - 2026-02-09
 
