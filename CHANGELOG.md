@@ -18,6 +18,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Reports page layout updated so each section has more space; on mobile, sections are swipeable like columns
 
+- Reports lead time chart now shows Completed as blue bars, with Avg lead time and Trend as lines
+
+- Calendar now highlights overdue due-date counts and overdue tasks in red
+
+- Reports and Calendar pages now honor the saved theme (including dark mode)
+
 ### Removed (unreleased)
 
 

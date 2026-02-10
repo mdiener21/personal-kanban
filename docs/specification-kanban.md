@@ -222,8 +222,9 @@
 
 - Reports dashboard also shows **weekly lead time** for completed tasks (creation → done):
   - Uses `creationDate` and `doneDate` on tasks.
-  - Lead time is grouped by week (Monday-start), displayed as a **bar chart** of **average lead time (days)**.
+  - Lead time is grouped by week (Monday-start), displayed as **lines** for **average lead time (days)** and a **trend** (4-week moving average).
   - Includes a **trend line** (4-week moving average).
+  - Completed tasks per week are displayed as **blue bars**.
 - Reports dashboard also shows a **weekly completion summary**:
   - KPI tiles for "Completed this week", "Completed last week", and "Avg lead time (last 12 weeks)".
   - A small sparkline chart of tasks completed per week (last 12 weeks).
@@ -242,7 +243,9 @@
 - Separate page: `calendar.html`
 - Shows a one-month calendar for the **active board**.
 - Each day cell shows the **count of tasks due** on that date (based on `task.dueDate`, `YYYY-MM-DD`).
+- If a day contains any **overdue** tasks (due date is before today and the task is not in Done), the count badge is shown in **red**.
 - Clicking a day shows the **list of tasks due** on that date.
+- Overdue tasks in the list are shown in **red**.
 - Tasks in the list are links that open the task edit modal on the board and return the user to `index.html`.
 - Accessible from the main board menu as “View Calendar”.
 

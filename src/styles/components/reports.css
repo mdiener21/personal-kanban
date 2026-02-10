@@ -353,6 +353,11 @@ body.calendar-page .rpt-due-count {
   line-height: 1.2;
 }
 
+body.calendar-page .rpt-due-count.is-overdue {
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+}
+
 body.calendar-page .rpt-due-list {
   flex: 1 1 auto;
   min-height: 0;
@@ -388,11 +393,19 @@ body.calendar-page .rpt-due-item {
   color: var(--text);
 }
 
+body.calendar-page .rpt-due-item.is-overdue {
+  border-color: var(--color-danger);
+}
+
 body.calendar-page .rpt-due-tasklink {
   display: block;
   color: inherit;
   text-decoration: none;
   font-weight: 700;
+}
+
+body.calendar-page .rpt-due-tasklink.is-overdue {
+  color: var(--color-danger);
 }
 
 body.calendar-page .rpt-due-tasklink:hover {

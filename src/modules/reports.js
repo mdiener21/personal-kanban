@@ -11,6 +11,7 @@ import {
 import { BarChart, HeatmapChart, LineChart } from 'echarts/charts';
 import { CanvasRenderer } from 'echarts/renderers';
 import { renderIcons } from './icons.js';
+import { initializeThemeToggle } from './theme.js';
 import { ensureBoardsInitialized, getActiveBoardId, getActiveBoardName } from './storage.js';
 import { loadColumns, loadTasks } from './storage.js';
 
@@ -27,6 +28,21 @@ echarts.use([
   LineChart,
   CanvasRenderer
 ]);
+
+function cssVar(name, fallback) {
+  const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  return value || fallback;
+}
+
+function getChartTheme() {
+  return {
+    text: cssVar('--text', '#111827'),
+    muted: cssVar('--text-muted', '#6b7280'),
+    border: cssVar('--border', '#d1d5db'),
+    borderSubtle: cssVar('--border-subtle', '#e5e7eb'),
+    surface: cssVar('--surface', '#ffffff')
+  };
+}
 
 function isoDateOnly(value) {
   const s = (value || '').toString().trim();
@@ -114,14 +130,21 @@ function computeDailyUpdateCounts(tasks, startDate, endDate) {
 
 function buildDailyUpdatesOption({ rangeStart, rangeEnd, data, maxValue, boardName }) {
   const max = Math.max(1, maxValue || 0);
+  const theme = getChartTheme();
 
   return {
+    backgroundColor: 'transparent',
+    textStyle: { color: theme.text },
     title: {
       top: 20,
       left: 'center',
-      text: `Daily updates — ${boardName}`
+      text: `Daily updates — ${boardName}`,
+      textStyle: { color: theme.text }
     },
     tooltip: {
+      backgroundColor: theme.surface,
+      borderColor: theme.border,
+      textStyle: { color: theme.text },
       formatter: (params) => {
         const date = params?.value?.[0] || '';
         const value = params?.value?.[1] ?? 0;
@@ -134,7 +157,8 @@ function buildDailyUpdatesOption({ rangeStart, rangeEnd, data, maxValue, boardNa
       type: 'piecewise',
       orient: 'horizontal',
       left: 'center',
-      top: 55
+      top: 55,
+      textStyle: { color: theme.muted }
     },
     calendar: {
       top: 110,
@@ -143,8 +167,11 @@ function buildDailyUpdatesOption({ rangeStart, rangeEnd, data, maxValue, boardNa
       cellSize: ['auto', 14],
       range: [formatIsoDate(rangeStart), formatIsoDate(rangeEnd)],
       itemStyle: {
-        borderWidth: 0.5
+        borderWidth: 0.5,
+        borderColor: theme.borderSubtle
       },
+      dayLabel: { color: theme.muted },
+      monthLabel: { color: theme.text },
       yearLabel: { show: false }
     },
     series: {
@@ -227,11 +254,17 @@ function computeWeeklyLeadTimeAndCompletions(tasks, rangeStart, rangeEnd) {
 
 function buildLeadTimeOption({ labels, avgLeadDays, trendLeadDays, completedCounts }) {
   const maxLead = Math.max(1, ...avgLeadDays.map((v) => (Number.isFinite(v) ? v : 0)));
+  const theme = getChartTheme();
 
   return {
+    backgroundColor: 'transparent',
+    textStyle: { color: theme.text },
     tooltip: {
       trigger: 'axis',
       axisPointer: { type: 'shadow' },
+      backgroundColor: theme.surface,
+      borderColor: theme.border,
+      textStyle: { color: theme.text },
       formatter: (params) => {
         const items = Array.isArray(params) ? params : [];
         const header = items[0]?.axisValueLabel || '';
@@ -246,7 +279,8 @@ function buildLeadTimeOption({ labels, avgLeadDays, trendLeadDays, completedCoun
       }
     },
     legend: {
-      top: 8
+      top: 8,
+      textStyle: { color: theme.muted }
     },
     grid: {
       left: 40,
@@ -257,34 +291,45 @@ function buildLeadTimeOption({ labels, avgLeadDays, trendLeadDays, completedCoun
     xAxis: {
       type: 'category',
       data: labels,
-      axisLabel: { interval: 1, rotate: 20 }
+      axisLabel: { interval: 1, rotate: 20, color: theme.muted },
+      axisLine: { lineStyle: { color: theme.borderSubtle } },
+      axisTick: { lineStyle: { color: theme.borderSubtle } }
     },
     yAxis: [
       {
         type: 'value',
         name: 'Days',
         min: 0,
-        max: Math.ceil(maxLead)
+        max: Math.ceil(maxLead),
+        nameTextStyle: { color: theme.muted },
+        axisLabel: { color: theme.muted },
+        axisLine: { lineStyle: { color: theme.borderSubtle } },
+        axisTick: { lineStyle: { color: theme.borderSubtle } },
+        splitLine: { lineStyle: { color: theme.borderSubtle } }
       },
       {
         type: 'value',
         name: 'Completed',
         min: 0,
-        axisLabel: { formatter: '{value}' }
+        nameTextStyle: { color: theme.muted },
+        axisLabel: { formatter: '{value}', color: theme.muted },
+        axisLine: { lineStyle: { color: theme.borderSubtle } },
+        axisTick: { lineStyle: { color: theme.borderSubtle } },
+        splitLine: { show: false }
       }
     ],
     series: [
       {
-        name: 'Avg lead time (days)',
+        name: 'Completed',
         type: 'bar',
-        data: avgLeadDays.map((v) => (v == null ? 0 : v)),
+        data: completedCounts,
         itemStyle: { color: '#3b82f6' },
-        yAxisIndex: 0
+        yAxisIndex: 1
       },
       {
-        name: 'Trend (4-week MA)',
+        name: 'Avg lead time (days)',
         type: 'line',
-        data: trendLeadDays.map((v) => (v == null ? null : v)),
+        data: avgLeadDays.map((v) => (v == null ? null : v)),
         smooth: true,
         symbol: 'circle',
         symbolSize: 6,
@@ -293,20 +338,23 @@ function buildLeadTimeOption({ labels, avgLeadDays, trendLeadDays, completedCoun
         yAxisIndex: 0
       },
       {
-        name: 'Completed',
+        name: 'Trend (4-week MA)',
         type: 'line',
-        data: completedCounts,
+        data: trendLeadDays.map((v) => (v == null ? null : v)),
         smooth: true,
         symbol: 'none',
         lineStyle: { width: 2, type: 'dashed', color: '#6b7280' },
-        yAxisIndex: 1
+        itemStyle: { color: '#6b7280' },
+        yAxisIndex: 0
       }
     ]
   };
 }
 
 function buildCompletedSparkOption({ labels, completedCounts }) {
+  const theme = getChartTheme();
   return {
+    backgroundColor: 'transparent',
     grid: { left: 8, right: 8, top: 8, bottom: 8 },
     xAxis: {
       type: 'category',
@@ -321,6 +369,9 @@ function buildCompletedSparkOption({ labels, completedCounts }) {
     tooltip: {
       trigger: 'axis',
       axisPointer: { type: 'line' },
+      backgroundColor: theme.surface,
+      borderColor: theme.border,
+      textStyle: { color: theme.text },
       formatter: (params) => {
         const p = Array.isArray(params) ? params[0] : params;
         const label = p?.axisValueLabel || '';
@@ -462,15 +513,23 @@ function buildCfdOption({ labels, seriesDefs, boardName }) {
     ? Math.max(1, ...labels.map((_, i) => seriesDefs.reduce((s, series) => s + (series.data[i] || 0), 0)))
     : 1;
 
+  const theme = getChartTheme();
+
   return {
+    backgroundColor: 'transparent',
+    textStyle: { color: theme.text },
     title: {
       top: 12,
       left: 'center',
-      text: `Cumulative flow — ${boardName}`
+      text: `Cumulative flow — ${boardName}`,
+      textStyle: { color: theme.text }
     },
     tooltip: {
       trigger: 'axis',
       axisPointer: { type: 'line' },
+      backgroundColor: theme.surface,
+      borderColor: theme.border,
+      textStyle: { color: theme.text },
       formatter: (params) => {
         const items = Array.isArray(params) ? params : [];
         const date = items[0]?.axisValueLabel || '';
@@ -487,7 +546,8 @@ function buildCfdOption({ labels, seriesDefs, boardName }) {
     },
     legend: {
       top: 40,
-      type: 'scroll'
+      type: 'scroll',
+      textStyle: { color: theme.muted }
     },
     grid: {
       left: 40,
@@ -499,13 +559,20 @@ function buildCfdOption({ labels, seriesDefs, boardName }) {
       type: 'category',
       data: labels,
       boundaryGap: false,
-      axisLabel: { hideOverlap: true }
+      axisLabel: { hideOverlap: true, color: theme.muted },
+      axisLine: { lineStyle: { color: theme.borderSubtle } },
+      axisTick: { lineStyle: { color: theme.borderSubtle } }
     },
     yAxis: {
       type: 'value',
       name: 'Tasks',
       min: 0,
-      max: Math.ceil(maxY)
+      max: Math.ceil(maxY),
+      nameTextStyle: { color: theme.muted },
+      axisLabel: { color: theme.muted },
+      axisLine: { lineStyle: { color: theme.borderSubtle } },
+      axisTick: { lineStyle: { color: theme.borderSubtle } },
+      splitLine: { lineStyle: { color: theme.borderSubtle } }
     },
     dataZoom: [
       {
@@ -529,6 +596,7 @@ function buildCfdOption({ labels, seriesDefs, boardName }) {
 }
 
 function main() {
+  initializeThemeToggle();
   ensureBoardsInitialized();
   renderIcons();
 

@@ -1,4 +1,5 @@
 import { renderIcons } from './icons.js';
+import { initializeThemeToggle } from './theme.js';
 import { ensureBoardsInitialized, getActiveBoardId, getActiveBoardName } from './storage.js';
 import { loadTasks } from './storage.js';
 
@@ -66,20 +67,41 @@ function extractTaskTitle(task) {
   return legacy || 'Untitled task';
 }
 
-function groupTasksByDueDateForMonth(tasks, monthDate) {
+function isTaskDone(task) {
+  if (!task) return false;
+  if (task?.column === 'done') return true;
+  const doneDate = (task?.doneDate ?? '').toString().trim();
+  return doneDate.length > 0;
+}
+
+function isTaskOverdue(task, todayIso) {
+  const due = extractTaskDueDateIso(task);
+  if (!due || due.length < 10) return false;
+  if (!todayIso || todayIso.length < 10) return false;
+  if (isTaskDone(task)) return false;
+  return due < todayIso;
+}
+
+function groupTasksByDueDateForMonth(tasks, monthDate, todayIso) {
   const monthKey = formatMonthKey(monthDate);
-  const grouped = new Map();
+  const tasksByDate = new Map();
+  const overdueCountByDate = new Map();
 
   for (const task of tasks || []) {
     const due = extractTaskDueDateIso(task);
     if (!due || due.length < 10) continue;
     if (!due.startsWith(monthKey)) continue;
-    const list = grouped.get(due) || [];
+    const list = tasksByDate.get(due) || [];
     list.push(task);
-    grouped.set(due, list);
+
+    tasksByDate.set(due, list);
+
+    if (isTaskOverdue(task, todayIso)) {
+      overdueCountByDate.set(due, (overdueCountByDate.get(due) || 0) + 1);
+    }
   }
 
-  return grouped;
+  return { tasksByDate, overdueCountByDate };
 }
 
 function renderDueDateCalendar({ tasks, monthDate, boardId }) {
@@ -92,8 +114,8 @@ function renderDueDateCalendar({ tasks, monthDate, boardId }) {
   const monthStart = startOfMonth(monthDate);
   const monthEnd = endOfMonth(monthDate);
 
-  const dueTasksByDate = groupTasksByDueDateForMonth(tasks, monthDate);
   const todayIso = formatIsoDate(new Date());
+  const { tasksByDate, overdueCountByDate } = groupTasksByDueDateForMonth(tasks, monthDate, todayIso);
   const monthKey = formatMonthKey(monthDate);
 
   const selectedDefault = todayIso.startsWith(monthKey)
@@ -103,7 +125,7 @@ function renderDueDateCalendar({ tasks, monthDate, boardId }) {
   let selectedIso = selectedDefault;
 
   const renderSelectedList = () => {
-    const items = (dueTasksByDate.get(selectedIso) || []).slice();
+    const items = (tasksByDate.get(selectedIso) || []).slice();
     items.sort((a, b) => extractTaskTitle(a).localeCompare(extractTaskTitle(b)));
 
     listTitleEl.textContent = `Tasks due ${selectedIso} (${items.length})`;
@@ -121,8 +143,12 @@ function renderDueDateCalendar({ tasks, monthDate, boardId }) {
       const li = document.createElement('li');
       li.className = 'rpt-due-item';
 
+      const overdue = isTaskOverdue(task, todayIso);
+      if (overdue) li.classList.add('is-overdue');
+
       const a = document.createElement('a');
       a.className = 'rpt-due-tasklink';
+      if (overdue) a.classList.add('is-overdue');
       const id = (task?.id || '').toString();
       const bid = (boardId || '').toString();
       const qs = new URLSearchParams();
@@ -159,7 +185,8 @@ function renderDueDateCalendar({ tasks, monthDate, boardId }) {
     const days = eachDayInclusive(gridStart, gridEnd);
     for (const d of days) {
       const iso = formatIsoDate(d);
-      const count = dueTasksByDate.get(iso)?.length || 0;
+      const count = tasksByDate.get(iso)?.length || 0;
+      const overdueCount = overdueCountByDate.get(iso) || 0;
       const outside = d.getMonth() !== monthDate.getMonth();
       const isToday = iso === todayIso;
 
@@ -170,7 +197,9 @@ function renderDueDateCalendar({ tasks, monthDate, boardId }) {
       if (isToday) btn.classList.add('is-today');
       btn.dataset.date = iso;
       btn.setAttribute('aria-pressed', iso === selectedIso ? 'true' : 'false');
-      btn.title = `${iso}: ${count} task${count === 1 ? '' : 's'} due`;
+      btn.title = overdueCount > 0
+        ? `${iso}: ${count} task${count === 1 ? '' : 's'} due (${overdueCount} overdue)`
+        : `${iso}: ${count} task${count === 1 ? '' : 's'} due`;
 
       const num = document.createElement('div');
       num.className = 'rpt-due-num';
@@ -180,6 +209,7 @@ function renderDueDateCalendar({ tasks, monthDate, boardId }) {
       if (count > 0) {
         const badge = document.createElement('div');
         badge.className = 'rpt-due-count';
+        if (overdueCount > 0) badge.classList.add('is-overdue');
         badge.textContent = String(count);
         btn.appendChild(badge);
       }
@@ -213,6 +243,7 @@ function renderDueDateCalendar({ tasks, monthDate, boardId }) {
 }
 
 function main() {
+  initializeThemeToggle();
   ensureBoardsInitialized();
   renderIcons();
 
