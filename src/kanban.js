@@ -10,12 +10,23 @@ import { initializeBoardsUI } from './modules/boards.js';
 import { confirmDialog } from './modules/dialog.js';
 import { initializeSettingsUI } from './modules/settings.js';
 import { initializeNotifications } from './modules/notifications.js';
-import { ensureBoardsInitialized, setActiveBoardId } from './modules/storage.js';
+import { ensureBoardsInitialized, setActiveBoardId, listBoards, getBoardById, loadColumns, loadTasks, loadLabels, loadSettings, saveColumns, saveTasks, saveLabels, saveSettings, createBoard } from './modules/storage.js';
+import { setToken, getToken, getUserInfo, loginWithProvider, syncData, fetchBoards, fetchFullBoard } from './modules/sync.js';
+import { setupModalCloseHandlers, hideLoginModal } from './modules/modals.js';
 
 // Add task button listeners
-document.addEventListener('DOMContentLoaded', () => {
-  // Deep-link support (e.g., from calendar.html): open a task modal by ID.
+document.addEventListener('DOMContentLoaded', async () => {
+  // Handle token in URL from social auth callback
   const urlParams = new URLSearchParams(window.location.search);
+  const token = urlParams.get('token');
+  if (token) {
+    setToken(token);
+    // Remove token from URL
+    const nextUrl = window.location.pathname + (window.location.hash || '');
+    window.history.replaceState({}, '', nextUrl);
+  }
+
+  // Deep-link support (e.g., from calendar.html): open a task modal by ID.
   const openTaskId = (urlParams.get('openTaskId') || '').trim();
   const openTaskBoardId = (urlParams.get('openTaskBoardId') || '').trim();
 
@@ -52,6 +63,132 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Initialize notifications
   initializeNotifications();
+
+  // Auth UI
+  const loginBtn = document.getElementById('login-btn');
+  const userInfo = document.getElementById('user-info');
+  const userNameEl = document.getElementById('user-name');
+  const syncBtn = document.getElementById('sync-btn');
+  const logoutBtn = document.getElementById('logout-btn');
+
+  async function updateAuthUI() {
+    const user = await getUserInfo();
+    if (user) {
+      loginBtn.classList.add('hidden');
+      userInfo.classList.remove('hidden');
+      userNameEl.textContent = user.name || user.email;
+    } else {
+      loginBtn.classList.remove('hidden');
+      userInfo.classList.add('hidden');
+    }
+  }
+
+  const loginModal = document.getElementById('login-modal');
+  const providerBtns = document.querySelectorAll('.login-provider-btn');
+
+  loginBtn.addEventListener('click', () => {
+    loginModal.classList.remove('hidden');
+  });
+
+  setupModalCloseHandlers('login-modal', hideLoginModal);
+
+  providerBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const provider = btn.dataset.provider;
+      loginWithProvider(provider);
+    });
+  });
+
+  logoutBtn.addEventListener('click', () => {
+    setToken(null);
+    updateAuthUI();
+  });
+
+  syncBtn.addEventListener('click', async () => {
+    try {
+      syncBtn.disabled = true;
+      syncBtn.classList.add('spinning');
+
+      const ok = await confirmDialog({
+        title: 'Sync Data',
+        message: 'Push local data to cloud or Pull from cloud?',
+        confirmText: 'Push to Cloud',
+        cancelText: 'Pull from Cloud'
+      });
+
+      if (ok) {
+        // PUSH
+        const boards = listBoards().map(b => {
+          const originalActiveBoard = localStorage.getItem('kanbanActiveBoardId');
+          localStorage.setItem('kanbanActiveBoardId', b.id);
+
+          const data = {
+            ...b,
+            columns: loadColumns(),
+            tasks: loadTasks(),
+            labels: loadLabels(),
+            settings: loadSettings()
+          };
+
+          localStorage.setItem('kanbanActiveBoardId', originalActiveBoard);
+          return data;
+        });
+
+        await syncData({ boards });
+        alert('Data pushed to cloud successfully!');
+      } else {
+        // PULL
+        const remoteBoards = await fetchBoards();
+        if (!remoteBoards || remoteBoards.length === 0) {
+          alert('No data found in cloud.');
+          return;
+        }
+
+        const confirmPull = await confirmDialog({
+          title: 'Confirm Pull',
+          message: 'This will replace your local data with cloud data. Continue?',
+          confirmText: 'Replace Local Data',
+          cancelText: 'Cancel'
+        });
+
+        if (!confirmPull) return;
+
+        // Clear local boards metadata first
+        localStorage.setItem('kanbanBoards', JSON.stringify([]));
+
+        for (const rb of remoteBoards) {
+          const fullBoard = await fetchFullBoard(rb.id);
+
+          // Register board metadata
+          const localBoards = JSON.parse(localStorage.getItem('kanbanBoards') || '[]');
+          localBoards.push({ id: fullBoard.id, name: fullBoard.name, createdAt: fullBoard.createdAt });
+          localStorage.setItem('kanbanBoards', JSON.stringify(localBoards));
+
+          // Save board data
+          localStorage.setItem(`kanbanBoard:${fullBoard.id}:columns`, JSON.stringify(fullBoard.columns));
+          localStorage.setItem(`kanbanBoard:${fullBoard.id}:tasks`, JSON.stringify(fullBoard.tasks));
+          localStorage.setItem(`kanbanBoard:${fullBoard.id}:labels`, JSON.stringify(fullBoard.labels));
+          localStorage.setItem(`kanbanBoard:${fullBoard.id}:settings`, JSON.stringify(fullBoard.settings));
+        }
+
+        if (remoteBoards.length > 0) {
+          setActiveBoardId(remoteBoards[0].id);
+        }
+
+        renderBoard();
+        initializeBoardsUI(); // Refresh board selector
+        alert('Data pulled from cloud successfully!');
+      }
+    } catch (err) {
+      console.error('Sync failed', err);
+      alert('Sync failed: ' + err.message);
+    } finally {
+      syncBtn.disabled = false;
+      syncBtn.classList.remove('spinning');
+    }
+  });
+
+  updateAuthUI();
 
   // Export button listener
   document.getElementById('export-btn').addEventListener('click', async () => {
