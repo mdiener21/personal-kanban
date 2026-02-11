@@ -334,6 +334,11 @@ function hideHelpModal() {
   modal.classList.add('hidden');
 }
 
+export function hideLoginModal() {
+  const modal = document.getElementById('login-modal');
+  if (modal) modal.classList.add('hidden');
+}
+
 const HEX_COLOR_RE = /^#[0-9a-fA-F]{6}$/;
 
 function isValidHexColor(value) {
@@ -1063,6 +1068,10 @@ export function initializeModalHandlers() {
       }
       if (isModalOpen('help-modal')) {
         hideHelpModal();
+        return;
+      }
+      if (isModalOpen('login-modal')) {
+        hideLoginModal();
         return;
       }
       if (isModalOpen('column-modal')) {

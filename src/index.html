@@ -85,6 +85,22 @@
           <span data-lucide="help-circle" aria-hidden="true"></span>
           <span>Help</span>
         </button>
+        <div class="auth-controls">
+          <button id="login-btn" class="control-btn" type="button">
+            <span data-lucide="user" aria-hidden="true"></span>
+            <span>Go Online</span>
+          </button>
+          <div id="user-info" class="user-info hidden">
+            <span id="user-name"></span>
+            <button id="sync-btn" class="control-btn" type="button" title="Sync with cloud">
+              <span data-lucide="refresh-cw" aria-hidden="true"></span>
+              <span>Sync</span>
+            </button>
+            <button id="logout-btn" class="control-btn" type="button">
+              <span>Logout</span>
+            </button>
+          </div>
+        </div>
       </div>
       
       <button id="desktop-menu-btn" class="control-btn icon-only" type="button" aria-label="Menu" aria-expanded="false" aria-controls="board-controls-menu">
@@ -363,6 +379,37 @@
           <button type="submit" id="board-create-submit-btn" class="btn btn-primary">Create Board</button>
         </div>
       </form>
+    </article>
+  </div>
+
+  <!-- Login Modal -->
+  <div id="login-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="login-modal-title">
+    <div class="modal-backdrop" data-close-modal></div>
+    <article class="modal-content">
+      <header class="modal-header-row">
+        <h3 id="login-modal-title">Go Online</h3>
+        <button id="login-close-btn" type="button" class="icon-btn" aria-label="Close" title="Close">
+          <span data-lucide="x" aria-hidden="true"></span>
+        </button>
+      </header>
+      <div class="login-options">
+        <p>Choose a provider to sync your data across devices:</p>
+        <button type="button" class="btn btn-secondary login-provider-btn" data-provider="google">
+          <span data-lucide="user" aria-hidden="true"></span>
+          Continue with Google
+        </button>
+        <button type="button" class="btn btn-secondary login-provider-btn" data-provider="apple">
+          <span data-lucide="user" aria-hidden="true"></span>
+          Continue with Apple
+        </button>
+        <button type="button" class="btn btn-secondary login-provider-btn" data-provider="microsoftonline">
+          <span data-lucide="user" aria-hidden="true"></span>
+          Continue with Microsoft
+        </button>
+      </div>
+      <div class="form-actions">
+        <button type="button" id="login-modal-cancel-btn" class="btn btn-secondary">Cancel</button>
+      </div>
     </article>
   </div>
 

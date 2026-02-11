@@ -42,6 +42,7 @@ Experience it firsthand: **[Try the Live Demo](https://mdiener21.github.io/perso
 - **🎨 Drag & Drop**: Effortlessly move tasks and columns for seamless workflow management.
 - **🏷️ Custom Labels & Colors**: Organize with personalized labels, groups, and column colors.
 - **💾 Easy Backup**: Export/import boards as JSON files to your favorite cloud storage (OneDrive, Google Drive, Dropbox).
+- **☁️ Cloud Sync**: Opt-in to online storage and sync your boards across devices using Social Auth (Google, Apple, Microsoft).
 - **📱 Fully Responsive**: Optimized for mobile and desktop—work from anywhere.
 - **🥇 Free & Open Source**: Always free, no hidden costs or subscriptions.
 
@@ -94,6 +95,13 @@ The repository includes a pre-built static site in `dist/`. Simply upload it to 
 npm run build
 ```
 Built files are in `dist/`.
+
+### Backend Setup (Optional)
+To run the Golang API and PostgreSQL database:
+1. Ensure you have Docker and Docker Compose installed.
+2. Configure your social auth credentials in `api/.env` (copy from `api/.env.example`).
+3. Run `docker-compose up -d`.
+4. The API will be available at `http://localhost:8080`.
 
 ### Preview Production Build
 ```bash
