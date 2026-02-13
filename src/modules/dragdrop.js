@@ -9,6 +9,8 @@ let autoScrollInterval = null;
 let lastTouchX = 0;
 let lastTouchY = 0;
 const COLLAPSED_DROP_HOVER_CLASS = 'is-drop-hover';
+let isDraggingTask = false;
+let activeTaskList = null;
 
 function shouldForceFallbackForTasks() {
   // Sortable's JS fallback is required on most mobile/touch environments
@@ -79,6 +81,30 @@ function stopAutoScroll() {
   lastTouchY = 0;
 }
 
+function autoScrollActiveTaskList() {
+  if (!isDraggingTask || !activeTaskList) return;
+  const rect = activeTaskList.getBoundingClientRect();
+  const edgeSize = 80;
+  const maxSpeed = 20;
+  let delta = 0;
+
+  if (lastTouchY > 0) {
+    if (lastTouchY < rect.top + edgeSize) {
+      const dist = Math.max(0, lastTouchY - rect.top);
+      const intensity = (edgeSize - dist) / edgeSize;
+      delta = -Math.ceil(intensity * maxSpeed);
+    } else if (lastTouchY > rect.bottom - edgeSize) {
+      const dist = Math.max(0, rect.bottom - lastTouchY);
+      const intensity = (edgeSize - dist) / edgeSize;
+      delta = Math.ceil(intensity * maxSpeed);
+    }
+  }
+
+  if (delta !== 0) {
+    activeTaskList.scrollTop += delta;
+  }
+}
+
 function showCollapsedDropZones() {
   document.querySelectorAll('.task-column.is-collapsed .tasks').forEach((tasksList) => {
     if (tasksList.classList.contains('hidden')) {
@@ -118,6 +144,7 @@ function trackPointer(evt) {
     lastTouchY = evt.clientY;
   }
   updateCollapsedHoverFromPoint(lastTouchX, lastTouchY);
+  autoScrollActiveTaskList();
 }
 
 function updateCollapsedHoverFromPoint(x, y) {
@@ -158,9 +185,15 @@ function initTaskSortables() {
       swapThreshold: 0.65,
       emptyInsertThreshold: 20, // Pixels around empty list where items can be dropped
       direction: 'vertical',
+      scroll: true,
+      scrollSensitivity: 120,
+      scrollSpeed: 22,
+      bubbleScroll: true,
       
       onStart: function(evt) {
         document.body.classList.add('dragging');
+        isDraggingTask = true;
+        activeTaskList = evt.from || null;
         showCollapsedDropZones();
         startAutoScroll();
         // Add global move listener to track pointer
@@ -170,6 +203,7 @@ function initTaskSortables() {
       },
 
       onMove: function(evt) {
+        activeTaskList = evt.to || activeTaskList;
         const targetColumn = evt.to?.closest('.task-column');
         if (targetColumn && targetColumn.classList.contains('is-collapsed')) {
           setCollapsedDropHover(targetColumn);
@@ -180,6 +214,8 @@ function initTaskSortables() {
       
       onEnd: async function(evt) {
         document.body.classList.remove('dragging');
+        isDraggingTask = false;
+        activeTaskList = null;
         stopAutoScroll();
         document.removeEventListener('touchmove', trackPointer);
         document.removeEventListener('mousemove', trackPointer);

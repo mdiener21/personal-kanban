@@ -291,6 +291,7 @@ The notification system alerts users to tasks with approaching or past due dates
 ### Drag and Drop
 
 - **Tasks**: Draggable within and between columns, placeholder shows drop location
+- **Task List Auto-Scroll**: Dragging near the top/bottom of a scrollable column auto-scrolls the list so tasks can be moved beyond the visible viewport
 - **Collapsed Columns**: Accept task drops; hovering shows a dashed outline and the dropped task is placed at the top of the column
 - **Columns**: Draggable via grip handle only, placeholder shows drop position
 - **Order Tracking**: Both tasks and columns have order property (1-based), updated on drop
