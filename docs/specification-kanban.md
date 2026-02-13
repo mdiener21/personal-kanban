@@ -110,7 +110,7 @@
   - Sorting permanently reorders tasks (updates the `order` property)
 - **Permanent Done column**: The column with id `done` cannot be deleted.
 - **Reorder**: Drag via grip icon handle, updates order property
-- **Collapse**: Toggle button (left of the grip handle) collapses a column into a ~20px vertical bar; state is stored per column. When collapsed, the column header displays the task count in the format "ColumnName (count)".
+- **Collapse**: Toggle button (left of the grip handle) collapses a column into a ~20px vertical bar; state is stored per column. When collapsed, the column header displays the task count in the format "ColumnName (count)". Dragging a task over a collapsed column shows a dashed outline, and dropping places the task at the top of that column.
 - **Actions**: Plus icon (add task), pencil (edit), trash (delete)
 
 #### Column Header Actions
@@ -291,6 +291,8 @@ The notification system alerts users to tasks with approaching or past due dates
 ### Drag and Drop
 
 - **Tasks**: Draggable within and between columns, placeholder shows drop location
+- **Task List Auto-Scroll**: Dragging near the top/bottom of a scrollable column auto-scrolls the list so tasks can be moved beyond the visible viewport
+- **Collapsed Columns**: Accept task drops; hovering shows a dashed outline and the dropped task is placed at the top of the column
 - **Columns**: Draggable via grip handle only, placeholder shows drop position
 - **Order Tracking**: Both tasks and columns have order property (1-based), updated on drop
 - **Performance Optimization**: Task drops use incremental updates instead of full board re-render:

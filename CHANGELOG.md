@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed (unreleased)
 
+- Dragging tasks onto collapsed columns now highlights the column with a dashed outline and drops the task at the top of that column
+- Task drag now auto-scrolls within tall columns so tasks can be dropped beyond the visible viewport
+- Mobile task drag now auto-scrolls the column as you drag toward the top or bottom edge
+
 ### Removed (unreleased)
 
 

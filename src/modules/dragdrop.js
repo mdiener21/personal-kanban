@@ -1,5 +1,5 @@
 import Sortable from 'sortablejs';
-import { updateTaskPositionsFromDrop } from './tasks.js';
+import { moveTaskToTopInColumn, updateTaskPositionsFromDrop } from './tasks.js';
 import { updateColumnPositions } from './columns.js';
 
 // Store Sortable instances for cleanup
@@ -7,6 +7,10 @@ let taskSortables = [];
 let columnSortable = null;
 let autoScrollInterval = null;
 let lastTouchX = 0;
+let lastTouchY = 0;
+const COLLAPSED_DROP_HOVER_CLASS = 'is-drop-hover';
+let isDraggingTask = false;
+let activeTaskList = null;
 
 function shouldForceFallbackForTasks() {
   // Sortable's JS fallback is required on most mobile/touch environments
@@ -74,20 +78,89 @@ function stopAutoScroll() {
     autoScrollInterval = null;
   }
   lastTouchX = 0;
+  lastTouchY = 0;
+}
+
+function autoScrollActiveTaskList() {
+  if (!isDraggingTask || !activeTaskList) return;
+  const rect = activeTaskList.getBoundingClientRect();
+  const edgeSize = 80;
+  const maxSpeed = 20;
+  let delta = 0;
+
+  if (lastTouchY > 0) {
+    if (lastTouchY < rect.top + edgeSize) {
+      const dist = Math.max(0, lastTouchY - rect.top);
+      const intensity = (edgeSize - dist) / edgeSize;
+      delta = -Math.ceil(intensity * maxSpeed);
+    } else if (lastTouchY > rect.bottom - edgeSize) {
+      const dist = Math.max(0, rect.bottom - lastTouchY);
+      const intensity = (edgeSize - dist) / edgeSize;
+      delta = Math.ceil(intensity * maxSpeed);
+    }
+  }
+
+  if (delta !== 0) {
+    activeTaskList.scrollTop += delta;
+  }
+}
+
+function showCollapsedDropZones() {
+  document.querySelectorAll('.task-column.is-collapsed .tasks').forEach((tasksList) => {
+    if (tasksList.classList.contains('hidden')) {
+      tasksList.dataset.wasHidden = 'true';
+      tasksList.classList.remove('hidden');
+    }
+  });
+}
+
+function hideCollapsedDropZones() {
+  document.querySelectorAll('.task-column.is-collapsed .tasks').forEach((tasksList) => {
+    if (tasksList.dataset.wasHidden === 'true') {
+      tasksList.classList.add('hidden');
+      delete tasksList.dataset.wasHidden;
+    }
+  });
+}
+
+function clearCollapsedDropHover() {
+  document
+    .querySelectorAll(`.task-column.is-collapsed.${COLLAPSED_DROP_HOVER_CLASS}`)
+    .forEach((column) => column.classList.remove(COLLAPSED_DROP_HOVER_CLASS));
+}
+
+function setCollapsedDropHover(columnEl) {
+  clearCollapsedDropHover();
+  if (columnEl) columnEl.classList.add(COLLAPSED_DROP_HOVER_CLASS);
 }
 
 // Track touch/mouse position globally during drag
 function trackPointer(evt) {
   if (evt.touches && evt.touches[0]) {
     lastTouchX = evt.touches[0].clientX;
+    lastTouchY = evt.touches[0].clientY;
   } else if (evt.clientX) {
     lastTouchX = evt.clientX;
+    lastTouchY = evt.clientY;
+  }
+  updateCollapsedHoverFromPoint(lastTouchX, lastTouchY);
+  autoScrollActiveTaskList();
+}
+
+function updateCollapsedHoverFromPoint(x, y) {
+  if (!x && !y) return;
+  const target = document.elementFromPoint(x, y);
+  const column = target?.closest?.('.task-column');
+  if (column && column.classList.contains('is-collapsed')) {
+    setCollapsedDropHover(column);
+  } else {
+    clearCollapsedDropHover();
   }
 }
 
 // Initialize sortable for tasks within columns
 function initTaskSortables() {
-  const taskLists = document.querySelectorAll('.tasks:not(.hidden)');
+  const taskLists = document.querySelectorAll('.tasks');
   const forceFallback = shouldForceFallbackForTasks();
   
   taskLists.forEach(taskList => {
@@ -112,24 +185,51 @@ function initTaskSortables() {
       swapThreshold: 0.65,
       emptyInsertThreshold: 20, // Pixels around empty list where items can be dropped
       direction: 'vertical',
+      scroll: true,
+      scrollSensitivity: 120,
+      scrollSpeed: 22,
+      bubbleScroll: true,
       
       onStart: function(evt) {
         document.body.classList.add('dragging');
+        isDraggingTask = true;
+        activeTaskList = evt.from || null;
+        showCollapsedDropZones();
         startAutoScroll();
         // Add global move listener to track pointer
         document.addEventListener('touchmove', trackPointer, { passive: true });
         document.addEventListener('mousemove', trackPointer, { passive: true });
+        updateCollapsedHoverFromPoint(lastTouchX, lastTouchY);
+      },
+
+      onMove: function(evt) {
+        activeTaskList = evt.to || activeTaskList;
+        const targetColumn = evt.to?.closest('.task-column');
+        if (targetColumn && targetColumn.classList.contains('is-collapsed')) {
+          setCollapsedDropHover(targetColumn);
+        } else {
+          clearCollapsedDropHover();
+        }
       },
       
       onEnd: async function(evt) {
         document.body.classList.remove('dragging');
+        isDraggingTask = false;
+        activeTaskList = null;
         stopAutoScroll();
         document.removeEventListener('touchmove', trackPointer);
         document.removeEventListener('mousemove', trackPointer);
         
         // Update task positions in storage (optimized - no full re-render)
         const dropResult = updateTaskPositionsFromDrop(evt);
-        
+        const toColumnEl = evt.to?.closest('.task-column');
+        if (dropResult && toColumnEl?.classList.contains('is-collapsed')) {
+          moveTaskToTopInColumn(dropResult.movedTaskId, dropResult.toColumn);
+        }
+
+        clearCollapsedDropHover();
+        hideCollapsedDropZones();
+
         if (dropResult) {
           // Import helpers dynamically to avoid circular dependencies
           const { syncTaskCounters, syncCollapsedTitles } = await import('./render.js');
