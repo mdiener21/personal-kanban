@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed (unreleased)
 
+- Column color picker now displays hex color code alongside the color selector, matching the label editor UX
+
 ### Removed (unreleased)
 
 ## [1.1.2] - 2026-02-14

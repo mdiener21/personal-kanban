@@ -5,7 +5,7 @@
 
 > **Your data, your browser, your workflow.** A local-first Kanban board that runs entirely in your browser — no servers, no accounts, no tracking.
 
-**[Try the Live Demo](https://mdiener21.github.io/personal-kanban/)**
+**[Use it Live Here](https://mdiener21.github.io/personal-kanban/)**
 
 ---
 
