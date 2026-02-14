@@ -20,12 +20,7 @@ function syncNotificationBannerVisibilityToggle() {
   toggle.checked = !isNotificationBannerHidden();
 }
 
-/**
- * Get all tasks that are due within the threshold or overdue.
- * Excludes tasks in the 'done' column.
- * @returns {Array} Array of task objects with additional `daysUntilDue` property
- */
-export function getNotificationTasks() {
+function buildNotificationSnapshot() {
   const tasks = loadTasks();
   const settings = loadSettings();
   const thresholdDays = Number.isFinite(settings.notificationDays) ? settings.notificationDays : 3;
@@ -49,7 +44,22 @@ export function getNotificationTasks() {
     });
   });
 
-  return dueTasks.sort((a, b) => a.daysUntilDue - b.daysUntilDue); // Most urgent first
+  dueTasks.sort((a, b) => a.daysUntilDue - b.daysUntilDue);
+
+  return {
+    tasks: dueTasks,
+    settings,
+    thresholdDays
+  };
+}
+
+/**
+ * Get all tasks that are due within the threshold or overdue.
+ * Excludes tasks in the 'done' column.
+ * @returns {Array} Array of task objects with additional `daysUntilDue` property
+ */
+export function getNotificationTasks() {
+  return buildNotificationSnapshot().tasks;
 }
 
 /**
@@ -90,13 +100,13 @@ function formatDueStatus(daysUntilDue, dueDate, locale) {
 /**
  * Render the notification banner.
  */
-export function renderNotificationBanner() {
+export function renderNotificationBanner(snapshot = null) {
   const banner = document.getElementById('notification-banner');
   const list = document.getElementById('notification-banner-list');
   if (!banner || !list) return;
 
-  const tasks = getNotificationTasks();
-  const settings = loadSettings();
+  const currentSnapshot = snapshot || buildNotificationSnapshot();
+  const { tasks, settings } = currentSnapshot;
 
   if (tasks.length === 0) {
     banner.classList.add('hidden');
@@ -220,13 +230,12 @@ export function renderNotificationBanner() {
 /**
  * Render the notifications modal content.
  */
-function renderNotificationsModalContent() {
+function renderNotificationsModalContent(snapshot = null) {
   const list = document.getElementById('notifications-list');
   if (!list) return;
 
-  const tasks = getNotificationTasks();
-  const settings = loadSettings();
-  const thresholdDays = Number.isFinite(settings.notificationDays) ? settings.notificationDays : 3;
+  const currentSnapshot = snapshot || buildNotificationSnapshot();
+  const { tasks, settings, thresholdDays } = currentSnapshot;
 
   list.innerHTML = '';
 
@@ -304,11 +313,11 @@ function renderNotificationsModalContent() {
 /**
  * Update the notification badge count on the bell button.
  */
-export function updateNotificationBadge() {
+export function updateNotificationBadge(snapshot = null) {
   const badge = document.getElementById('notification-badge');
   if (!badge) return;
 
-  const tasks = getNotificationTasks();
+  const tasks = snapshot?.tasks || getNotificationTasks();
   const count = tasks.length;
 
   if (count === 0) {
@@ -325,7 +334,7 @@ export function updateNotificationBadge() {
  */
 export function showNotificationsModal() {
   syncNotificationBannerVisibilityToggle();
-  renderNotificationsModalContent();
+  renderNotificationsModalContent(buildNotificationSnapshot());
   const modal = document.getElementById('notifications-modal');
   modal?.classList.remove('hidden');
 }
@@ -397,6 +406,7 @@ export function initializeNotifications() {
  * Call this after renderBoard() or any task update.
  */
 export function refreshNotifications() {
-  renderNotificationBanner();
-  updateNotificationBadge();
+  const snapshot = buildNotificationSnapshot();
+  renderNotificationBanner(snapshot);
+  updateNotificationBadge(snapshot);
 }

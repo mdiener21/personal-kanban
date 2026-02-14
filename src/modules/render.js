@@ -9,6 +9,9 @@ import { refreshNotifications } from './notifications.js';
 import { calculateDaysUntilDue, formatCountdown, getCountdownClassName } from './dateutils.js';
 
 let columnMenuCloseHandlerAttached = false;
+let taskInteractionHandlersAttached = false;
+let columnInteractionHandlersAttached = false;
+let columnMenuInteractionHandlersAttached = false;
 
 let boardFilterQuery = '';
 
@@ -17,8 +20,104 @@ const DONE_INITIAL_BATCH_SIZE = 50;
 const DONE_LOAD_MORE_SIZE = 50;
 let doneVisibleCount = DONE_INITIAL_BATCH_SIZE;
 
+const TASK_OPEN_TRIGGER_SELECTOR = '.task-title, .task-description, .task-priority-header';
+const TASK_KEYBOARD_OPEN_SELECTOR = '.task-title, .task-priority-header';
+const COLUMN_MENU_ACTION_TOGGLE_SORT = 'toggle-sort';
+
 export function setBoardFilterQuery(query) {
   boardFilterQuery = (query || '').toString();
+}
+
+function getTaskIdFromEventTarget(target) {
+  const taskEl = target?.closest?.('.task');
+  return taskEl?.dataset?.taskId || '';
+}
+
+async function confirmAndDeleteTask(taskId) {
+  const ok = await confirmDialog({
+    title: 'Delete Task',
+    message: 'Are you sure you want to delete this task?',
+    confirmText: 'Delete'
+  });
+  if (!ok) return;
+  if (deleteTask(taskId)) renderBoard();
+}
+
+function handleTaskInteractionClick(event) {
+  const deleteBtn = event.target.closest('.delete-task-btn');
+  if (deleteBtn) {
+    event.stopPropagation();
+    const taskId = getTaskIdFromEventTarget(deleteBtn);
+    if (!taskId) return;
+    void confirmAndDeleteTask(taskId);
+    return;
+  }
+
+  const openTrigger = event.target.closest(TASK_OPEN_TRIGGER_SELECTOR);
+  if (!openTrigger) return;
+
+  const taskId = getTaskIdFromEventTarget(openTrigger);
+  if (!taskId) return;
+  showEditModal(taskId);
+}
+
+function handleTaskInteractionKeydown(event) {
+  if (event.key !== 'Enter' && event.key !== ' ') return;
+
+  const openTrigger = event.target.closest(TASK_KEYBOARD_OPEN_SELECTOR);
+  if (!openTrigger) return;
+
+  event.preventDefault();
+  const taskId = getTaskIdFromEventTarget(openTrigger);
+  if (!taskId) return;
+  showEditModal(taskId);
+}
+
+function ensureTaskInteractionHandlers() {
+  if (taskInteractionHandlersAttached) return;
+
+  const container = document.getElementById('board-container');
+  if (!container) return;
+
+  taskInteractionHandlersAttached = true;
+
+  container.addEventListener('click', handleTaskInteractionClick);
+  container.addEventListener('keydown', handleTaskInteractionKeydown);
+}
+
+function getColumnIdFromEventTarget(target) {
+  const columnEl = target?.closest?.('.task-column');
+  return columnEl?.dataset?.column || '';
+}
+
+function handleColumnInteractionClick(event) {
+  const addBtn = event.target.closest('.add-task-btn-icon');
+  if (addBtn) {
+    event.stopPropagation();
+    const columnId = getColumnIdFromEventTarget(addBtn);
+    if (!columnId) return;
+    showModal(columnId);
+    return;
+  }
+
+  const collapseBtn = event.target.closest('.column-collapse-btn');
+  if (!collapseBtn) return;
+
+  event.stopPropagation();
+  const columnId = getColumnIdFromEventTarget(collapseBtn);
+  if (!columnId) return;
+  if (toggleColumnCollapsed(columnId)) renderBoard();
+}
+
+function ensureColumnInteractionHandlers() {
+  if (columnInteractionHandlersAttached) return;
+
+  const container = document.getElementById('board-container');
+  if (!container) return;
+
+  columnInteractionHandlersAttached = true;
+
+  container.addEventListener('click', handleColumnInteractionClick);
 }
 
 function buildTaskCountByColumn(tasks) {
@@ -70,10 +169,131 @@ function closeAllColumnMenus(exceptMenu = null) {
     if (exceptMenu && menu === exceptMenu) return;
     menu.classList.add('hidden');
   });
+  document.querySelectorAll('.column-menu-btn').forEach((btn) => {
+    btn.setAttribute('aria-expanded', 'false');
+  });
   // Also close any open submenus
   document.querySelectorAll('.column-submenu').forEach((submenu) => {
     submenu.classList.add('hidden');
   });
+  document.querySelectorAll('.column-menu-item.has-submenu').forEach((btn) => {
+    btn.setAttribute('aria-expanded', 'false');
+  });
+}
+
+async function handleDeleteColumnAction(columnId) {
+  if (columnId === 'done') {
+    await alertDialog({ title: 'Cannot Delete Column', message: 'The Done column is permanent and cannot be deleted.' });
+    return;
+  }
+
+  const columns = loadColumns();
+  if (columns.length <= 1) {
+    await alertDialog({ title: 'Cannot Delete Column', message: 'Cannot delete the last column.' });
+    return;
+  }
+
+  const column = columns.find((c) => c.id === columnId);
+  const tasks = loadTasks();
+  const tasksInColumn = tasks.filter((t) => t.column === columnId);
+  const colName = column?.name ? `"${column.name}"` : 'this column';
+  const message = tasksInColumn.length > 0
+    ? `Delete ${colName}? This will also delete ${tasksInColumn.length} task(s).`
+    : `Delete ${colName}?`;
+
+  const ok = await confirmDialog({ title: 'Delete Column', message, confirmText: 'Delete' });
+  if (!ok) return;
+  if (deleteColumn(columnId)) renderBoard();
+}
+
+function toggleColumnMenu(menuBtn) {
+  const menuWrapper = menuBtn.closest('.column-menu-wrapper');
+  const menu = menuWrapper?.querySelector('.column-menu');
+  if (!menu) return;
+
+  const isOpen = !menu.classList.contains('hidden');
+  closeAllColumnMenus(menu);
+  if (isOpen) {
+    menu.classList.add('hidden');
+    menuBtn.setAttribute('aria-expanded', 'false');
+  } else {
+    menu.classList.remove('hidden');
+    menuBtn.setAttribute('aria-expanded', 'true');
+  }
+}
+
+function toggleSortSubmenu(sortToggleBtn) {
+  const sortWrapper = sortToggleBtn.closest('.column-menu-submenu-wrapper');
+  const sortSubmenu = sortWrapper?.querySelector('.column-submenu');
+  if (!sortSubmenu) return;
+
+  const isExpanded = !sortSubmenu.classList.contains('hidden');
+  sortSubmenu.classList.toggle('hidden');
+  sortToggleBtn.setAttribute('aria-expanded', isExpanded ? 'false' : 'true');
+}
+
+function handleColumnMenuAction(action, columnId) {
+  if (!columnId) return;
+
+  const columnMenuActionHandlers = {
+    edit: () => {
+      closeAllColumnMenus();
+      showEditColumnModal(columnId);
+    },
+    'sort-due-date': () => {
+      closeAllColumnMenus();
+      sortColumnTasks(columnId, 'dueDate');
+    },
+    'sort-priority': () => {
+      closeAllColumnMenus();
+      sortColumnTasks(columnId, 'priority');
+    },
+    delete: () => {
+      closeAllColumnMenus();
+      void handleDeleteColumnAction(columnId);
+    }
+  };
+
+  const actionHandler = columnMenuActionHandlers[action];
+  if (!actionHandler) return;
+  actionHandler();
+}
+
+function handleColumnMenuInteractionClick(event) {
+  const menuBtn = event.target.closest('.column-menu-btn');
+  if (menuBtn) {
+    event.stopPropagation();
+    toggleColumnMenu(menuBtn);
+    return;
+  }
+
+  const sortToggleBtn = event.target.closest(`[data-column-menu-action="${COLUMN_MENU_ACTION_TOGGLE_SORT}"]`);
+  if (sortToggleBtn) {
+    event.stopPropagation();
+    toggleSortSubmenu(sortToggleBtn);
+    return;
+  }
+
+  const actionBtn = event.target.closest('[data-column-menu-action]');
+  if (!actionBtn) return;
+
+  const action = actionBtn.dataset.columnMenuAction;
+  if (!action || action === COLUMN_MENU_ACTION_TOGGLE_SORT) return;
+
+  event.stopPropagation();
+  const columnId = getColumnIdFromEventTarget(actionBtn);
+  handleColumnMenuAction(action, columnId);
+}
+
+function ensureColumnMenuInteractionHandlers() {
+  if (columnMenuInteractionHandlersAttached) return;
+
+  const container = document.getElementById('board-container');
+  if (!container) return;
+
+  columnMenuInteractionHandlersAttached = true;
+
+  container.addEventListener('click', handleColumnMenuInteractionClick);
 }
 
 /**
@@ -237,13 +457,6 @@ function createTaskElement(task, settings, labelsMap = null, today = null) {
   titleEl.setAttribute('tabindex', '0');
   const legacyTitle = typeof task.text === 'string' ? task.text : '';
   titleEl.textContent = (typeof task.title === 'string' && task.title.trim() !== '') ? task.title : legacyTitle;
-  titleEl.addEventListener('click', () => showEditModal(task.id));
-  titleEl.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      showEditModal(task.id);
-    }
-  });
 
   const actions = document.createElement('div');
   actions.classList.add('task-actions');
@@ -260,16 +473,6 @@ function createTaskElement(task, settings, labelsMap = null, today = null) {
     priorityEl.setAttribute('role', 'button');
     priorityEl.setAttribute('tabindex', '0');
     priorityEl.title = 'Edit task';
-    priorityEl.addEventListener('click', (e) => {
-      e.stopPropagation();
-      showEditModal(task.id);
-    });
-    priorityEl.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        showEditModal(task.id);
-      }
-    });
     actions.appendChild(priorityEl);
   }
 
@@ -281,16 +484,6 @@ function createTaskElement(task, settings, labelsMap = null, today = null) {
   deleteIcon.dataset.lucide = 'trash-2';
   deleteIcon.setAttribute('aria-hidden', 'true');
   deleteBtn.appendChild(deleteIcon);
-  deleteBtn.addEventListener('click', async (e) => {
-    e.stopPropagation();
-    const ok = await confirmDialog({
-      title: 'Delete Task',
-      message: 'Are you sure you want to delete this task?',
-      confirmText: 'Delete'
-    });
-    if (!ok) return;
-    if (deleteTask(task.id)) renderBoard();
-  });
 
   actions.appendChild(deleteBtn);
   header.appendChild(titleEl);
@@ -301,7 +494,6 @@ function createTaskElement(task, settings, labelsMap = null, today = null) {
   descriptionEl.classList.add('task-description');
   descriptionEl.textContent = descriptionValue;
   descriptionEl.style.display = descriptionValue ? 'block' : 'none';
-  descriptionEl.addEventListener('click', () => showEditModal(task.id));
 
   li.appendChild(header);
   li.appendChild(descriptionEl);
@@ -396,10 +588,6 @@ function createColumnElement(column, taskCount = 0) {
   collapseIcon.dataset.lucide = isCollapsed ? 'chevron-right' : 'chevrons-right-left';
   collapseIcon.setAttribute('aria-hidden', 'true');
   collapseBtn.appendChild(collapseIcon);
-  collapseBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    if (toggleColumnCollapsed(column.id)) renderBoard();
-  });
 
   const dragHandle = document.createElement('button');
   dragHandle.classList.add('column-drag-handle');
@@ -440,7 +628,6 @@ function createColumnElement(column, taskCount = 0) {
   plusIcon.setAttribute('aria-hidden', 'true');
   addBtn.appendChild(plusIcon);
   addBtn.title = 'Add task';
-  addBtn.addEventListener('click', () => showModal(column.id));
 
   // Overflow menu: ellipsis-vertical -> (pencil, trash)
   const menuWrapper = document.createElement('div');
@@ -466,6 +653,7 @@ function createColumnElement(column, taskCount = 0) {
   editColBtn.classList.add('column-menu-item');
   editColBtn.type = 'button';
   editColBtn.setAttribute('role', 'menuitem');
+  editColBtn.dataset.columnMenuAction = 'edit';
   const editIcon = document.createElement('span');
   editIcon.dataset.lucide = 'pencil';
   editIcon.setAttribute('aria-hidden', 'true');
@@ -473,16 +661,12 @@ function createColumnElement(column, taskCount = 0) {
   const editText = document.createTextNode(' Edit');
   editColBtn.appendChild(editText);
   editColBtn.title = 'Edit column';
-  editColBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    closeAllColumnMenus();
-    showEditColumnModal(column.id);
-  });
 
   const deleteColBtn = document.createElement('button');
   deleteColBtn.classList.add('column-menu-item', 'danger');
   deleteColBtn.type = 'button';
   deleteColBtn.setAttribute('role', 'menuitem');
+  deleteColBtn.dataset.columnMenuAction = 'delete';
   const deleteIcon = document.createElement('span');
   deleteIcon.dataset.lucide = 'trash-2';
   deleteIcon.setAttribute('aria-hidden', 'true');
@@ -490,33 +674,6 @@ function createColumnElement(column, taskCount = 0) {
   const deleteText = document.createTextNode(' Delete');
   deleteColBtn.appendChild(deleteText);
   deleteColBtn.title = 'Delete column';
-  deleteColBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    closeAllColumnMenus();
-    (async () => {
-      if (column.id === 'done') {
-        await alertDialog({ title: 'Cannot Delete Column', message: 'The Done column is permanent and cannot be deleted.' });
-        return;
-      }
-
-      const columns = loadColumns();
-      if (columns.length <= 1) {
-        await alertDialog({ title: 'Cannot Delete Column', message: 'Cannot delete the last column.' });
-        return;
-      }
-
-      const tasks = loadTasks();
-      const tasksInColumn = tasks.filter((t) => t.column === column.id);
-      const colName = column?.name ? `"${column.name}"` : 'this column';
-      const message = tasksInColumn.length > 0
-        ? `Delete ${colName}? This will also delete ${tasksInColumn.length} task(s).`
-        : `Delete ${colName}?`;
-
-      const ok = await confirmDialog({ title: 'Delete Column', message, confirmText: 'Delete' });
-      if (!ok) return;
-      if (deleteColumn(column.id)) renderBoard();
-    })();
-  });
 
   // Sort submenu wrapper
   const sortWrapper = document.createElement('div');
@@ -528,6 +685,7 @@ function createColumnElement(column, taskCount = 0) {
   sortBtn.setAttribute('role', 'menuitem');
   sortBtn.setAttribute('aria-haspopup', 'menu');
   sortBtn.setAttribute('aria-expanded', 'false');
+  sortBtn.dataset.columnMenuAction = 'toggle-sort';
   const sortIcon = document.createElement('span');
   sortIcon.dataset.lucide = 'arrow-up-down';
   sortIcon.setAttribute('aria-hidden', 'true');
@@ -552,37 +710,21 @@ function createColumnElement(column, taskCount = 0) {
   sortByDueDateBtn.classList.add('column-menu-item');
   sortByDueDateBtn.type = 'button';
   sortByDueDateBtn.setAttribute('role', 'menuitem');
+  sortByDueDateBtn.dataset.columnMenuAction = 'sort-due-date';
   sortByDueDateBtn.textContent = 'By Due Date';
   sortByDueDateBtn.title = 'Sort by due date (earliest first)';
-  sortByDueDateBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    closeAllColumnMenus();
-    sortColumnTasks(column.id, 'dueDate');
-  });
 
   // Sort by Priority option
   const sortByPriorityBtn = document.createElement('button');
   sortByPriorityBtn.classList.add('column-menu-item');
   sortByPriorityBtn.type = 'button';
   sortByPriorityBtn.setAttribute('role', 'menuitem');
+  sortByPriorityBtn.dataset.columnMenuAction = 'sort-priority';
   sortByPriorityBtn.textContent = 'By Priority';
   sortByPriorityBtn.title = 'Sort by priority (urgent to none)';
-  sortByPriorityBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    closeAllColumnMenus();
-    sortColumnTasks(column.id, 'priority');
-  });
 
   sortSubmenu.appendChild(sortByDueDateBtn);
   sortSubmenu.appendChild(sortByPriorityBtn);
-
-  // Toggle submenu on click
-  sortBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const isExpanded = !sortSubmenu.classList.contains('hidden');
-    sortSubmenu.classList.toggle('hidden');
-    sortBtn.setAttribute('aria-expanded', isExpanded ? 'false' : 'true');
-  });
 
   // Show submenu on hover (desktop)
   sortWrapper.addEventListener('mouseenter', () => {
@@ -601,18 +743,6 @@ function createColumnElement(column, taskCount = 0) {
   menu.appendChild(editColBtn);
   menu.appendChild(sortWrapper);
   menu.appendChild(deleteColBtn);
-
-  menuBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const isOpen = !menu.classList.contains('hidden');
-    closeAllColumnMenus();
-    if (!isOpen) {
-      menu.classList.remove('hidden');
-      menuBtn.setAttribute('aria-expanded', 'true');
-    } else {
-      menuBtn.setAttribute('aria-expanded', 'false');
-    }
-  });
 
   menuWrapper.appendChild(menuBtn);
   menuWrapper.appendChild(menu);
@@ -765,6 +895,10 @@ export function renderBoard() {
 
   // Refresh notifications after board render
   refreshNotifications();
+
+  ensureTaskInteractionHandlers();
+  ensureColumnInteractionHandlers();
+  ensureColumnMenuInteractionHandlers();
 
   if (!columnMenuCloseHandlerAttached) {
     columnMenuCloseHandlerAttached = true;

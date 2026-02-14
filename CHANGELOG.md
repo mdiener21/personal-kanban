@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added (unreleased)
 
+- Playwright E2E coverage for column menu actions (`tests/e2e/column-menu-actions.spec.js`) covering edit, sort (due date/priority), and Done delete guard dialog behavior
+- Playwright E2E coverage for delegated task-card interactions (`tests/e2e/task-card-interactions.spec.js`) covering open/edit triggers (title/description/priority + keyboard) and delete confirm flow
+- Shared E2E fixture helpers (`tests/e2e/helpers/board-seed.js`, `tests/e2e/helpers/test-fixtures.js`) to remove repeated localStorage seeding boilerplate across specs
+- New focused npm scripts for fast local runs: `test:column-menu`, `test:task-card`, `test:dragdrop`
+
 ### Changed (unreleased)
 
 - Column color picker now displays hex color code alongside the color selector, matching the label editor UX
@@ -19,6 +24,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Import and board rename flows now use the app's modal alert dialog (non-blocking) instead of browser `alert()`
 - Drag/drop order updates now use per-column taskId→order maps during drop handling to avoid repeated linear lookups
 - Priority normalization is now centralized in a shared helper used by task editing, storage migration, and import/export normalization
+- New columns are now inserted immediately before the permanent Done column with sequentially normalized `order` values
+- Notification refresh now computes one shared notification snapshot and reuses it for banner and badge rendering
+- Task card open/delete interactions are now delegated to `#board-container` in `render.js`, reducing per-task listener rebinding on full renders
+- Column collapse/add-task button actions are now delegated to `#board-container` in `render.js`, reducing per-column listener rebinding on full renders
+- Column menu click actions (menu toggle, sort submenu toggle, edit, sort, delete) are now delegated to `#board-container` in `render.js`, reducing per-column listener rebinding on full renders
+- Delegated `render.js` interaction handlers were reorganized into clearer action-router helpers/constants to simplify future maintenance without changing behavior
 
 ### Removed (unreleased)
 

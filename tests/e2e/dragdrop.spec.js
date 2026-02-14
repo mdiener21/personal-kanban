@@ -1,6 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { readFileSync } from 'fs';
-import { join } from 'path';
+import { buildSingleBoardFixture, loadJsonFixture, seedBoardFixture } from './helpers/board-seed.js';
 
 /**
  * Performance test for drag-drop into Done column with 300+ tasks
@@ -14,26 +13,17 @@ test.describe('Drag and Drop Performance', () => {
     // Wait for the app to load
     await expect(page.locator('#board-container')).toBeVisible();
     
-    // Load the performance fixture directly into localStorage
-    const fixturePath = join(process.cwd(), 'tests/fixtures/performance-board.json');
-    const fixture = JSON.parse(readFileSync(fixturePath, 'utf-8'));
-    
-    await page.evaluate((data) => {
-      // Clear existing data
-      localStorage.clear();
-      
-      // Create a board for the fixture
-      const boardId = 'perf-test-board';
-      const boards = [{ id: boardId, name: 'Performance Test Board', createdAt: new Date().toISOString() }];
-      localStorage.setItem('kanbanBoards', JSON.stringify(boards));
-      localStorage.setItem('kanbanActiveBoardId', boardId);
-      
-      // Store board data
-      localStorage.setItem(`kanbanBoard:${boardId}:columns`, JSON.stringify(data.columns));
-      localStorage.setItem(`kanbanBoard:${boardId}:tasks`, JSON.stringify(data.tasks));
-      localStorage.setItem(`kanbanBoard:${boardId}:labels`, JSON.stringify(data.labels));
-      localStorage.setItem(`kanbanBoard:${boardId}:settings`, JSON.stringify(data.settings));
-    }, fixture);
+    const fixture = loadJsonFixture('tests/fixtures/performance-board.json');
+    const boardFixture = buildSingleBoardFixture({
+      boardId: 'perf-test-board',
+      boardName: 'Performance Test Board',
+      columns: fixture.columns,
+      tasks: fixture.tasks,
+      labels: fixture.labels,
+      settings: fixture.settings
+    });
+
+    await seedBoardFixture(page, boardFixture);
     
     // Reload to apply the fixture
     await page.reload();

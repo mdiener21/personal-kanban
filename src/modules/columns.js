@@ -14,11 +14,26 @@ export function addColumn(name, color) {
   if (!name || name.trim() === '') return;
   
   const columns = loadColumns();
-  const maxOrder = columns.reduce((max, c) => Math.max(max, c.order ?? 0), 0);
   const id = name.toLowerCase().replace(/\s+/g, '-') + '-' + generateUUID().substring(0, 8);
-  const newColumn = { id, name: name.trim(), color: normalizeColumnColor(color), order: maxOrder - 1, collapsed: false };
-  columns.push(newColumn);
-  saveColumns(columns);
+  const newColumn = {
+    id,
+    name: name.trim(),
+    color: normalizeColumnColor(color),
+    collapsed: false
+  };
+
+  const doneIndex = columns.findIndex((column) => column.id === 'done');
+  const insertAt = doneIndex >= 0 ? doneIndex : columns.length;
+
+  const nextColumns = columns.map((column) => ({ ...column }));
+  nextColumns.splice(insertAt, 0, newColumn);
+
+  const orderedColumns = nextColumns.map((column, index) => ({
+    ...column,
+    order: index + 1
+  }));
+
+  saveColumns(orderedColumns);
 }
 
 export function toggleColumnCollapsed(columnId) {

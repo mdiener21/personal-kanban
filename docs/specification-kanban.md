@@ -102,7 +102,7 @@
 - **Create**: Modal form with column name (required) input + color picker
   - If submitted without a name, the name field displays a red error border, red label, and "Column name is required" message below the field
   - Error state is cleared when the modal is reopened
-- **New column placement**: Newly created column are inserted to the far right of the board but before column `done` (order `-1`).
+- **New column placement**: Newly created columns are inserted directly before column `done`; column `order` values are re-normalized sequentially to preserve deterministic render order.
 - **Edit**: Open column menu (ellipsis) → pencil, edit name + color in modal
 - **Delete**: Open column menu (ellipsis) → trash, confirm if tasks exist
 - **Sort**: Open column menu (ellipsis) → Sort → choose "By Due Date" or "By Priority"
@@ -208,15 +208,15 @@
 
 - Settings are **per active board** and stored in localStorage (`kanbanBoard:<boardId>:settings`).
 - Settings modal allows:
-  - Toggle to show/hide task priority
-  - Toggle to show/hide task due date
-  - Number input to set the notifications upcoming window (days)
-  - Number input to set the countdown urgent threshold (days) - tasks due within this threshold show in red
-  - Number input to set the countdown warning threshold (days) - tasks due within this threshold show in amber
-  - Toggle to show/hide task age
   - Toggle to show/hide task updated date/time (`changeDate`)
   - Locale dropdown for formatting the updated timestamp
   - Default task priority dropdown (urgent/high/medium/low/none) used when creating new tasks
+  - `npm run test:column-menu`: Run column menu interaction tests only
+  - `npm run test:task-card`: Run delegated task-card interaction tests only
+  - `npm run test:dragdrop`: Run drag/drop performance tests only
+- **Shared E2E Fixture Helpers**:
+  - `tests/e2e/helpers/board-seed.js`: reusable board fixture loading + localStorage seeding helpers
+  - `tests/e2e/helpers/test-fixtures.js`: reusable deterministic board fixtures for targeted interaction tests
 - Default locale is initialized from the browser (e.g. `navigator.language`).
 - Default priority is `none`.
 
@@ -290,6 +290,10 @@ The notification system alerts users to tasks with approaching or past due dates
 - Clicking a notification opens the task edit modal
 - Sorted by urgency (most overdue first)
 
+#### Notification Refresh Optimization
+
+- `refreshNotifications()` computes a single in-memory notification snapshot (tasks + settings + threshold) and reuses it for banner and badge updates to avoid duplicate recalculation in the same refresh cycle.
+
 ### Icons
 
 - Lucide icons are tree-shaken via `src/modules/icons.js` to minimize bundle size.
@@ -327,6 +331,10 @@ The notification system alerts users to tasks with approaching or past due dates
 - **Label Loading Optimization**: Pre-loads labels into a Map once per render, passed to all `createTaskElement()` calls to avoid repeated `loadLabels()` calls
 - **Column Task Grouping Optimization**: `renderBoard()` pre-groups visible tasks by `column` and reuses grouped arrays while rendering, avoiding repeated per-column filtering
 - **Counter/Collapsed Title Optimization**: task counters and collapsed column title counts are derived from precomputed per-column counts instead of repeated full task scans
+- **Delegated Task Interactions**: task open/edit and delete actions are handled via delegated listeners on `#board-container`, reducing per-task listener attachment work during rerenders
+- **Delegated Column Button Interactions**: column collapse and add-task actions are handled via delegated listeners on `#board-container`, reducing per-column listener attachment work during rerenders
+- **Delegated Column Menu Interactions**: column menu toggle, sort submenu toggle, and menu actions (edit/sort/delete) are handled via delegated listeners on `#board-container`, reducing per-column listener attachment work during rerenders
+- **Interaction Router Structure**: delegated interaction handlers in `render.js` use action-specific helper/router functions and shared selector/action constants to keep behavior changes localized and maintainable
 - `renderBoard()` clears container, recreates all columns/tasks from localStorage
 - Sorts columns by order property
 - Sorts tasks within each column by order property
@@ -500,6 +508,8 @@ The canonical Help modal copy lives in `docs/help-how-to.md`.
 - **Boards**: board management modal scenarios
 - **Task creation**: happy-path creation with due dates and labels
 - **Validation**: required-title validation on task creation
+- **Column menu actions**: edit flow, sort-by-due-date, sort-by-priority, and Done-column delete guard dialog
+- **Task card interactions**: delegated open/edit triggers (title, description, priority, keyboard) and delete confirm/counter update flow
 - **Drag/drop performance**: moving tasks into Done with 300+ existing Done tasks
 
 ### Performance Tests

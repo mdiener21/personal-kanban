@@ -8,6 +8,9 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "playwright test",
+    "test:column-menu": "playwright test tests/e2e/column-menu-actions.spec.js --project=firefox",
+    "test:task-card": "playwright test tests/e2e/task-card-interactions.spec.js --project=firefox",
+    "test:dragdrop": "playwright test tests/e2e/dragdrop.spec.js --project=firefox",
     "test:ui": "playwright test --ui",
     "test:debug": "playwright test --debug"
   },
