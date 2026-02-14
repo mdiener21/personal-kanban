@@ -202,7 +202,7 @@ function defaultSettings() {
     showPriority: true,
     showDueDate: true,
     showAge: true,
-    showChangeDate: true,
+    showChangeDate: false,
     locale,
     defaultPriority: 'none',
     // Number of days ahead (inclusive) to consider tasks "upcoming" for notifications.
