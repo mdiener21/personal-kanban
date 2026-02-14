@@ -207,7 +207,10 @@ function defaultSettings() {
     defaultPriority: 'none',
     // Number of days ahead (inclusive) to consider tasks "upcoming" for notifications.
     // Overdue tasks are always included.
-    notificationDays: 3
+    notificationDays: 3,
+    // Countdown color thresholds
+    countdownUrgentThreshold: 3,   // Red: tasks due within this many days
+    countdownWarningThreshold: 10  // Amber: tasks due within this many days (must be >= urgent threshold)
   };
 }
 
@@ -501,7 +504,27 @@ function normalizeSettings(raw) {
     ? Math.min(365, Math.max(0, rawNotificationDays))
     : 3;
 
-  return { showPriority, showDueDate, showAge, showChangeDate, locale, defaultPriority, notificationDays };
+  const rawUrgentThreshold = Number.parseInt((obj.countdownUrgentThreshold ?? '').toString(), 10);
+  const countdownUrgentThreshold = Number.isFinite(rawUrgentThreshold)
+    ? Math.min(365, Math.max(1, rawUrgentThreshold))
+    : 3;
+
+  const rawWarningThreshold = Number.parseInt((obj.countdownWarningThreshold ?? '').toString(), 10);
+  const countdownWarningThreshold = Number.isFinite(rawWarningThreshold)
+    ? Math.min(365, Math.max(countdownUrgentThreshold, rawWarningThreshold))
+    : 10;
+
+  return {
+    showPriority,
+    showDueDate,
+    showAge,
+    showChangeDate,
+    locale,
+    defaultPriority,
+    notificationDays,
+    countdownUrgentThreshold,
+    countdownWarningThreshold
+  };
 }
 
 export function loadSettings() {
