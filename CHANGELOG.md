@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added (unreleased)
 
+- Create Board modal now includes a Template dropdown to create a new board from a built-in template (or start blank)
+
 ### Changed (unreleased)
 
 - Task edit modal redesigned with 2-column layout on desktop
@@ -17,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Modal width increased to 850px on desktop for better space utilization
   - Remains single-column on mobile devices for optimal touch interaction
 - Active labels in task modal now wrap to multiple lines instead of horizontal scrolling when many labels are selected
+- Manage Boards modal now closes immediately after clicking "Open" on a board
 
 ### Removed (unreleased)
 

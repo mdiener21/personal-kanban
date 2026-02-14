@@ -7,9 +7,77 @@ import {
   createBoard,
   getActiveBoardId,
   setActiveBoardId,
-  getActiveBoardName
+  getActiveBoardName,
+  saveColumns,
+  saveTasks,
+  saveLabels,
+  loadSettings,
+  saveSettings
 } from './storage.js';
 import { alertDialog } from './dialog.js';
+
+const builtInTemplateModules = import.meta.glob('../templates/*.json', {
+  eager: true,
+  import: 'default'
+});
+
+function templateIdFromPath(path) {
+  const base = typeof path === 'string' ? path.split('/').pop() : '';
+  return base ? base.replace(/\.json$/i, '') : '';
+}
+
+function getBuiltInBoardTemplates() {
+  return Object.entries(builtInTemplateModules)
+    .map(([path, data]) => {
+      const id = templateIdFromPath(path);
+      const name = typeof data?.boardName === 'string' ? data.boardName.trim() : '';
+      const columns = Array.isArray(data?.columns) ? data.columns : null;
+      const tasks = Array.isArray(data?.tasks) ? data.tasks : null;
+      const labels = Array.isArray(data?.labels) ? data.labels : null;
+      const settings = data?.settings && typeof data.settings === 'object' ? data.settings : null;
+      if (!id || !name || !tasks) return null;
+
+      return {
+        id,
+        name,
+        board: { boardName: name, columns, tasks, labels, settings }
+      };
+    })
+    .filter(Boolean)
+    .sort((a, b) => a.name.localeCompare(b.name));
+}
+
+function populateTemplateSelect(selectEl) {
+  if (!selectEl) return;
+  const templates = getBuiltInBoardTemplates();
+
+  selectEl.innerHTML = '';
+  const blank = document.createElement('option');
+  blank.value = '';
+  blank.textContent = 'Blank board';
+  blank.selected = true;
+  selectEl.appendChild(blank);
+
+  templates.forEach((t) => {
+    const opt = document.createElement('option');
+    opt.value = t.id;
+    opt.textContent = t.name;
+    selectEl.appendChild(opt);
+  });
+}
+
+function applyBoardTemplate(templateBoard) {
+  const board = templateBoard && typeof templateBoard === 'object' ? templateBoard : null;
+  if (!board) return;
+
+  if (Array.isArray(board.columns)) saveColumns(board.columns);
+  if (Array.isArray(board.tasks)) saveTasks(board.tasks);
+  if (Array.isArray(board.labels)) saveLabels(board.labels);
+  if (board.settings && typeof board.settings === 'object') {
+    const current = loadSettings();
+    saveSettings({ ...current, ...board.settings });
+  }
+}
 
 function boardDisplayName(board) {
   const name = typeof board?.name === 'string' ? board.name.trim() : '';
@@ -42,9 +110,11 @@ function refreshBrandText() {
 export function showBoardCreateModal() {
   const modal = document.getElementById('board-create-modal');
   const nameInput = document.getElementById('board-create-name');
+  const templateSelect = document.getElementById('board-create-template');
   if (!modal || !nameInput) return;
 
   nameInput.value = '';
+  if (templateSelect) templateSelect.value = '';
   modal.classList.remove('hidden');
   nameInput.focus();
 }
@@ -86,6 +156,9 @@ export function initializeBoardsUI() {
   const createModal = document.getElementById('board-create-modal');
   const createForm = document.getElementById('board-create-form');
   const cancelCreateBtn = document.getElementById('cancel-board-create-btn');
+  const templateSelect = document.getElementById('board-create-template');
+
+  populateTemplateSelect(templateSelect);
 
   if (createModal) {
     // Backdrop click closes modal
@@ -117,8 +190,15 @@ export function initializeBoardsUI() {
         return;
       }
 
+      const selectedTemplateId = (templateSelect?.value || '').trim();
+      const templates = selectedTemplateId ? getBuiltInBoardTemplates() : [];
+      const template = selectedTemplateId ? templates.find((t) => t.id === selectedTemplateId) : null;
+
       const board = createBoard(trimmed);
       setActiveBoardId(board.id);
+
+      if (template?.board) applyBoardTemplate(template.board);
+
       refreshBoardSelect(selectEl);
       refreshBrandText();
       renderBoard();
