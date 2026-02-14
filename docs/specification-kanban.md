@@ -86,7 +86,8 @@
   - `kanbanBoard:<boardId>:settings`
 - Legacy storage (`kanbanTasks`, `kanbanColumns`, `kanbanLabels`) is migrated into a default board on first run.
 - All CRUD operations load/save against the currently active board.
-- Export/Import operates on the active board.
+- **Export** operates on the active board.
+- **Import** creates a **new board** from the JSON and switches to it.
 
 ## UI Components
 
@@ -348,7 +349,10 @@ The notification system alerts users to tasks with approaching or past due dates
 ### Boards
 
 - **Select active board**: via the board dropdown; selection persists and is restored on next page load.
-- **Create board**: via Manage Boards modal → "Add Board" button → opens a modal form with board name input. New boards start with default columns + labels, and empty tasks.
+- **Create board**: via Manage Boards modal → "Add Board" button → opens the Create New Board modal.
+  - Fields: board name (required) and a template dropdown.
+  - Template dropdown defaults to "Blank board"; selecting a template creates the new board pre-populated with that template’s columns, tasks, labels, and settings.
+  - Blank boards start with default columns + labels, and empty tasks.
 - **Manage boards**: via Manage Boards modal:
   - List boards
   - Open a board (sets active and renders)

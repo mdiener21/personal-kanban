@@ -1,8 +1,15 @@
-# Help Modal Copy (In-App)
+# Help (In-App)
+
+[![GitHub stars](https://img.shields.io/github/stars/mdiener21/personal-kanban.svg?style=social)](https://github.com/mdiener21/personal-kanban/stargazers)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Visit%20Now-blue)](https://mdiener21.github.io/personal-kanban/)
 
 This file is the canonical user-facing text for the in-app **Help** modal.
 
-## Personal Kanban Board Help
+## Quick start
+
+- Create a task with the **+** button in a column header.
+- Drag and drop tasks between columns to update status.
+- Use **Priority** for urgency, **Due Date** for deadlines, and **Labels** for categories.
 
 ## Support & Community
 
@@ -22,33 +29,19 @@ This is a fully local personal Kanban board.
 - **Local-first storage**: data is stored in this browser’s `localStorage`.
 - **Backups are your responsibility**: export regularly if you care about the data.
 
-### Notifications
+## Controls Menu
 
-#### Benefits:
+All controls are in the header menu (ellipsis **⋮**).
 
-- Per-board customization: Different boards can have different thresholds
-- Flexible workflows: Adjust to your team's or personal preferences
-- Better prioritization: Set thresholds that match your actual deadlines
-- Real-time updates: Changes apply immediately to all tasks
+- **Board Select**: switch boards
+- **New Board**: create a board
+- **Manage Boards**: open/rename/delete boards
+- **Add Column**: create a new column
+- **Manage Labels**: create/edit/delete labels and groups
+- **Export** / **Import**: backup and restore boards
+- **Theme** / **Help**: appearance and help
 
-For example, you could set:
-
-- Sprint planning board: urgent=2 days, warning=5 days (shorter cycles)
-- Long-term projects: urgent=7 days, warning=30 days (longer horizons)
-- Personal tasks: urgent=3 days, warning=10 days (default)
-
-
-### Controls Menu
-
-All controls are in the header menu.
-
-- Click the **ellipsis (⋮)** menu button to open the controls dropdown.
-- Use **Board Select** to switch boards.
-- Use **New Board** to create a board.
-- Use **Manage Boards** to open/rename/delete boards.
-- Use **Add Column**, **Manage Labels**, **Export**, **Import**, **Theme**, and **Help** from the same menu.
-
-### Boards
+## Boards
 
 - **Switch boards** using the board dropdown.
 - The **last active board is restored** when you return.
@@ -58,7 +51,7 @@ All controls are in the header menu.
   - Delete a board (confirmation required)
   - The last remaining board cannot be deleted
 
-### Tasks
+## Tasks
 
 - **Add**: click the **plus** icon in a column header.
 - **Edit**: click a task card to edit its title/description/priority/due date/column/labels.
@@ -96,14 +89,11 @@ All controls are in the header menu.
 - **Export** downloads the active board only (columns + tasks + labels) as a JSON file. It does not back up all boards.
 
 To back up everything:
+
 - Switch boards
 - Export each board individually
-- **Import** loads a JSON file into the active board and **overwrites** its tasks, columns, and labels.
 
-Recommended workflow:
-- Create a new blank board first
-- Switch to it
-- Then click **Import**
+**Import** creates a **new board** from the JSON (columns + tasks + labels + settings when present) and switches to it.
 
 Important notes:
 - Clearing site data, using private browsing, or switching browsers/devices can make your data disappear.
@@ -118,79 +108,19 @@ Important notes:
 
 - Export on a schedule (end of day / end of week).
 - Use multiple boards to separate contexts (work, personal, projects).
-- Use labels to slice across columns (e.g., Urgent, Feature, Task).
+- Use labels to slice across columns (e.g., Feature, Finance, Email).
 
-## Strong Action Verbs for Task Management
+## Writing good task titles (optional)
 
-Using strong action verbs is key to creating clear, actionable, and results-oriented tasks. Here is a curated list of action words categorized by the type of work:
+Short, action-oriented titles are easiest to execute. Examples:
 
-## 1. Project & Task Management
-
-- **Implement**: Put a plan or project into effect
-- **Coordinate**: Bring different elements into a harmonious, functional whole
-- **Execute**: Carry out a plan or task to completion
-- **Spearhead**: Lead a new initiative or project from start to finish
-- **Delegate**: Entrust tasks to team members to increase efficiency
-- **Oversee**: Monitor a process to ensure it stays on track
-- **Streamline**: Simplify a process to make it faster or more efficient
-- **Prioritize**: Organize tasks based on importance
-
-## 2. Research & Analysis
-
-- **Analyze**: Examine data or information in detail to draw conclusions
-- **Assess**: Evaluate the value, quality, or impact of something
-- **Investigate**: Systematically search for facts or solutions
-- **Forecast**: Predict future trends or requirements
-- **Diagnose**: Identify the root cause of a problem
-- **Audit**: Examine processes or records for accuracy
-- **Quantify**: Express results or findings in numerical terms
-- **Map**: Outline a plan or process
-
-## 3. Creation & Development
-
-- **Conceptualize**: Develop an idea or design from the initial phase
-- **Draft**: Create a preliminary version of a document or plan
-- **Architect**: Structure or build a complex system or plan
-- **Prototype**: Build an early model of a product or process
-- **Initiate**: Start a new project or program
-- **Design**: Create a plan or blueprint for a new product or system
-- **Author**: Produce written content
-
-## 4. Leadership & Communication
-
-- **Negotiate**: Discuss with others to reach an agreement
-- **Mentor**: Guide and develop the skills of team members
-- **Mobilize**: Organize people to take specific, collaborative action
-- **Persuade**: Convince others to accept a new idea or approach
-- **Present**: Deliver information to stakeholders
-- **Align**: Coordinate teams to work toward the same goal
-
-## 5. Efficiency & Results (Increasing/Reducing)
-
-- **Boost**: Increase performance or sales
-- **Maximize**: Get the most out of a resource or process
-- **Optimize**: Refine a process to make it the best possible version
-- **Cut**: Reduce costs, time, or unnecessary steps
-- **Conserve**: Save resources
-- **Accelerate**: Hasten the progress of a task or project
-- **Deliver**: Produce a finished result
-
-## 6. Technical & Operational
-
-- **Automate**: Set up a process to run without manual intervention
-- **Troubleshoot**: Resolve technical issues or problems
-- **Deploy**: Launch a system or software
-- **Configure**: Set up equipment or software for use
-- **Maintain**: Ensure systems remain operational
-- **Integrate**: Combine two or more systems or components
-
-## 7. Administrative & Organization
-
-- **Catalog**: Organize items systematically
-- **Schedule**: Plan specific times for tasks
-- **Assemble**: Gather components or data
-- **Reconcile**: Match records or accounts
-- **Screen**: Filter applicants or information for relevance
+- Implement
+- Fix
+- Draft
+- Review
+- Schedule
+- Follow up
+- Investigate
 
 ---
 

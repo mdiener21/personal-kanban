@@ -580,6 +580,7 @@ function renderBoardsList() {
       renderBoardsList();
       const { renderBoard } = await import('./render.js');
       renderBoard();
+      hideBoardsModal();
     });
 
     const exportBtn = document.createElement('button');
