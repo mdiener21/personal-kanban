@@ -126,48 +126,54 @@
         </div>
       </header>
       <form id="task-form" novalidate>
-        <div class="form-group">
-          <label for="task-title">Title <span aria-hidden="true">*</span></label>
-          <input id="task-title" type="text" required placeholder="Enter task title..." aria-required="true">
-        </div>
-        <div class="form-group">
-          <label for="task-description">Description</label>
-          <textarea id="task-description" rows="3" placeholder="Enter task description..."></textarea>
-        </div>
-        <div class="form-group">
-          <label for="task-priority">Priority</label>
-          <select id="task-priority">
-            <option value="urgent">Urgent</option>
-            <option value="high">High</option>
-            <option value="medium">Medium</option>
-            <option value="low">Low</option>
-            <option value="none" selected>None</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="task-due-date">Due Date</label>
-          <input id="task-due-date" type="date">
-        </div>
-        <div class="form-group">
-          <label for="task-column">Column</label>
-          <select id="task-column" aria-describedby="task-column-help">
-            <!-- Options populated dynamically -->
-          </select>
-          <span id="task-column-help" class="sr-only">Select which column to place this task in</span>
-        </div>
-        <fieldset class="form-group">
-          <legend>Labels</legend>
-          <div id="task-active-labels" class="active-labels" role="list" aria-label="Selected labels"></div>
-          <div class="task-label-search-row">
-            <input type="text" id="task-label-search" placeholder="Search labels…" autocomplete="off" aria-label="Filter available labels">
-            <button id="task-add-label-btn" type="button" class="icon-btn" aria-label="Add a new label" title="Add label">
-              <span data-lucide="plus" aria-hidden="true"></span>
-            </button>
+        <div class="task-form-columns">
+          <div class="task-form-column-left">
+            <div class="form-group">
+              <label for="task-title">Title <span aria-hidden="true">*</span></label>
+              <input id="task-title" type="text" required placeholder="Enter task title..." aria-required="true">
+            </div>
+            <div class="form-group">
+              <label for="task-description">Description</label>
+              <textarea id="task-description" rows="3" placeholder="Enter task description..."></textarea>
+            </div>
+            <div class="form-group">
+              <label for="task-priority">Priority</label>
+              <select id="task-priority">
+                <option value="urgent">Urgent</option>
+                <option value="high">High</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+                <option value="none" selected>None</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="task-due-date">Due Date</label>
+              <input id="task-due-date" type="date">
+            </div>
+            <div class="form-group">
+              <label for="task-column">Column</label>
+              <select id="task-column" aria-describedby="task-column-help">
+                <!-- Options populated dynamically -->
+              </select>
+              <span id="task-column-help" class="sr-only">Select which column to place this task in</span>
+            </div>
           </div>
-          <div id="task-labels-selection" class="labels-selection" role="listbox" aria-label="Available labels">
-            <!-- Labels populated dynamically -->
+          <div class="task-form-column-right">
+            <fieldset class="form-group">
+              <legend>Labels</legend>
+              <div id="task-active-labels" class="active-labels" role="list" aria-label="Selected labels"></div>
+              <div class="task-label-search-row">
+                <input type="text" id="task-label-search" placeholder="Search labels…" autocomplete="off" aria-label="Filter available labels">
+                <button id="task-add-label-btn" type="button" class="icon-btn" aria-label="Add a new label" title="Add label">
+                  <span data-lucide="plus" aria-hidden="true"></span>
+                </button>
+              </div>
+              <div id="task-labels-selection" class="labels-selection" role="listbox" aria-label="Available labels">
+                <!-- Labels populated dynamically -->
+              </div>
+            </fieldset>
           </div>
-        </fieldset>
+        </div>
         <div class="form-actions">
           <button type="button" id="cancel-task-btn" class="btn btn-secondary">Cancel</button>
           <button type="submit" id="task-submit-btn" class="btn btn-primary">Add Task</button>
