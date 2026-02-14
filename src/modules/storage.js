@@ -95,9 +95,11 @@ function defaultColumns() {
 
 function defaultLabels() {
   return [
-    { id: 'urgent', name: 'Urgent', color: '#ef4444', group: '' },
-    { id: 'feature', name: 'Feature', color: '#3b82f6', group: '' },
-    { id: 'task', name: 'Task', color: '#f59e0b', group: '' }
+    { id: 'task-ez2522q8', name: 'Task', color: '#f59e0b', group: 'Activity' },
+    { id: 'meeting-gy2462e7', name: 'Meeting', color: '#ffd001', group: 'Activity' },
+    { id: 'email-gy2462e7', name: 'Email', color: '#d4a300', group: 'Activity' },
+    { id: 'idea-ju2554t6', name: 'Idea', color: '#25b631', group: '' },
+    { id: 'goal-hr2475r4', name: 'Goal', color: '#1b7cbd', group: '' },
   ];
 }
 
