@@ -89,7 +89,7 @@ function defaultColumns() {
   return [
     { id: 'todo', name: 'To Do', color: '#3583ff' },
     { id: 'inprogress', name: 'In Progress', color: '#f59e0b' },
-    { id: 'done', name: 'Done', color: '#16a34a' }
+    { id: 'done', name: 'Done', color: '#374151' }
   ];
 }
 
