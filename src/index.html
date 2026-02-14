@@ -199,8 +199,10 @@
         </div>
         <div class="form-group">
           <label for="column-color">Color</label>
-          <input type="color" id="column-color" value="#3b82f6" aria-describedby="column-color-help">
-          <span id="column-color-help" class="sr-only">Choose accent color for the column</span>
+          <div class="color-picker-row">
+            <input type="color" id="column-color" value="#3b82f6">
+            <input type="text" id="column-color-hex" class="color-hex-display" value="#3b82f6" maxlength="7" spellcheck="false" aria-label="Hex color code">
+          </div>
         </div>
         <div class="form-actions">
           <button type="button" id="cancel-column-btn" class="btn btn-secondary">Cancel</button>

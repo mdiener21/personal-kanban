@@ -7,7 +7,7 @@
 
 Use **columns** to track workflow state (To Do → In Progress → Done) and use **labels** for categories like type, area, context, and activity. With **label groups**, you can keep labels organized and easy to scan.
 
-**🚀 [Try the Live Demo](https://mdiener21.github.io/personal-kanban/) and see labels in action!**
+**🚀 [Use it LIVE here](https://mdiener21.github.io/personal-kanban/) and see labels in action!**
 
 ## 📁 Quick Example Boards
 
