@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added (unreleased)
 
+### Changed (unreleased)
+
+### Removed (unreleased)
+
+## [1.1.0] - 2026-02-14
+
+The jump to 1.1.0 reflects a substantial release with many new features, quality-of-life improvements, and stronger end-to-end test coverage.
+
+### Added (2026-02-14)
+
 - Due date countdown timer showing time remaining in task footer
   - Countdown displays beside due date in format "Due MM/DD/YYYY (countdown)"
   - Shows months and days for periods ≥ 30 days (e.g., "2 months 5 days", "1 month")
@@ -24,13 +34,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Per-board configuration allows different workflows for different boards
 - Shared date utility module (`dateutils.js`) for consistent countdown calculations across features
 
-### Changed (unreleased)
+### Changed (2026-02-14)
 
 - Dragging tasks onto collapsed columns now highlights the column with a dashed outline and drops the task at the top of that column
 - Task drag now auto-scrolls within tall columns so tasks can be dropped beyond the visible viewport
 - Mobile task drag now auto-scrolls the column as you drag toward the top or bottom edge
 
-### Removed (unreleased)
+### Removed (2026-02-14)
 
 
 ## [1.0.13] - 2026-02-10

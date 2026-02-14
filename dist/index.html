@@ -7,10 +7,10 @@
   <title>Personal Kanban Board</title>
   <!-- Kanban favicon (inline SVG data URI) -->
   <link rel="icon" href="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='2' y='3' width='6' height='18' rx='1.5' fill='%233b82f6'/%3E%3Crect x='9' y='3' width='6' height='12' rx='1.5' fill='%2360a5fa'/%3E%3Crect x='16' y='3' width='6' height='8' rx='1.5' fill='%2393c5fd'/%3E%3C/svg%3E">
-  <script type="module" crossorigin src="./assets/index-jqFazCm6.js"></script>
+  <script type="module" crossorigin src="./assets/index-BBEQmuko.js"></script>
   <link rel="modulepreload" crossorigin href="./assets/vendor-pJTqpwCg.js">
-  <link rel="modulepreload" crossorigin href="./assets/theme-C0UV_EmW.js">
-  <link rel="stylesheet" crossorigin href="./assets/theme-GCAwAfqF.css">
+  <link rel="modulepreload" crossorigin href="./assets/theme-BHSURPZY.js">
+  <link rel="stylesheet" crossorigin href="./assets/theme-CR-AvNPv.css">
 </head>
 <body>
   <!-- Skip link for accessibility -->
@@ -244,7 +244,7 @@
       <div class="form-actions">
         <button id="add-board-btn" type="button" class="btn btn-primary">
           <span data-lucide="kanban" aria-hidden="true"></span>
-          <span> Add Board</span>
+          <span> Create Board</span>
         </button>
         <button id="boards-import-btn" type="button" class="btn btn-secondary">
           <span data-lucide="upload" aria-hidden="true"></span>
@@ -289,6 +289,34 @@
             inputmode="numeric"
             aria-label="Number of days ahead to include for notifications"
           >
+        </div>
+        <div class="form-group">
+          <label for="settings-countdown-urgent-threshold">Countdown: urgent threshold (days)</label>
+          <input
+            id="settings-countdown-urgent-threshold"
+            type="number"
+            min="1"
+            max="365"
+            step="1"
+            inputmode="numeric"
+            aria-label="Days until due date to show countdown in red (urgent)"
+            title="Tasks due within this many days show in red"
+          >
+          <small class="form-help">Tasks due within this many days show in <span style="font-weight:800; color:red">red</span></small>
+        </div>
+        <div class="form-group">
+          <label for="settings-countdown-warning-threshold">Countdown: warning threshold (days)</label>
+          <input
+            id="settings-countdown-warning-threshold"
+            type="number"
+            min="1"
+            max="365"
+            step="1"
+            inputmode="numeric"
+            aria-label="Days until due date to show countdown in amber (warning)"
+            title="Tasks due within this many days show in amber (must be > urgent threshold)"
+          >
+          <small class="form-help">Tasks due within this many days show in <span style="font-weight:800; color:#ffd000">amber</span> (must be ≥ urgent threshold)</small>
         </div>
         <div class="form-group checkbox-group">
           <label>
