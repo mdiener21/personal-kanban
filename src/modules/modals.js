@@ -1060,19 +1060,25 @@ export function initializeModalHandlers() {
   setupModalCloseHandlers('boards-modal', hideBoardsModal);
 
   // Board rename modal
-  document.getElementById('board-rename-form')?.addEventListener('submit', (e) => {
+  document.getElementById('board-rename-form')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (!editingBoardId) return;
 
     const input = document.getElementById('board-rename-name');
     const name = (input?.value || '').trim();
     if (!name) {
-      alert('Board name cannot be empty.');
+      await alertDialog({
+        title: 'Board Name Required',
+        message: 'Board name cannot be empty.'
+      });
       return;
     }
 
     if (!renameBoard(editingBoardId, name)) {
-      alert('Unable to rename board.');
+      await alertDialog({
+        title: 'Rename Failed',
+        message: 'Unable to rename board.'
+      });
       return;
     }
 

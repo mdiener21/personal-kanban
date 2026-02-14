@@ -32,31 +32,24 @@ export function getNotificationTasks() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  return tasks
-    .filter((task) => {
-      // Exclude tasks in 'done' column
-      if (task.column === 'done') return false;
+  const dueTasks = [];
 
-      // Must have a due date
-      const dueDate = (task.dueDate || '').toString().trim();
-      if (!dueDate) return false;
+  tasks.forEach((task) => {
+    if (task.column === 'done') return;
 
-      // Calculate days until due using shared utility
-      const daysUntilDue = calculateDaysUntilDue(dueDate, today);
-      if (daysUntilDue === null) return false;
+    const dueDate = (task.dueDate || '').toString().trim();
+    if (!dueDate) return;
 
-      // Include if overdue or within threshold
-      return daysUntilDue <= thresholdDays;
-    })
-    .map((task) => {
-      const daysUntilDue = calculateDaysUntilDue(task.dueDate, today);
+    const daysUntilDue = calculateDaysUntilDue(dueDate, today);
+    if (daysUntilDue === null || daysUntilDue > thresholdDays) return;
 
-      return {
-        ...task,
-        daysUntilDue
-      };
-    })
-    .sort((a, b) => a.daysUntilDue - b.daysUntilDue); // Most urgent first
+    dueTasks.push({
+      ...task,
+      daysUntilDue
+    });
+  });
+
+  return dueTasks.sort((a, b) => a.daysUntilDue - b.daysUntilDue); // Most urgent first
 }
 
 /**

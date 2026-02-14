@@ -21,9 +21,25 @@ export function setBoardFilterQuery(query) {
   boardFilterQuery = (query || '').toString();
 }
 
-function getTaskCountInColumn(columnId) {
-  const tasks = loadTasks();
-  return tasks.filter(t => t.column === columnId).length;
+function buildTaskCountByColumn(tasks) {
+  const counts = new Map();
+  tasks.forEach((task) => {
+    const columnId = task?.column;
+    if (!columnId) return;
+    counts.set(columnId, (counts.get(columnId) || 0) + 1);
+  });
+  return counts;
+}
+
+function buildTasksByColumn(tasks) {
+  const tasksByColumn = new Map();
+  tasks.forEach((task) => {
+    const columnId = task?.column;
+    if (!columnId) return;
+    if (!tasksByColumn.has(columnId)) tasksByColumn.set(columnId, []);
+    tasksByColumn.get(columnId).push(task);
+  });
+  return tasksByColumn;
 }
 
 function taskMatchesFilter(task, queryLower, labelsById) {
@@ -357,7 +373,7 @@ function createTaskElement(task, settings, labelsMap = null, today = null) {
 }
 
 // Create a column element
-function createColumnElement(column) {
+function createColumnElement(column, taskCount = 0) {
   const div = document.createElement('article');
   div.classList.add('task-column');
   div.dataset.column = column.id;
@@ -401,7 +417,6 @@ function createColumnElement(column) {
   const h2 = document.createElement('h2');
   h2.id = `column-title-${column.id}`;
   if (isCollapsed) {
-    const taskCount = getTaskCountInColumn(column.id);
     h2.textContent = `${column.name} (${taskCount})`;
   } else {
     h2.textContent = column.name;
@@ -648,18 +663,16 @@ export function syncTaskCounters() {
   const tasks = loadTasks();
   const labelsById = new Map(loadLabels().map((l) => [l.id, { name: (l.name || '').toString().trim().toLowerCase(), group: (l.group || '').toString().trim().toLowerCase() }]));
   const queryLower = (boardFilterQuery || '').toString().trim().toLowerCase();
+  const visibleTasks = queryLower
+    ? tasks.filter((t) => taskMatchesFilter(t, queryLower, labelsById))
+    : tasks;
+  const countByColumn = buildTaskCountByColumn(visibleTasks);
   
   document.querySelectorAll('.task-counter').forEach(counter => {
     const columnId = counter.dataset.columnId;
     if (!columnId) return;
-    
-    const columnTasks = tasks.filter(t => {
-      if (t.column !== columnId) return false;
-      if (!queryLower) return true;
-      return taskMatchesFilter(t, queryLower, labelsById);
-    });
-    
-    counter.textContent = columnTasks.length;
+
+    counter.textContent = countByColumn.get(columnId) || 0;
   });
 }
 
@@ -667,12 +680,14 @@ export function syncTaskCounters() {
  * Sync collapsed column titles without full re-render (performance optimization)
  */
 export function syncCollapsedTitles() {
+  const taskCountByColumn = buildTaskCountByColumn(loadTasks());
+
   document.querySelectorAll('.task-column.is-collapsed').forEach(columnEl => {
     const columnId = columnEl.dataset.column;
     const h2 = columnEl.querySelector('h2');
     if (!columnId || !h2) return;
-    
-    const taskCount = getTaskCountInColumn(columnId);
+
+    const taskCount = taskCountByColumn.get(columnId) || 0;
     const columnName = h2.textContent.replace(/\s*\(\d+\)$/, ''); // Remove existing count
     h2.textContent = `${columnName} (${taskCount})`;
   });
@@ -697,6 +712,10 @@ export function renderBoard() {
   const visibleTasks = queryLower
     ? tasks.filter((t) => taskMatchesFilter(t, queryLower, labelsById))
     : tasks;
+  const visibleTasksByColumn = buildTasksByColumn(visibleTasks);
+  visibleTasksByColumn.forEach((columnTasks) => {
+    columnTasks.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+  });
   const container = document.getElementById('board-container');
   container.innerHTML = '';
   
@@ -704,15 +723,12 @@ export function renderBoard() {
   const sortedColumns = [...columns].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
   
   sortedColumns.forEach(column => {
-    const columnEl = createColumnElement(column);
+    const columnTasks = visibleTasksByColumn.get(column.id) || [];
+    const columnEl = createColumnElement(column, columnTasks.length);
     container.appendChild(columnEl);
     
     const tasksList = columnEl.querySelector('.tasks');
     const taskCounter = columnEl.querySelector('.task-counter');
-    
-    // Sort tasks by order within each column
-    const columnTasks = visibleTasks.filter(t => t.column === column.id)
-      .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
     
     // Apply virtualization for Done column (performance optimization)
     const isDoneColumn = column.id === 'done';

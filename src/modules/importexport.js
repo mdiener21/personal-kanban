@@ -10,6 +10,8 @@ import {
 } from './storage.js';
 
 import { createBoard, getActiveBoardName, listBoards, setActiveBoardId } from './storage.js';
+import { alertDialog } from './dialog.js';
+import { normalizePriority } from './priorities.js';
 
 function safeParseArrayFromStorage(key) {
   if (!key) return null;
@@ -68,13 +70,6 @@ function boardNameFromFile(file) {
 
 function isHexColor(value) {
   return typeof value === 'string' && /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(value.trim());
-}
-
-const allowedPriorities = new Set(['urgent', 'high', 'medium', 'low', 'none']);
-
-function normalizePriority(value) {
-  const v = (value || '').toString().trim().toLowerCase();
-  return allowedPriorities.has(v) ? v : 'none';
 }
 
 function normalizeSettingsForExport(settings) {
@@ -358,7 +353,10 @@ export function importTasks(file) {
         settings = Object.prototype.hasOwnProperty.call(data, 'settings') ? data.settings : null;
         boardName = typeof data.boardName === 'string' ? data.boardName.trim() : null;
       } else {
-        alert('Invalid JSON file format');
+        await alertDialog({
+          title: 'Import Failed',
+          message: 'Invalid JSON file format.'
+        });
         return;
       }
 
@@ -368,7 +366,10 @@ export function importTasks(file) {
       const normalizedSettings = settings ? normalizeImportedSettings(settings) : null;
 
       if (!normalizedTasks || (columns && !normalizedColumns) || (labels && !normalizedLabels) || (settings && !normalizedSettings)) {
-        alert('Invalid data structure');
+        await alertDialog({
+          title: 'Import Failed',
+          message: 'Invalid data structure.'
+        });
         return;
       }
 
@@ -390,9 +391,15 @@ export function importTasks(file) {
       const { renderBoard } = await import('./render.js');
       renderBoard();
       document.dispatchEvent(new CustomEvent('kanban:boards-changed'));
-      alert('Board imported successfully!');
+      await alertDialog({
+        title: 'Import Complete',
+        message: 'Board imported successfully!'
+      });
     } catch (error) {
-      alert('Error parsing JSON file: ' + error.message);
+      await alertDialog({
+        title: 'Import Failed',
+        message: 'Error parsing JSON file: ' + error.message
+      });
     }
   };
   reader.readAsText(file);

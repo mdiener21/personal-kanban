@@ -1,4 +1,5 @@
 import { generateUUID } from './utils.js';
+import { normalizePriority } from './priorities.js';
 
 const BOARDS_KEY = 'kanbanBoards';
 const ACTIVE_BOARD_KEY = 'kanbanActiveBoardId';
@@ -214,13 +215,6 @@ function defaultSettings() {
     countdownUrgentThreshold: 3,   // Red: tasks due within this many days
     countdownWarningThreshold: 10  // Amber: tasks due within this many days (must be >= urgent threshold)
   };
-}
-
-const ALLOWED_PRIORITIES = new Set(['urgent', 'high', 'medium', 'low', 'none']);
-
-function normalizePriority(value) {
-  const v = (value || '').toString().trim().toLowerCase();
-  return ALLOWED_PRIORITIES.has(v) ? v : 'none';
 }
 
 function migrateLegacySingleBoardIntoDefault() {

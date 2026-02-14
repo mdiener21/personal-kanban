@@ -1,12 +1,6 @@
 import { generateUUID } from './utils.js';
 import { loadTasks, saveTasks } from './storage.js';
-
-const ALLOWED_PRIORITIES = new Set(['urgent', 'high', 'medium', 'low', 'none']);
-
-function normalizePriority(priority) {
-  const value = (priority || '').toString().trim().toLowerCase();
-  return ALLOWED_PRIORITIES.has(value) ? value : 'none';
-}
+import { normalizePriority } from './priorities.js';
 
 function normalizeDueDate(value) {
   const date = (value || '').toString().trim();
@@ -145,8 +139,6 @@ export function updateTaskPositionsFromDrop(evt) {
   const movedTaskIndex = tasks.findIndex(t => t.id === movedTaskId);
   if (movedTaskIndex === -1) return null;
 
-  const movedTask = tasks[movedTaskIndex];
-
   // Build order maps for affected columns from DOM
   const affectedColumns = new Set([fromColumn, toColumn]);
   const orderByColumn = new Map();
@@ -156,11 +148,11 @@ export function updateTaskPositionsFromDrop(evt) {
     if (!columnEl) return;
     
     const taskEls = columnEl.querySelectorAll('.task');
-    const order = [];
+    const order = new Map();
     taskEls.forEach((el, idx) => {
       const taskId = el.dataset.taskId;
       if (taskId) {
-        order.push({ id: taskId, order: idx + 1 });
+        order.set(taskId, idx + 1);
       }
     });
     orderByColumn.set(columnId, order);
@@ -177,9 +169,9 @@ export function updateTaskPositionsFromDrop(evt) {
 
       // Update order
       const toOrder = orderByColumn.get(toColumn);
-      const orderEntry = toOrder?.find(o => o.id === movedTaskId);
-      if (orderEntry) {
-        nextTask.order = orderEntry.order;
+      const nextOrder = toOrder?.get(movedTaskId);
+      if (typeof nextOrder === 'number') {
+        nextTask.order = nextOrder;
       }
 
       // Only update history/dates if column changed
@@ -205,9 +197,9 @@ export function updateTaskPositionsFromDrop(evt) {
     // Update order for other tasks in affected columns
     if (affectedColumns.has(task.column)) {
       const columnOrder = orderByColumn.get(task.column);
-      const orderEntry = columnOrder?.find(o => o.id === task.id);
-      if (orderEntry && orderEntry.order !== task.order) {
-        return { ...task, order: orderEntry.order };
+      const nextOrder = columnOrder?.get(task.id);
+      if (typeof nextOrder === 'number' && nextOrder !== task.order) {
+        return { ...task, order: nextOrder };
       }
     }
 

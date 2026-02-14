@@ -13,6 +13,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed (unreleased)
 
 - Column color picker now displays hex color code alongside the color selector, matching the label editor UX
+- Notifications due-task derivation now uses a single-pass calculation path to avoid duplicate due-date computations
+- `renderBoard()` now pre-groups visible tasks by column before rendering, reducing repeated per-column filtering work
+- Task counters and collapsed column titles now use precomputed column counts instead of repeated task scans
+- Import and board rename flows now use the app's modal alert dialog (non-blocking) instead of browser `alert()`
+- Drag/drop order updates now use per-column taskId→order maps during drop handling to avoid repeated linear lookups
+- Priority normalization is now centralized in a shared helper used by task editing, storage migration, and import/export normalization
 
 ### Removed (unreleased)
 

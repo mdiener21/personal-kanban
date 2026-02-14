@@ -311,6 +311,7 @@ The notification system alerts users to tasks with approaching or past due dates
 - **Order Tracking**: Both tasks and columns have order property (1-based), updated on drop
 - **Performance Optimization**: Task drops use incremental updates instead of full board re-render:
   - `updateTaskPositionsFromDrop()` updates only the moved task and recomputes order for affected columns
+  - Drag/drop ordering uses per-column `taskId -> order` maps during drop processing to avoid repeated linear `find()` lookups
   - Only updates `columnHistory` and timestamps when task changes columns (not for reorders within same column)
   - Syncs task counters and collapsed column titles without rebuilding the entire DOM
   - Notifications refresh only when tasks move between columns
@@ -324,6 +325,8 @@ The notification system alerts users to tasks with approaching or past due dates
   - Virtualization applies only to Done column when task count exceeds initial batch size
   - Newly dropped tasks into Done remain visible in the rendered slice
 - **Label Loading Optimization**: Pre-loads labels into a Map once per render, passed to all `createTaskElement()` calls to avoid repeated `loadLabels()` calls
+- **Column Task Grouping Optimization**: `renderBoard()` pre-groups visible tasks by `column` and reuses grouped arrays while rendering, avoiding repeated per-column filtering
+- **Counter/Collapsed Title Optimization**: task counters and collapsed column title counts are derived from precomputed per-column counts instead of repeated full task scans
 - `renderBoard()` clears container, recreates all columns/tasks from localStorage
 - Sorts columns by order property
 - Sorts tasks within each column by order property
@@ -344,6 +347,7 @@ The notification system alerts users to tasks with approaching or past due dates
 - Settings modal
 - Help modal
 - Confirm/Alert dialog modal
+- Runtime user messages (e.g., import format/data errors, import success, board rename validation errors) use the modal alert dialog instead of browser-blocking `alert()`
 - Close on Escape key or backdrop click
 
 ### Boards
@@ -416,6 +420,7 @@ The notification system alerts users to tasks with approaching or past due dates
 - SortableJS: npm package (`sortablejs`) for drag-and-drop
 - localStorage only (no server, no database)
 - Two HTML entry points (`index.html`, `reports.html`) + modular CSS (`styles/index.css`) + JS modules
+- Shared priority normalization helper (`src/modules/priorities.js`) is used across task CRUD, storage normalization, and import/export normalization to keep accepted values consistent (`urgent|high|medium|low|none`)
 
 ## Export/Import Logic
 
