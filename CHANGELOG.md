@@ -11,6 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed (unreleased)
 
+- Task edit modal redesigned with 2-column layout on desktop
+  - Left column: title, description, priority, due date, column selector
+  - Right column: labels section
+  - Modal width increased to 850px on desktop for better space utilization
+  - Remains single-column on mobile devices for optimal touch interaction
+- Active labels in task modal now wrap to multiple lines instead of horizontal scrolling when many labels are selected
+
 ### Removed (unreleased)
 
 ## [1.1.0] - 2026-02-14

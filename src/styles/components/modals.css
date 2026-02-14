@@ -107,6 +107,38 @@
   max-width: 600px;
 }
 
+/* Task modal: wider for 2-column layout on desktop */
+@media (min-width: 768px) {
+  #task-modal .modal-content {
+    max-width: 850px;
+  }
+}
+
+/* Task form: 2-column layout on desktop */
+.task-form-columns {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+@media (min-width: 768px) {
+  .task-form-columns {
+    flex-direction: row;
+    gap: 24px;
+    align-items: flex-start;
+  }
+
+  .task-form-column-left {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .task-form-column-right {
+    flex: 0 0 320px;
+    min-width: 320px;
+  }
+}
+
 /* Help content */
 .help-content {
   font-size: 14px;
