@@ -9,6 +9,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added (unreleased)
 
+- Due date countdown timer showing time remaining in task footer
+  - Countdown displays beside due date in format "Due MM/DD/YYYY (countdown)"
+  - Shows months and days for periods ≥ 30 days (e.g., "2 months 5 days", "1 month")
+  - Shows only days for periods < 30 days (e.g., "5 days", "tomorrow", "today")
+  - Three-tier color coding for quick visual prioritization (configurable in Settings):
+    - Red: within urgent threshold (default: < 3 days to due)
+    - Amber: within warning threshold (default: 3-10 days to due)
+    - Default: beyond warning threshold (default: > 10 days to due)
+  - Overdue tasks show "overdue by X days" or "overdue by X months Y days"
+- Countdown color threshold settings in Settings modal
+  - Urgent threshold: customize when countdown shows red (default: 3 days)
+  - Warning threshold: customize when countdown shows amber (default: 10 days)
+  - Per-board configuration allows different workflows for different boards
+- Shared date utility module (`dateutils.js`) for consistent countdown calculations across features
+
 ### Changed (unreleased)
 
 - Dragging tasks onto collapsed columns now highlights the column with a dashed outline and drops the task at the top of that column

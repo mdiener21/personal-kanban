@@ -6,7 +6,7 @@
 - Minimal dependencies:
   - **Lucide icons**: Tree-shaken ES module import (not CDN) via `src/modules/icons.js`
   - **SortableJS**: Drag-and-drop library for tasks and columns
-  - **Apache ECharts (Reports only)**: Modular import via `echarts/core` + explicit `echarts.use()` registration in `src/modules/reports.js`
+  - **Apache ECharts (Reports and Calendar only)**: Modular import via `echarts/core` + explicit `echarts.use()` registration in `src/modules/reports.js` and in `src/modules/calendar.js`
 - Storage: browser localStorage only
 - Data persistence: JSON import/export to local disk
 - No server, no frameworks
@@ -15,7 +15,7 @@
 
 ## AI LLM Rules
 
-- Always update the specification upon completing new tasks to keep the specification up to date.
+- Always update the specification in `docs/specification-kanban.md` upon completing new tasks to keep the specification up to date technology agnostic.
 - Always follow the Technology Rules and Principles section in the document
 
 ## Core Data Structures
@@ -141,8 +141,19 @@
   - Optional description (clamped to ~2 lines)
   - Labels (colored badges)
   - Footer: optional updated timestamp; bottom row shows due date + age in the same row (depending on Settings)
-- **Footer**: Can show `changeDate` ("Updated …") and task age ("Age …") depending on Settings toggles.
+- **Footer**: Can show `changeDate` ("Updated …"), due date with countdown, and task age ("Age …") depending on Settings toggles.
   - `changeDate` is displayed using the user-selected locale (via `toLocaleString(locale)`)
+  - Due date shows formatted date with countdown timer in parentheses:
+    - Format: "Due MM/DD/YYYY (countdown)"
+    - Countdown shows time remaining:
+      - Less than 30 days: "3 days", "tomorrow", "today"
+      - 30 days or more: "2 months 5 days", "1 month"
+    - Overdue tasks show: "overdue by 2 days" or "overdue by 1 month 5 days"
+    - Color coding (thresholds configurable in **Settings**):
+      - Red/danger: when within urgent threshold (default: < 3 days to due)
+      - Amber/warning: when within warning threshold (default: 3-10 days to due)
+      - Default/muted: when beyond warning threshold (default: > 10 days to due)
+    - Countdown respects the `showDueDate` setting
   - Age is based on `creationDate` and displayed as `1y 6M 40d` for larger than 1 year,  `0d` for < 1 day, `Nd` for days, and `NM` for months (30 days per month, floor)
     - Years shown only if age ≥ 1 year
     - Months shown only if age ≥ 1 month
@@ -199,6 +210,8 @@
   - Toggle to show/hide task priority
   - Toggle to show/hide task due date
   - Number input to set the notifications upcoming window (days)
+  - Number input to set the countdown urgent threshold (days) - tasks due within this threshold show in red
+  - Number input to set the countdown warning threshold (days) - tasks due within this threshold show in amber
   - Toggle to show/hide task age
   - Toggle to show/hide task updated date/time (`changeDate`)
   - Locale dropdown for formatting the updated timestamp
