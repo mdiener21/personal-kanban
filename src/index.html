@@ -241,7 +241,7 @@
       <div class="form-actions">
         <button id="add-board-btn" type="button" class="btn btn-primary">
           <span data-lucide="kanban" aria-hidden="true"></span>
-          <span> Add Board</span>
+          <span> Create Board</span>
         </button>
         <button id="boards-import-btn" type="button" class="btn btn-secondary">
           <span data-lucide="upload" aria-hidden="true"></span>
@@ -286,6 +286,34 @@
             inputmode="numeric"
             aria-label="Number of days ahead to include for notifications"
           >
+        </div>
+        <div class="form-group">
+          <label for="settings-countdown-urgent-threshold">Countdown: urgent threshold (days)</label>
+          <input
+            id="settings-countdown-urgent-threshold"
+            type="number"
+            min="1"
+            max="365"
+            step="1"
+            inputmode="numeric"
+            aria-label="Days until due date to show countdown in red (urgent)"
+            title="Tasks due within this many days show in red"
+          >
+          <small class="form-help">Tasks due within this many days show in <span style="font-weight:800; color:red">red</span></small>
+        </div>
+        <div class="form-group">
+          <label for="settings-countdown-warning-threshold">Countdown: warning threshold (days)</label>
+          <input
+            id="settings-countdown-warning-threshold"
+            type="number"
+            min="1"
+            max="365"
+            step="1"
+            inputmode="numeric"
+            aria-label="Days until due date to show countdown in amber (warning)"
+            title="Tasks due within this many days show in amber (must be > urgent threshold)"
+          >
+          <small class="form-help">Tasks due within this many days show in <span style="font-weight:800; color:#ffd000">amber</span> (must be ≥ urgent threshold)</small>
         </div>
         <div class="form-group checkbox-group">
           <label>

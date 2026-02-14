@@ -22,6 +22,22 @@ This is a fully local personal Kanban board.
 - **Local-first storage**: data is stored in this browser’s `localStorage`.
 - **Backups are your responsibility**: export regularly if you care about the data.
 
+### Notifications
+
+#### Benefits:
+
+- Per-board customization: Different boards can have different thresholds
+- Flexible workflows: Adjust to your team's or personal preferences
+- Better prioritization: Set thresholds that match your actual deadlines
+- Real-time updates: Changes apply immediately to all tasks
+
+For example, you could set:
+
+- Sprint planning board: urgent=2 days, warning=5 days (shorter cycles)
+- Long-term projects: urgent=7 days, warning=30 days (longer horizons)
+- Personal tasks: urgent=3 days, warning=10 days (default)
+
+
 ### Controls Menu
 
 All controls are in the header menu.

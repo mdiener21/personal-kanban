@@ -54,12 +54,14 @@ export function initializeSettingsUI() {
   const showPriorityEl = document.getElementById('settings-show-priority');
   const showDueDateEl = document.getElementById('settings-show-due-date');
   const notificationDaysEl = document.getElementById('settings-notification-days');
+  const countdownUrgentEl = document.getElementById('settings-countdown-urgent-threshold');
+  const countdownWarningEl = document.getElementById('settings-countdown-warning-threshold');
   const showAgeEl = document.getElementById('settings-show-age');
   const showChangeDateEl = document.getElementById('settings-show-change-date');
   const localeEl = document.getElementById('settings-locale');
   const defaultPriorityEl = document.getElementById('settings-default-priority');
 
-  if (!openBtn || !closeBtn || !showPriorityEl || !showDueDateEl || !notificationDaysEl || !showAgeEl || !showChangeDateEl || !localeEl || !defaultPriorityEl) return;
+  if (!openBtn || !closeBtn || !showPriorityEl || !showDueDateEl || !notificationDaysEl || !countdownUrgentEl || !countdownWarningEl || !showAgeEl || !showChangeDateEl || !localeEl || !defaultPriorityEl) return;
 
   function syncFormFromSettings() {
     const settings = loadSettings();
@@ -69,6 +71,8 @@ export function initializeSettingsUI() {
     showChangeDateEl.checked = settings.showChangeDate !== false;
 
     notificationDaysEl.value = String(Number.isFinite(settings.notificationDays) ? settings.notificationDays : 3);
+    countdownUrgentEl.value = String(Number.isFinite(settings.countdownUrgentThreshold) ? settings.countdownUrgentThreshold : 3);
+    countdownWarningEl.value = String(Number.isFinite(settings.countdownWarningThreshold) ? settings.countdownWarningThreshold : 10);
 
     const options = buildLocaleOptions(settings.locale);
     localeEl.innerHTML = '';
@@ -124,6 +128,22 @@ export function initializeSettingsUI() {
     const raw = Number.parseInt(notificationDaysEl.value, 10);
     const notificationDays = Number.isFinite(raw) ? raw : 3;
     await applyAndRerender({ ...current, notificationDays });
+  });
+
+  countdownUrgentEl.addEventListener('change', async () => {
+    const current = loadSettings();
+    const raw = Number.parseInt(countdownUrgentEl.value, 10);
+    const countdownUrgentThreshold = Number.isFinite(raw) && raw >= 1 ? raw : 3;
+    await applyAndRerender({ ...current, countdownUrgentThreshold });
+  });
+
+  countdownWarningEl.addEventListener('change', async () => {
+    const current = loadSettings();
+    const raw = Number.parseInt(countdownWarningEl.value, 10);
+    const urgentThreshold = current.countdownUrgentThreshold || 3;
+    // Warning threshold must be >= urgent threshold
+    const countdownWarningThreshold = Number.isFinite(raw) && raw >= urgentThreshold ? raw : 10;
+    await applyAndRerender({ ...current, countdownWarningThreshold });
   });
 
   localeEl.addEventListener('change', async () => {

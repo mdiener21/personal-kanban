@@ -1,6 +1,7 @@
 import { loadTasks, loadSettings } from './storage.js';
 import { showEditModal, setupModalCloseHandlers } from './modals.js';
 import { renderIcons } from './icons.js';
+import { calculateDaysUntilDue } from './dateutils.js';
 
 const NOTIFICATION_BANNER_HIDDEN_KEY = 'kanbanNotificationBannerHidden';
 let bannerResizeTimeout;
@@ -40,21 +41,15 @@ export function getNotificationTasks() {
       const dueDate = (task.dueDate || '').toString().trim();
       if (!dueDate) return false;
 
-      // Parse the due date
-      const dueDateParsed = new Date(dueDate + 'T00:00:00');
-      if (Number.isNaN(dueDateParsed.getTime())) return false;
-
-      // Calculate days until due
-      const diffMs = dueDateParsed.getTime() - today.getTime();
-      const daysUntilDue = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+      // Calculate days until due using shared utility
+      const daysUntilDue = calculateDaysUntilDue(dueDate, today);
+      if (daysUntilDue === null) return false;
 
       // Include if overdue or within threshold
       return daysUntilDue <= thresholdDays;
     })
     .map((task) => {
-      const dueDateParsed = new Date(task.dueDate + 'T00:00:00');
-      const diffMs = dueDateParsed.getTime() - today.getTime();
-      const daysUntilDue = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+      const daysUntilDue = calculateDaysUntilDue(task.dueDate, today);
 
       return {
         ...task,

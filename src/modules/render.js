@@ -6,6 +6,7 @@ import { initDragDrop } from './dragdrop.js';
 import { confirmDialog, alertDialog } from './dialog.js';
 import { renderIcons } from './icons.js';
 import { refreshNotifications } from './notifications.js';
+import { calculateDaysUntilDue, formatCountdown, getCountdownClassName } from './dateutils.js';
 
 let columnMenuCloseHandlerAttached = false;
 
@@ -178,7 +179,7 @@ function formatTaskAge(task) {
 
 
 // Create a task element
-function createTaskElement(task, settings, labelsMap = null) {
+function createTaskElement(task, settings, labelsMap = null, today = null) {
   const li = document.createElement('li');
   li.classList.add('task');
   li.draggable = true;
@@ -313,11 +314,28 @@ function createTaskElement(task, settings, labelsMap = null) {
     const dueDateRaw = typeof task.dueDate === 'string' ? task.dueDate.trim() : '';
     const dueDateEl = document.createElement('span');
     dueDateEl.classList.add('task-date');
+
     if (!dueDateRaw) {
       dueDateEl.textContent = 'No due date';
+      dueDateEl.classList.add('countdown-none');
     } else {
-      dueDateEl.textContent = 'Due ' + formatDisplayDate(dueDateRaw, settings?.locale);
+      const formattedDate = formatDisplayDate(dueDateRaw, settings?.locale);
+      const daysUntilDue = calculateDaysUntilDue(dueDateRaw, today);
+
+      if (daysUntilDue !== null) {
+        const countdown = formatCountdown(daysUntilDue);
+        const urgentThreshold = settings?.countdownUrgentThreshold ?? 3;
+        const warningThreshold = settings?.countdownWarningThreshold ?? 10;
+        const countdownClass = getCountdownClassName(daysUntilDue, urgentThreshold, warningThreshold);
+        dueDateEl.textContent = `Due ${formattedDate} (${countdown})`;
+        dueDateEl.classList.add(countdownClass);
+      } else {
+        // Invalid date, show as-is
+        dueDateEl.textContent = 'Due ' + formattedDate;
+        dueDateEl.classList.add('countdown-none');
+      }
     }
+
     footerRow.appendChild(dueDateEl);
   }
 
@@ -666,7 +684,11 @@ export function renderBoard() {
   const tasks = loadTasks();
   const labels = loadLabels();
   const settings = loadSettings();
-  
+
+  // Memoize today's date for performance (avoid creating new Date for every task)
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
   // Pre-build labels map for performance (avoid repeated loadLabels calls in createTaskElement)
   const labelsMap = new Map(labels.map(l => [l.id, l]));
   const labelsById = new Map(labels.map((l) => [l.id, { name: (l.name || '').toString().trim().toLowerCase(), group: (l.group || '').toString().trim().toLowerCase() }]));
@@ -698,7 +720,7 @@ export function renderBoard() {
     const tasksToRender = shouldVirtualize ? columnTasks.slice(0, doneVisibleCount) : columnTasks;
     
     tasksToRender.forEach(task => {
-      tasksList.appendChild(createTaskElement(task, settings, labelsMap));
+      tasksList.appendChild(createTaskElement(task, settings, labelsMap, today));
     });
     
     // Add "Show more" button for virtualized Done column

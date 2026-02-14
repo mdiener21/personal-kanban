@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Local-first personal kanban board with no backend. All state lives in browser localStorage. Built with vanilla JavaScript, HTML, and CSS using Vite for bundling.
+Local-first personal kanban board with no backend. `docs/specification-kanban.md` outlines structure and features, all state lives in browser localStorage. Built with vanilla JavaScript, HTML, and CSS using Vite for bundling.
 
 ## Commands
 

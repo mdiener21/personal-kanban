@@ -10,7 +10,7 @@
     {
       "id": "done",
       "name": "Done",
-      "color": "#16a34a",
+      "color": "#505050",
       "order": 4
     },
     {
@@ -22,7 +22,7 @@
     {
       "id": "waiting-for-3bca5c87",
       "name": "Waiting-For On/Hold Blocked",
-      "color": "#9c9c9c",
+      "color": "#f59e0b",
       "order": 1
     }
   ],
