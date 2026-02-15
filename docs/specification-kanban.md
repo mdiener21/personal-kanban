@@ -13,7 +13,9 @@
 - Build tooling: Vite (ES modules)
   - Reports bundling: Rollup chunk splitting keeps ECharts and ZRender in dedicated vendor chunks (`vendor-echarts`, `vendor-zrender`) to avoid oversized entry chunks.
 - Backend: Golang API with PostgreSQL
-- Authentication: Social Auth (Google, Apple, Microsoft) via OAuth2/OIDC
+- Authentication:
+  - Social Auth (Google, Apple, Microsoft) via OAuth2/OIDC
+  - Email/Password Auth with email verification
 
 ## AI LLM Rules
 
@@ -94,7 +96,8 @@
 ### Online Sync
 
 - Users can opt-in to cloud storage by clicking **Go Online**.
-- Authentication is handled via Social Auth (Google, Apple, and Microsoft options are provided).
+- Authentication is handled via Social Auth (Google, Apple, and Microsoft options) or Email/Password.
+- Email/Password registration requires clicking a verification link sent to the user's email.
 - Once logged in, a **Sync** button allows pushing local data to the cloud or pulling remote data to the local machine.
 - Cloud data is stored in a PostgreSQL database managed by a Golang API.
 - Sync is currently a bulk operation (Push all or Pull all).

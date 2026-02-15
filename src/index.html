@@ -393,19 +393,50 @@
         </button>
       </header>
       <div class="login-options">
-        <p>Choose a provider to sync your data across devices:</p>
-        <button type="button" class="btn btn-secondary login-provider-btn" data-provider="google">
-          <span data-lucide="user" aria-hidden="true"></span>
-          Continue with Google
-        </button>
-        <button type="button" class="btn btn-secondary login-provider-btn" data-provider="apple">
-          <span data-lucide="user" aria-hidden="true"></span>
-          Continue with Apple
-        </button>
-        <button type="button" class="btn btn-secondary login-provider-btn" data-provider="microsoftonline">
-          <span data-lucide="user" aria-hidden="true"></span>
-          Continue with Microsoft
-        </button>
+        <div class="login-tabs">
+          <button type="button" class="login-tab active" data-tab="social">Social Login</button>
+          <button type="button" class="login-tab" data-tab="email">Email Login</button>
+        </div>
+
+        <div id="social-login-pane" class="login-pane">
+          <p>Choose a provider to sync your data across devices:</p>
+          <button type="button" class="btn btn-secondary login-provider-btn" data-provider="google">
+            <span data-lucide="user" aria-hidden="true"></span>
+            Continue with Google
+          </button>
+          <button type="button" class="btn btn-secondary login-provider-btn" data-provider="apple">
+            <span data-lucide="user" aria-hidden="true"></span>
+            Continue with Apple
+          </button>
+          <button type="button" class="btn btn-secondary login-provider-btn" data-provider="microsoftonline">
+            <span data-lucide="user" aria-hidden="true"></span>
+            Continue with Microsoft
+          </button>
+        </div>
+
+        <div id="email-login-pane" class="login-pane hidden">
+          <form id="email-login-form">
+            <div id="email-login-fields">
+              <div class="form-group">
+                <label for="login-email">Email</label>
+                <input type="email" id="login-email" required placeholder="your@email.com">
+              </div>
+              <div class="form-group">
+                <label for="login-password">Password</label>
+                <input type="password" id="login-password" required placeholder="••••••••">
+              </div>
+              <div id="signup-name-field" class="form-group hidden">
+                <label for="signup-name">Name</label>
+                <input type="text" id="signup-name" placeholder="Your Name">
+              </div>
+            </div>
+            <p id="auth-message" class="auth-message hidden"></p>
+            <div class="form-actions-column">
+              <button type="submit" id="email-auth-submit" class="btn btn-primary">Log In</button>
+              <button type="button" id="toggle-auth-mode" class="btn-link">Don't have an account? Sign Up</button>
+            </div>
+          </form>
+        </div>
       </div>
       <div class="form-actions">
         <button type="button" id="login-modal-cancel-btn" class="btn btn-secondary">Cancel</button>

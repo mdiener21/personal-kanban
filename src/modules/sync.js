@@ -70,3 +70,17 @@ export async function fetchBoards() {
 export async function fetchFullBoard(boardId) {
   return await apiFetch(`/api/boards/${boardId}`);
 }
+
+export async function registerUser(email, password, name) {
+  return await apiFetch('/auth/register', {
+    method: 'POST',
+    body: JSON.stringify({ email, password, name })
+  });
+}
+
+export async function loginUser(email, password) {
+  return await apiFetch('/auth/login', {
+    method: 'POST',
+    body: JSON.stringify({ email, password })
+  });
+}

@@ -7,12 +7,16 @@ import (
 )
 
 type User struct {
-	ID         uuid.UUID `json:"id"`
-	Email      string    `json:"email"`
-	Name       string    `json:"name"`
-	Provider   string    `json:"provider"`
-	ProviderID string    `json:"provider_id"`
-	CreatedAt  time.Time `json:"created_at"`
+	ID                       uuid.UUID  `json:"id"`
+	Email                    string     `json:"email"`
+	Name                     string     `json:"name"`
+	Provider                 *string    `json:"provider"`
+	ProviderID               *string    `json:"provider_id"`
+	PasswordHash             *string    `json:"-"`
+	IsVerified               bool       `json:"is_verified"`
+	VerificationToken        *string    `json:"-"`
+	VerificationTokenExpires *time.Time `json:"-"`
+	CreatedAt                time.Time  `json:"created_at"`
 }
 
 type Board struct {

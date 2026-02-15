@@ -54,6 +54,9 @@ func main() {
 			r.Get("/{provider}/login", handlers.AuthLogin)
 			r.Get("/{provider}/callback", handlers.AuthCallback)
 		})
+		r.Post("/register", handlers.Register)
+		r.Post("/login", handlers.Login)
+		r.Get("/verify", handlers.VerifyEmail)
 		r.Get("/me", handlers.GetMe)
 	})
 

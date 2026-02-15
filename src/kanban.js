@@ -11,7 +11,7 @@ import { confirmDialog } from './modules/dialog.js';
 import { initializeSettingsUI } from './modules/settings.js';
 import { initializeNotifications } from './modules/notifications.js';
 import { ensureBoardsInitialized, setActiveBoardId, listBoards, getBoardById, loadColumns, loadTasks, loadLabels, loadSettings, saveColumns, saveTasks, saveLabels, saveSettings, createBoard } from './modules/storage.js';
-import { setToken, getToken, getUserInfo, loginWithProvider, syncData, fetchBoards, fetchFullBoard } from './modules/sync.js';
+import { setToken, getToken, getUserInfo, loginWithProvider, syncData, fetchBoards, fetchFullBoard, loginUser, registerUser } from './modules/sync.js';
 import { setupModalCloseHandlers, hideLoginModal } from './modules/modals.js';
 
 // Add task button listeners
@@ -97,6 +97,69 @@ document.addEventListener('DOMContentLoaded', async () => {
       const provider = btn.dataset.provider;
       loginWithProvider(provider);
     });
+  });
+
+  // Tab switching
+  const tabs = document.querySelectorAll('.login-tab');
+  const panes = document.querySelectorAll('.login-pane');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      panes.forEach(p => p.classList.add('hidden'));
+      tab.classList.add('active');
+      document.getElementById(`${tab.dataset.tab}-login-pane`).classList.remove('hidden');
+    });
+  });
+
+  // Email Auth logic
+  const emailLoginForm = document.getElementById('email-login-form');
+  const toggleAuthModeBtn = document.getElementById('toggle-auth-mode');
+  const signupNameField = document.getElementById('signup-name-field');
+  const emailAuthSubmit = document.getElementById('email-auth-submit');
+  const authMessage = document.getElementById('auth-message');
+  let isSignupMode = false;
+
+  toggleAuthModeBtn.addEventListener('click', () => {
+    isSignupMode = !isSignupMode;
+    if (isSignupMode) {
+      signupNameField.classList.remove('hidden');
+      emailAuthSubmit.textContent = 'Sign Up';
+      toggleAuthModeBtn.textContent = 'Already have an account? Log In';
+    } else {
+      signupNameField.classList.add('hidden');
+      emailAuthSubmit.textContent = 'Log In';
+      toggleAuthModeBtn.textContent = "Don't have an account? Sign Up";
+    }
+    authMessage.classList.add('hidden');
+  });
+
+  emailLoginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+    const name = document.getElementById('signup-name').value;
+
+    authMessage.classList.remove('hidden');
+    authMessage.textContent = isSignupMode ? 'Registering...' : 'Logging in...';
+    authMessage.style.color = 'var(--text)';
+
+    try {
+      if (isSignupMode) {
+        await registerUser(email, password, name);
+        authMessage.textContent = 'Registration successful! Please check your email to verify your account.';
+        authMessage.style.color = 'green';
+      } else {
+        const { token } = await loginUser(email, password);
+        setToken(token);
+        hideLoginModal();
+        updateAuthUI();
+        alert('Logged in successfully!');
+      }
+    } catch (err) {
+      console.error('Auth error', err);
+      authMessage.textContent = err.message || 'An error occurred during authentication.';
+      authMessage.style.color = 'red';
+    }
   });
 
   logoutBtn.addEventListener('click', () => {
