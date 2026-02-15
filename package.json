@@ -12,7 +12,15 @@
     "test:task-card": "playwright test tests/e2e/task-card-interactions.spec.js --project=firefox",
     "test:dragdrop": "playwright test tests/e2e/dragdrop.spec.js --project=firefox",
     "test:ui": "playwright test --ui",
-    "test:debug": "playwright test --debug"
+    "test:debug": "playwright test --debug",
+    "test:column-management": "playwright test tests/e2e/column-management.spec.js --project=firefox",
+    "test:board-management": "playwright test tests/e2e/board-management.spec.js --project=firefox", 
+    "test:label-management": "playwright test tests/e2e/label-management.spec.js --project=firefox",
+    "test:phase1": "playwright test tests/e2e/column-management.spec.js tests/e2e/board-management.spec.js tests/e2e/label-management.spec.js --project=firefox",
+    "test:settings": "playwright test tests/e2e/settings.spec.js --project=firefox",
+    "test:import-export": "playwright test tests/e2e/import-export.spec.js --project=firefox",
+    "test:search-filter": "playwright test tests/e2e/search-filter.spec.js --project=firefox",
+    "test:phase2": "playwright test tests/e2e/settings.spec.js tests/e2e/import-export.spec.js tests/e2e/search-filter.spec.js --project=firefox"
   },
   "devDependencies": {
     "@playwright/test": "^1.58.2",
