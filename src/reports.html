@@ -80,6 +80,31 @@
       <div id="reports-cfd-chart" class="rpt-chart"></div>
     </section>
 
+    <section class="reports-kpis" aria-label="Label usage report">
+      <div class="rpt-card-header">
+        <h2 class="rpt-card-title">Label usage on done tasks (monthly treemap)</h2>
+        <div class="rpt-controls" role="group" aria-label="Label usage controls">
+          <label class="rpt-control">
+            <span class="rpt-control-label">Month</span>
+            <select id="reports-label-month" class="rpt-select" aria-label="Label usage month"></select>
+          </label>
+        </div>
+      </div>
+      <div class="rpt-label-usage-wrap">
+        <div class="rpt-label-usage-meta" id="reports-label-usage-meta">
+          Tap a label tile to view tasks.
+        </div>
+        <div id="reports-label-usage-chart" class="rpt-chart"></div>
+      </div>
+      <div class="rpt-label-tasks" aria-live="polite">
+        <h3 class="rpt-label-tasks-title" id="reports-label-tasks-title">Tasks</h3>
+        <ul class="rpt-label-tasks-list" id="reports-label-tasks-list"></ul>
+        <div class="rpt-label-tasks-empty" id="reports-label-tasks-empty">No tasks to show.</div>
+      </div>
+    </section>
+
+
+
     <section class="reports-kpis" aria-label="Daily updates report">
       <div class="rpt-card-header">
         <h2 class="rpt-card-title">Daily updates (365d)</h2>

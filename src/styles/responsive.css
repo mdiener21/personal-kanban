@@ -141,26 +141,91 @@
    Mobile Landscape – vertical space is very limited when phone is rotated
    ========================================================================== */
 @media (max-width: 920px) and (orientation: landscape) and (max-height: 500px) {
-  /* Compact header: single row, minimal padding */
-  .controls {
-    padding: 4px 8px;
-    gap: 6px;
+  body {
+    height: 100dvh;
+    min-height: 100dvh;
+    overflow: hidden;
   }
 
-  /* Hide the search row in landscape to save vertical space */
-  .board-search {
-    grid-row: 1;
-    grid-column: 1;
-    max-width: 220px;
+  /* Compact header: single row, minimal padding */
+  .controls {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto;
+    padding: 4px 8px;
+    gap: 6px;
+    flex-wrap: nowrap;
   }
 
   .brand {
+    grid-column: 1;
+    grid-row: 1;
+    margin-right: 0;
     font-size: 14px;
+    overflow: hidden;
+  }
+
+  .brand-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 180px;
+  }
+
+  #desktop-menu-btn {
+    grid-column: 2;
+    grid-row: 1;
+    margin-left: auto;
+  }
+
+  /* Keep search compact in same row for landscape */
+  .board-search {
+    display: flex;
+    grid-row: 1;
+    grid-column: 1;
+    max-width: 210px;
+    min-height: 34px;
+    padding: 6px 10px;
+  }
+
+  .container,
+  .board-container {
+    flex: 1 1 auto;
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 8px;
+    min-height: 0;
+  }
+
+  body.dragging .board-container,
+  body.dragging .container {
+    scroll-snap-type: none;
+  }
+
+  body.dragging .task-column {
+    scroll-snap-align: unset;
   }
 
   /* Columns fill the reduced viewport height */
   .task-column {
-    height: calc(100dvh - 100px);
+    min-width: 72vw;
+    max-width: 72vw;
+    margin: 0 6px;
+    scroll-snap-align: center;
+    height: calc(100dvh - 92px);
+    display: flex;
+    flex-direction: column;
+    flex: 0 0 auto;
+    min-height: 0;
+  }
+
+  .tasks {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    max-height: none !important;
+    min-height: 0;
   }
 
   /* Compact footer */

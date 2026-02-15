@@ -10,9 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added (unreleased)
 
+- Reports dashboard now includes an interactive "Label usage on done tasks" monthly treemap (one month at a time) with a month selector and click-to-drill-down task list for the selected label
+
 ### Changed (unreleased)
 
 - Column color picker now displays hex color code alongside the color selector, matching the label editor UX
+- Reports page now uses viewport-fitting card heights in mobile landscape, improving rotated-phone usability and preventing clipped report sections
+- Task board now fully adapts when a mobile phone is rotated to landscape, keeping horizontal column paging and viewport-fitting column/task-list scrolling
 
 ### Removed (unreleased)
 

@@ -8,12 +8,12 @@ import {
   TooltipComponent,
   VisualMapComponent
 } from 'echarts/components';
-import { BarChart, HeatmapChart, LineChart } from 'echarts/charts';
+import { BarChart, HeatmapChart, LineChart, TreemapChart } from 'echarts/charts';
 import { CanvasRenderer } from 'echarts/renderers';
 import { renderIcons } from './icons.js';
 import { initializeThemeToggle } from './theme.js';
 import { ensureBoardsInitialized, getActiveBoardId, getActiveBoardName } from './storage.js';
-import { loadColumns, loadTasks } from './storage.js';
+import { loadColumns, loadLabels, loadTasks } from './storage.js';
 
 echarts.use([
   CalendarComponent,
@@ -26,6 +26,7 @@ echarts.use([
   BarChart,
   HeatmapChart,
   LineChart,
+  TreemapChart,
   CanvasRenderer
 ]);
 
@@ -595,6 +596,321 @@ function buildCfdOption({ labels, seriesDefs, boardName }) {
   };
 }
 
+function taskTitle(task) {
+  const title = typeof task?.title === 'string' && task.title.trim()
+    ? task.title.trim()
+    : (typeof task?.text === 'string' ? task.text.trim() : '');
+  return title || '(Untitled task)';
+}
+
+function normalizeTaskLabelIds(task) {
+  if (!Array.isArray(task?.labels)) return [];
+  const unique = new Set();
+  for (const raw of task.labels) {
+    if (typeof raw !== 'string') continue;
+    const id = raw.trim();
+    if (id) unique.add(id);
+  }
+  return Array.from(unique);
+}
+
+function toMonthKey(date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+}
+
+function monthKeyToDate(monthKey) {
+  const m = /^(\d{4})-(\d{2})$/.exec(monthKey || '');
+  if (!m) return null;
+  const year = Number.parseInt(m[1], 10);
+  const month = Number.parseInt(m[2], 10);
+  if (!Number.isFinite(year) || !Number.isFinite(month) || month < 1 || month > 12) return null;
+  return new Date(year, month - 1, 1);
+}
+
+function formatMonthLabel(monthKey) {
+  const d = monthKeyToDate(monthKey);
+  if (!d) return monthKey;
+  return new Intl.DateTimeFormat(undefined, { month: 'long', year: 'numeric' }).format(d);
+}
+
+function buildRecentMonthOptions(count, endDate = new Date()) {
+  const options = [];
+  const total = Math.max(1, Number(count) || 1);
+  const cursor = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
+  for (let i = 0; i < total; i++) {
+    const d = new Date(cursor.getFullYear(), cursor.getMonth() - i, 1);
+    const key = toMonthKey(d);
+    options.push({
+      key,
+      label: formatMonthLabel(key)
+    });
+  }
+  return options;
+}
+
+function computeMonthlyDoneLabelUsage({ tasks, labels }) {
+  const labelMetaById = new Map(
+    (Array.isArray(labels) ? labels : [])
+      .filter((l) => typeof l?.id === 'string' && l.id.trim())
+      .map((l) => [l.id, {
+        id: l.id,
+        name: (typeof l?.name === 'string' && l.name.trim()) ? l.name.trim() : l.id,
+        color: isHexColor(l?.color) ? l.color.trim() : '#3b82f6'
+      }])
+  );
+
+  const monthlyBuckets = new Map();
+
+  for (const task of tasks || []) {
+    const done = safeDate(task?.doneDate);
+    if (!done) continue;
+
+    const labelIds = normalizeTaskLabelIds(task);
+    if (labelIds.length === 0) continue;
+
+    const monthKey = toMonthKey(done);
+    const monthBucket = monthlyBuckets.get(monthKey) || new Map();
+
+    for (const labelId of labelIds) {
+      const meta = labelMetaById.get(labelId) || {
+        id: labelId,
+        name: labelId,
+        color: '#3b82f6'
+      };
+      if (!labelMetaById.has(labelId)) labelMetaById.set(labelId, meta);
+
+      const entry = monthBucket.get(labelId) || {
+        count: 0,
+        tasks: [],
+        color: meta.color,
+        name: meta.name
+      };
+
+      entry.count += 1;
+      entry.tasks.push(task);
+      monthBucket.set(labelId, entry);
+    }
+
+    monthlyBuckets.set(monthKey, monthBucket);
+  }
+
+  const defaultMonths = buildRecentMonthOptions(12, new Date());
+  const discovered = Array.from(monthlyBuckets.keys())
+    .map((key) => ({ key, label: formatMonthLabel(key) }))
+    .sort((a, b) => b.key.localeCompare(a.key));
+
+  const optionsByKey = new Map(defaultMonths.map((m) => [m.key, m]));
+  for (const m of discovered) {
+    if (!optionsByKey.has(m.key)) optionsByKey.set(m.key, m);
+  }
+  const monthOptions = Array.from(optionsByKey.values()).sort((a, b) => b.key.localeCompare(a.key));
+
+  return {
+    monthOptions,
+    monthlyBuckets
+  };
+}
+
+function getMonthlyTreemapRows(usage, monthKey) {
+  const monthBucket = usage.monthlyBuckets.get(monthKey) || new Map();
+  const rows = Array.from(monthBucket.entries())
+    .map(([labelId, entry]) => ({
+      labelId,
+      name: entry.name || labelId,
+      color: entry.color || '#3b82f6',
+      count: Number(entry.count) || 0,
+      tasks: Array.isArray(entry.tasks) ? entry.tasks.slice() : []
+    }))
+    .filter((row) => row.count > 0)
+    .sort((a, b) => {
+      const delta = b.count - a.count;
+      if (delta !== 0) return delta;
+      return (a.name || '').localeCompare(b.name || '');
+    });
+
+  return rows;
+}
+
+function buildMonthlyLabelTreemapOption({ monthKey, rows }) {
+  const theme = getChartTheme();
+  const monthLabel = formatMonthLabel(monthKey);
+
+  if (!rows.length) {
+    return {
+      backgroundColor: 'transparent',
+      textStyle: { color: theme.text },
+      series: [],
+      graphic: {
+        type: 'text',
+        left: 'center',
+        top: 'middle',
+        style: {
+          text: `No labeled done tasks in ${monthLabel}.`,
+          fill: theme.muted,
+          fontSize: 12
+        }
+      }
+    };
+  }
+
+  const seriesData = rows.map((row) => ({
+    name: row.name,
+    value: row.count,
+    labelId: row.labelId,
+    itemStyle: { color: row.color }
+  }));
+
+  return {
+    backgroundColor: 'transparent',
+    textStyle: { color: theme.text },
+    tooltip: {
+      backgroundColor: theme.surface,
+      borderColor: theme.border,
+      textStyle: { color: theme.text },
+      formatter: (params) => {
+        const labelName = params?.name || '';
+        const count = Number(params?.value) || 0;
+        return `${labelName}<br/>${monthLabel}<br/>Done tasks: ${count}`;
+      }
+    },
+    series: [
+      {
+        type: 'treemap',
+        roam: false,
+        nodeClick: false,
+        breadcrumb: { show: false },
+        data: seriesData,
+        label: {
+          show: true,
+          color: theme.text,
+          formatter: (p) => {
+            const name = p?.name || '';
+            const count = Number(p?.value) || 0;
+            return `${name}\n${count}`;
+          }
+        },
+        emphasis: {
+          itemStyle: {
+            borderColor: cssVar('--color-primary', '#3b82f6'),
+            borderWidth: 1
+          }
+        },
+        upperLabel: { show: false },
+        itemStyle: {
+          borderColor: cssVar('--border-subtle', '#e5e7eb'),
+          borderWidth: 1,
+          gapWidth: 2
+        }
+      }
+    ]
+  };
+}
+
+function findDefaultMonthlyLabelSelection(rows) {
+  if (!rows.length) return null;
+  return rows[0].labelId;
+}
+
+function renderMonthlyLabelTaskDrilldown({ usage, monthKey, labelId }) {
+  const titleEl = document.getElementById('reports-label-tasks-title');
+  const listEl = document.getElementById('reports-label-tasks-list');
+  const emptyEl = document.getElementById('reports-label-tasks-empty');
+  const metaEl = document.getElementById('reports-label-usage-meta');
+  if (!titleEl || !listEl || !emptyEl || !metaEl) return;
+
+  const monthLabel = formatMonthLabel(monthKey);
+  const rows = getMonthlyTreemapRows(usage, monthKey);
+  const row = rows.find((r) => r.labelId === labelId) || null;
+
+  if (!row) {
+    titleEl.textContent = 'Tasks';
+    listEl.innerHTML = '';
+    emptyEl.textContent = `No tasks to show for ${monthLabel}.`;
+    emptyEl.style.display = '';
+    metaEl.textContent = `Tap a label tile to view tasks in ${monthLabel}.`;
+    return;
+  }
+
+  const tasks = row.tasks.slice();
+  const count = row.count;
+  titleEl.textContent = `${row.name} — ${monthLabel}`;
+  metaEl.textContent = `${row.name}: ${count} done task${count === 1 ? '' : 's'} in ${monthLabel}`;
+
+  tasks.sort((a, b) => {
+    const ad = safeDate(a?.doneDate)?.getTime() || 0;
+    const bd = safeDate(b?.doneDate)?.getTime() || 0;
+    return bd - ad;
+  });
+
+  listEl.innerHTML = '';
+  if (!tasks.length) {
+    emptyEl.textContent = `No done tasks found for this label in ${monthLabel}.`;
+    emptyEl.style.display = '';
+    return;
+  }
+
+  emptyEl.style.display = 'none';
+  const fragment = document.createDocumentFragment();
+  for (const task of tasks) {
+    const item = document.createElement('li');
+    item.className = 'rpt-label-task-item';
+
+    const title = document.createElement('div');
+    title.className = 'rpt-label-task-title';
+    title.textContent = taskTitle(task);
+
+    const done = document.createElement('div');
+    done.className = 'rpt-label-task-meta';
+    const doneDate = isoDateOnly(task?.doneDate) || 'unknown';
+    done.textContent = `Done: ${doneDate}`;
+
+    item.appendChild(title);
+    item.appendChild(done);
+    fragment.appendChild(item);
+  }
+  listEl.appendChild(fragment);
+}
+
+function populateLabelMonthSelect(selectEl, monthOptions, selectedKey) {
+  if (!selectEl) return;
+  selectEl.innerHTML = '';
+  const frag = document.createDocumentFragment();
+  for (const option of monthOptions) {
+    const el = document.createElement('option');
+    el.value = option.key;
+    el.textContent = option.label;
+    if (option.key === selectedKey) el.selected = true;
+    frag.appendChild(el);
+  }
+  selectEl.appendChild(frag);
+}
+
+function findDefaultMonthKey(usage) {
+  const withData = usage.monthOptions.find((m) => {
+    const rows = getMonthlyTreemapRows(usage, m.key);
+    return rows.length > 0;
+  });
+  if (withData) return withData.key;
+  return usage.monthOptions[0]?.key || toMonthKey(new Date());
+}
+
+function ensureMonthKey(usage, monthKey) {
+  if (usage.monthOptions.some((m) => m.key === monthKey)) return monthKey;
+  return findDefaultMonthKey(usage);
+}
+
+function parseLabelIdFromTreemapClick(params) {
+  const dataLabelId = params?.data?.labelId;
+  if (typeof dataLabelId === 'string' && dataLabelId.trim()) return dataLabelId;
+  const treePathInfo = Array.isArray(params?.treePathInfo) ? params.treePathInfo : [];
+  if (treePathInfo.length > 0) {
+    const leaf = treePathInfo[treePathInfo.length - 1];
+    const id = leaf?.data?.labelId;
+    if (typeof id === 'string' && id.trim()) return id;
+  }
+  return null;
+}
+
 function main() {
   initializeThemeToggle();
   ensureBoardsInitialized();
@@ -608,6 +924,7 @@ function main() {
 
   const tasks = loadTasks();
   const columns = loadColumns();
+  const labels = loadLabels();
 
   // Daily updates (last 365 days)
   const dailyEnd = new Date();
@@ -666,6 +983,50 @@ function main() {
       completedCounts: weekly.completedCounts
     }));
     window.addEventListener('resize', () => leadChart.resize());
+  }
+
+  // Monthly label usage on done tasks (one month at a time)
+  const labelUsageDom = document.getElementById('reports-label-usage-chart');
+  const labelMonthSelect = document.getElementById('reports-label-month');
+  if (labelUsageDom) {
+    const usage = computeMonthlyDoneLabelUsage({ tasks, labels });
+
+    const labelUsageChart = echarts.init(labelUsageDom);
+    let selectedMonthKey = findDefaultMonthKey(usage);
+    selectedMonthKey = ensureMonthKey(usage, selectedMonthKey);
+    populateLabelMonthSelect(labelMonthSelect, usage.monthOptions, selectedMonthKey);
+
+    let selectedLabelId = null;
+
+    const updateMonthlyLabelUsage = () => {
+      selectedMonthKey = ensureMonthKey(usage, selectedMonthKey);
+      const rows = getMonthlyTreemapRows(usage, selectedMonthKey);
+      labelUsageChart.setOption(buildMonthlyLabelTreemapOption({ monthKey: selectedMonthKey, rows }), true);
+
+      const validLabel = rows.some((r) => r.labelId === selectedLabelId);
+      if (!validLabel) selectedLabelId = findDefaultMonthlyLabelSelection(rows);
+      renderMonthlyLabelTaskDrilldown({ usage, monthKey: selectedMonthKey, labelId: selectedLabelId });
+    };
+
+    updateMonthlyLabelUsage();
+
+    labelMonthSelect?.addEventListener('change', () => {
+      const next = (labelMonthSelect.value || '').trim();
+      if (!next) return;
+      selectedMonthKey = next;
+      selectedLabelId = null;
+      updateMonthlyLabelUsage();
+    });
+
+    labelUsageChart.on('click', (params) => {
+      if (params?.seriesType !== 'treemap') return;
+      const labelId = parseLabelIdFromTreemapClick(params);
+      if (!labelId) return;
+      selectedLabelId = labelId;
+      renderMonthlyLabelTaskDrilldown({ usage, monthKey: selectedMonthKey, labelId: selectedLabelId });
+    });
+
+    window.addEventListener('resize', () => labelUsageChart.resize());
   }
 
   // Cumulative Flow Diagram (CFD)

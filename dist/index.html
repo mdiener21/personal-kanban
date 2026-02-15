@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Personal Kanban Board - A fully local task management tool with no server required">
-  <title>Personal Kanban Board</title>
+  <title>Personal Kanban Board</title>
+
   <!-- Kanban favicon (inline SVG data URI) -->
   <link rel="icon" href="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='2' y='3' width='6' height='18' rx='1.5' fill='%233b82f6'/%3E%3Crect x='9' y='3' width='6' height='12' rx='1.5' fill='%2360a5fa'/%3E%3Crect x='16' y='3' width='6' height='8' rx='1.5' fill='%2393c5fd'/%3E%3C/svg%3E">
   <script type="module" crossorigin src="./assets/index-DeHPiPO7.js"></script>
@@ -39,6 +40,18 @@
       <div id="board-controls-menu" class="controls-actions">
         <label class="sr-only" for="board-select">Select board</label>
         <select id="board-select" class="control-select" aria-label="Select board"></select>
+        <button id="show-calendar-btn" class="control-btn" type="button" aria-pressed="false" aria-label="Show Calendar">
+          <span data-lucide="calendar-days" aria-hidden="true"></span>
+          <span><a class="control-btn" href="./calendar.html" style="text-decoration:none;">
+          View Calendar
+        </a></span>
+        </button>
+        <button id="show-reports-btn" class="control-btn" type="button" aria-pressed="false" aria-label="Show Reports">
+          <span data-lucide="chart-column" aria-hidden="true"></span>
+          <span><a class="control-btn" href="./reports.html" style="text-decoration:none;">
+          View Reports
+        </a></span> 
+        </button>
         <button id="add-column-btn" class="control-btn" type="button" aria-haspopup="dialog">
           <span data-lucide="columns-3" aria-hidden="true"></span>
           <span style="color:green;">Add Column</span>
@@ -50,10 +63,6 @@
         <button id="manage-labels-btn" class="control-btn" type="button" aria-haspopup="dialog">
           <span data-lucide="tag" aria-hidden="true"></span>
           <span>Manage Labels</span>
-        </button>
-        <button id="settings-btn" class="control-btn" type="button" aria-haspopup="dialog">
-          <span data-lucide="sliders-horizontal" aria-hidden="true"></span>
-          <span>Settings</span>
         </button>
         <button id="notifications-btn" class="control-btn" type="button" aria-haspopup="dialog">
           <span data-lucide="bell" aria-hidden="true"></span>
@@ -71,18 +80,9 @@
         <button id="theme-toggle-btn" class="control-btn" type="button" aria-pressed="false" aria-label="Toggle dark mode">
           <span data-lucide="moon" aria-hidden="true"></span>
         </button>
-         <button id="show-reports-btn" class="control-btn" type="button" aria-pressed="false" aria-label="Show Reports">
-          <span data-lucide="chart-column" aria-hidden="true"></span>
-          <span><a class="control-btn" href="./reports.html" style="text-decoration:none;">
-          View Reports
-        </a></span> 
-        </button>
-
-        <button id="show-calendar-btn" class="control-btn" type="button" aria-pressed="false" aria-label="Show Calendar">
-          <span data-lucide="calendar-days" aria-hidden="true"></span>
-          <span><a class="control-btn" href="./calendar.html" style="text-decoration:none;">
-          View Calendar
-        </a></span>
+        <button id="settings-btn" class="control-btn" type="button" aria-haspopup="dialog">
+          <span data-lucide="sliders-horizontal" aria-hidden="true"></span>
+          <span>Settings</span>
         </button>
         <button id="help-btn" class="control-btn" type="button" aria-haspopup="dialog">
           <span data-lucide="help-circle" aria-hidden="true"></span>
@@ -568,6 +568,7 @@
     <span id="app-version" class="footer-version" aria-label="App version"></span>
   </p>
 </footer>
-
+
+
 </body>
 </html>

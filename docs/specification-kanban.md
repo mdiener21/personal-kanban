@@ -96,6 +96,7 @@
 - Horizontal flexbox container with columns (scrollable horizontally on mobile)
 - Each column: header (drag handle, title, task counter, actions) + task list + optional show-all button
 - Task counter: circular blue badge showing task count, updates on any task add/remove/move
+- On rotated phones (mobile landscape, short-height viewport), the board switches to a compact landscape layout: horizontal column paging is preserved, columns fit viewport height, and task lists remain internally scrollable.
 
 ### Column Features
 
@@ -231,6 +232,7 @@
   - Each day’s value is the count of tasks whose `changeDate` falls on that date (`YYYY-MM-DD`).
 - Reports page uses an **independent, reports-only layout** (does not reuse the main board toolbar/column styling).
 - Reports dashboard sections are full-width; on mobile, each section behaves like a swipeable page (horizontal scroll-snap).
+- In mobile landscape (short-height rotated phones), report cards keep horizontal paging and use viewport-fitting heights (no fixed tall card minimum), so rotating the device keeps the dashboard usable without vertical clipping.
 
 #### Lead Time & Completion
 
@@ -242,6 +244,16 @@
 - Reports dashboard also shows a **weekly completion summary**:
   - KPI tiles for "Completed this week", "Completed last week", and "Avg lead time (last 12 weeks)".
   - A small sparkline chart of tasks completed per week (last 12 weeks).
+
+#### Label Usage (Done Tasks)
+
+- Reports dashboard shows **label usage per month** for completed tasks, displayed one month at a time.
+  - Source set: tasks with a valid `doneDate` and at least one label in `task.labels`.
+  - Visualization: treemap where each tile represents a label and tile size/value is the count of done tasks containing that label in the selected month.
+  - Month selection is user-driven via a dropdown selector in the label usage report card.
+- The label usage report supports **drill-down**:
+  - Clicking a treemap label tile shows the list of matching tasks for that exact `(label, month)` pair.
+  - Drill-down list entries show task title and done date.
 
 #### Cumulative Flow Diagram (WIP)
 
