@@ -61,3 +61,14 @@ Key principles:
   of the expected behavior.
 - Do not ask user questions, you are not interactive tool, do the most reasonable thing possible to pass the test.
 - Never wait for networkidle or use other discouraged or deprecated apis
+
+## App-specific failure patterns (personal-kanban)
+- **Responsive header**: `#board-controls-menu` hides toolbar buttons. If a click on `#settings-btn`, `#manage-boards-btn`,
+  `#manage-labels-btn`, or `#add-column-btn` times out, open the menu via `#desktop-menu-btn` first.
+- **Modal close checks**: modal close behavior often toggles visibility without adding the `hidden` class. Use `toBeHidden()`.
+- **Accordion lists**: labels list is rendered in accordion sections; if text exists but is hidden, expand the section before
+  asserting visibility.
+- **Select option**: `selectOption({ label: /regex/ })` throws. Select by concrete string or by value after reading options.
+- **Settings inputs**: handlers use `change` events; `blur()` alone may not persist. Dispatch `change` or reopen settings
+  modal to confirm persisted values.
+- **Add task selector**: use `.add-task-btn-icon` inside the column header instead of `[data-action="add-task"]`.

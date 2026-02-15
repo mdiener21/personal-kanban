@@ -54,6 +54,16 @@
 - Styling is custom CSS variables and components in `src/design.css` (light/dark via `document.documentElement.dataset.theme`).
   - Theme persistence key: `kanban-theme` (see `src/modules/theme.js`).
 
+## E2E Testing (Playwright)
+- **Responsive controls menu**: `#board-controls-menu` hides toolbar buttons on small viewports; toggled by `#desktop-menu-btn`.
+  - If `#settings-btn`, `#manage-boards-btn`, `#manage-labels-btn`, or `#add-column-btn` times out, open the menu first.
+  - Pattern: check if button visible → if not, click menu button → wait for button → click button.
+- **Modal close assertions**: use `toBeHidden()` instead of `toHaveClass(/hidden/)` for reliable modal close checks.
+- **Accordion lists (labels)**: labels render in collapsible accordion sections. If asserting label visibility, expand the relevant accordion header first.
+- **Settings persistence**: settings inputs use `change` events. For reliable updates, dispatch `change` or close/reopen modal.
+- **Select inputs**: avoid `selectOption({ label: /regex/ })`. Use concrete strings or select by value after reading options.
+- **Add task**: use `.add-task-btn-icon` selector in column headers, not `[data-action="add-task"]`.
+
 ## Release Process
 
 When asked to create a release/tag for unreleased changes:

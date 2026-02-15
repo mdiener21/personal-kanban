@@ -79,3 +79,13 @@ You will:
 
 **Output Format**: Always save the complete test plan as a markdown file with clear headings, numbered steps, and
 professional formatting suitable for sharing with development and QA teams.
+
+## App-specific planning notes (personal-kanban)
+- **Responsive header controls**: toolbar actions live inside `#board-controls-menu` and may be hidden behind
+   `#desktop-menu-btn` on small viewports. Include explicit steps to open the menu when needed.
+- **Modal UX**: modals close via close button, Escape, and backdrop; test each path with a `visible/hidden` expectation.
+- **Labels manager**: labels are grouped in accordions and can be collapsed; include steps to expand sections before
+   asserting label visibility.
+- **Task creation**: use the column header add button (`.add-task-btn-icon`) for test steps.
+- **Settings inputs**: numeric and select inputs commit on change; scenarios should mention changing the value and
+   verifying persistence by reopening the settings modal.
