@@ -312,18 +312,41 @@ function renderNotificationsModalContent() {
  * Update the notification badge count on the bell button.
  */
 export function updateNotificationBadge() {
-  const badge = document.getElementById('notification-badge');
-  if (!badge) return;
+  const badges = [
+    document.getElementById('notification-badge'),
+    document.getElementById('notification-quick-badge')
+  ].filter(Boolean);
+
+  const buttons = [
+    document.getElementById('notifications-btn'),
+    document.getElementById('notifications-quick-btn')
+  ].filter(Boolean);
+
+  if (badges.length === 0) return;
 
   const tasks = getNotificationTasks();
   const count = tasks.length;
+  const label = count === 1 ? '1 notification' : `${count} notifications`;
+  const badgeText = count > 99 ? '99+' : String(count);
 
   if (count === 0) {
-    badge.classList.add('hidden');
-    badge.textContent = '';
+    badges.forEach((badge) => {
+      badge.classList.add('hidden');
+      badge.textContent = '';
+    });
+    buttons.forEach((button) => {
+      button.setAttribute('aria-label', 'Notifications');
+      button.removeAttribute('title');
+    });
   } else {
-    badge.classList.remove('hidden');
-    badge.textContent = count > 99 ? '99+' : String(count);
+    badges.forEach((badge) => {
+      badge.classList.remove('hidden');
+      badge.textContent = badgeText;
+    });
+    buttons.forEach((button) => {
+      button.setAttribute('aria-label', `Notifications (${label})`);
+      button.setAttribute('title', `Notifications (${label})`);
+    });
   }
 }
 
@@ -369,9 +392,14 @@ export function initializeNotifications() {
     refreshNotifications();
   });
 
-  // Bell button click handler
-  const notificationsBtn = document.getElementById('notifications-btn');
-  notificationsBtn?.addEventListener('click', showNotificationsModal);
+  // Bell button click handlers (menu + quick access)
+  const notificationButtons = [
+    document.getElementById('notifications-btn'),
+    document.getElementById('notifications-quick-btn')
+  ].filter(Boolean);
+  notificationButtons.forEach((button) => {
+    button.addEventListener('click', showNotificationsModal);
+  });
 
   // Close button handler
   const closeBtn = document.getElementById('notifications-close-btn');

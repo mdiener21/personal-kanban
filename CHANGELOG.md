@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed (unreleased)
 
 - Column color picker now displays hex color code alongside the color selector, matching the label editor UX
+- Added a quick-access Notifications bell beside the menu button while keeping Notifications in the controls dropdown; both buttons now show the same live notification count badge and open the same modal
 
 ### Removed (unreleased)
 

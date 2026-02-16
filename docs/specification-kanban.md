@@ -203,6 +203,8 @@
   - View Calendar link (opens `calendar.html`)
   - Export button (downloads JSON)
   - Import button (file picker for JSON)
+- A quick-access notifications bell button is shown beside the menu toggle in the header.
+  - It opens the same notifications modal and shows the same live count badge as the menu notification item.
 
 ### Settings
 
@@ -282,8 +284,8 @@ The notification system alerts users to tasks with approaching or past due dates
 
 #### Notifications Modal
 
-- Accessed via the bell icon in the board controls menu
-- Bell icon shows a badge with the count of qualifying tasks
+- Accessed via either bell icon (quick-access header bell or board controls menu bell)
+- Both bell icons show a badge with the count of qualifying tasks
 - Lists all tasks with due dates within the configured upcoming window (default 3 days) or overdue
 - Includes a toggle to show/hide the notification banner
 - Each notification shows: task title, due date status, priority

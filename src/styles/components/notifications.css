@@ -198,6 +198,17 @@
   display: none;
 }
 
+#notifications-quick-btn {
+  position: relative;
+}
+
+#notification-quick-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  margin-left: 0;
+}
+
 /* Notifications Modal List */
 .notifications-list {
   overflow-y: auto;
