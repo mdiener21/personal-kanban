@@ -26,7 +26,18 @@
   <main class="rpt-main" aria-label="Reports dashboard">
     <section class="reports-kpis" aria-label="Weekly completion summary">
       <div class="rpt-card-header">
-        <h2 class="rpt-card-title">Weekly Task completion</h2>
+        <h2 class="rpt-card-title">Task completion</h2>
+        <div class="rpt-controls" role="group" aria-label="Completion controls">
+          <label class="rpt-control">
+            <span class="rpt-control-label">View</span>
+            <select id="reports-completion-granularity" class="rpt-select" aria-label="Completion granularity">
+              <option value="daily">Daily</option>
+              <option value="weekly" selected>Weekly</option>
+              <option value="monthly">Monthly</option>
+            </select>
+          </label>
+        </div>
+        <div class="rpt-badge" id="reports-completion-badge" title="Completed tasks (last 12 weeks)">0</div>
       </div>
 
       <div class="rpt-kpi-grid" role="group" aria-label="Completion KPIs">
@@ -53,6 +64,16 @@
     <section class="reports-kpis" aria-label="Same-day completions summary">
       <div class="rpt-card-header">
         <h2 class="rpt-card-title">Same-day Task completions</h2>
+        <div class="rpt-controls" role="group" aria-label="Same-day controls">
+          <label class="rpt-control">
+            <span class="rpt-control-label">View</span>
+            <select id="reports-sameday-granularity" class="rpt-select" aria-label="Same-day granularity">
+              <option value="daily">Daily</option>
+              <option value="weekly" selected>Weekly</option>
+              <option value="monthly">Monthly</option>
+            </select>
+          </label>
+        </div>
         <div class="rpt-badge" id="reports-sameday-badge" title="Same-day tasks (last 12 weeks)">0</div>
       </div>
       <p class="rpt-card-hint">A downward trend means less ad-hoc work and more planned tasks getting done — that's progress.</p>

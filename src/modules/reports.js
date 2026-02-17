@@ -29,6 +29,10 @@ echarts.use([
   CanvasRenderer
 ]);
 
+// ---------------------------------------------------------------------------
+// Theme helpers
+// ---------------------------------------------------------------------------
+
 function cssVar(name, fallback) {
   const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
   return value || fallback;
@@ -44,10 +48,13 @@ function getChartTheme() {
   };
 }
 
+// ---------------------------------------------------------------------------
+// Date helpers
+// ---------------------------------------------------------------------------
+
 function isoDateOnly(value) {
   const s = (value || '').toString().trim();
   if (!s) return '';
-  // Most stored values are ISO strings; we only need YYYY-MM-DD.
   if (s.length >= 10) return s.slice(0, 10);
   return '';
 }
@@ -57,6 +64,38 @@ function formatIsoDate(d) {
   const mm = String(d.getMonth() + 1).padStart(2, '0');
   const dd = String(d.getDate()).padStart(2, '0');
   return `${yyyy}-${mm}-${dd}`;
+}
+
+function formatShortDate(d) {
+  return `${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function formatMonthLabel(date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+}
+
+function safeDate(value) {
+  const raw = (value || '').toString().trim();
+  if (!raw) return null;
+  const d = new Date(raw);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
+function addDays(date, days) {
+  const d = new Date(date);
+  d.setDate(d.getDate() + days);
+  return d;
+}
+
+function startOfWeekMonday(date) {
+  const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  const delta = (d.getDay() + 6) % 7;
+  d.setDate(d.getDate() - delta);
+  return d;
+}
+
+function startOfMonth(date) {
+  return new Date(date.getFullYear(), date.getMonth(), 1);
 }
 
 function eachDayInclusive(start, end) {
@@ -70,44 +109,112 @@ function eachDayInclusive(start, end) {
   return days;
 }
 
-function safeDate(value) {
-  const raw = (value || '').toString().trim();
-  if (!raw) return null;
-  const d = new Date(raw);
-  return Number.isNaN(d.getTime()) ? null : d;
-}
-
-function startOfWeekMonday(date) {
-  // Week bucket uses local time; Monday as start.
-  const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-  const day = d.getDay(); // 0=Sun..6=Sat
-  const delta = (day + 6) % 7; // Mon=0, Sun=6
-  d.setDate(d.getDate() - delta);
-  return d;
-}
-
-function addDays(date, days) {
-  const d = new Date(date);
-  d.setDate(d.getDate() + days);
-  return d;
-}
-
-function formatWeekLabel(weekStart) {
-  const end = addDays(weekStart, 6);
-  return `${formatIsoDate(weekStart)}…${formatIsoDate(end)}`;
-}
-
 function eachWeekStartInclusive(rangeStart, rangeEnd) {
   const weeks = [];
-  const start = startOfWeekMonday(rangeStart);
+  const d = new Date(startOfWeekMonday(rangeStart));
   const end = startOfWeekMonday(rangeEnd);
-  const d = new Date(start);
   while (d <= end) {
     weeks.push(new Date(d));
     d.setDate(d.getDate() + 7);
   }
   return weeks;
 }
+
+function eachMonthInclusive(rangeStart, rangeEnd) {
+  const months = [];
+  const d = startOfMonth(rangeStart);
+  const last = startOfMonth(rangeEnd);
+  while (d <= last) {
+    months.push(new Date(d));
+    d.setMonth(d.getMonth() + 1);
+  }
+  return months;
+}
+
+// ---------------------------------------------------------------------------
+// Shared granularity bucketing
+// ---------------------------------------------------------------------------
+
+function bucketKeyForDate(date, granularity) {
+  if (granularity === 'daily') return formatIsoDate(date);
+  if (granularity === 'monthly') return formatMonthLabel(date);
+  return formatIsoDate(startOfWeekMonday(date));
+}
+
+function generateTimeSlots(rangeStart, rangeEnd, granularity) {
+  if (granularity === 'daily') {
+    const days = eachDayInclusive(rangeStart, rangeEnd);
+    return { keys: days.map(formatIsoDate), labels: days.map(formatShortDate) };
+  }
+  if (granularity === 'monthly') {
+    const months = eachMonthInclusive(rangeStart, rangeEnd);
+    const keys = months.map(formatMonthLabel);
+    return { keys, labels: keys };
+  }
+  const weekStarts = eachWeekStartInclusive(rangeStart, rangeEnd);
+  return {
+    keys: weekStarts.map(formatIsoDate),
+    labels: weekStarts.map((ws) => `${formatShortDate(ws)} → ${formatShortDate(addDays(ws, 6))}`)
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Shared bar chart builder
+// ---------------------------------------------------------------------------
+
+function buildBarChartOption({ labels, seriesList, granularity, legend }) {
+  const theme = getChartTheme();
+  const showBarLabels = granularity !== 'daily';
+  const barLabel = showBarLabels
+    ? { show: true, position: 'top', fontSize: 10, color: theme.text, formatter: (p) => p.value > 0 ? String(p.value) : '' }
+    : { show: false };
+
+  return {
+    backgroundColor: 'transparent',
+    grid: { left: 40, right: 40, top: legend ? 30 : 8, bottom: 32 },
+    legend: legend
+      ? { top: 0, textStyle: { color: theme.muted, fontSize: 10 } }
+      : undefined,
+    xAxis: {
+      type: 'category',
+      data: labels,
+      axisLabel: { show: true, fontSize: 9, color: theme.muted, rotate: 30, hideOverlap: true },
+      axisLine: { show: false },
+      axisTick: { show: false }
+    },
+    yAxis: {
+      type: 'value',
+      name: 'Tasks',
+      min: 0,
+      nameTextStyle: { color: theme.muted },
+      axisLabel: { color: theme.muted },
+      axisLine: { lineStyle: { color: theme.borderSubtle } },
+      axisTick: { lineStyle: { color: theme.borderSubtle } },
+      splitLine: { lineStyle: { color: theme.borderSubtle } }
+    },
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: { type: 'shadow' },
+      backgroundColor: theme.surface,
+      borderColor: theme.border,
+      textStyle: { color: theme.text }
+    },
+    dataZoom: granularity === 'daily'
+      ? [{ type: 'inside', xAxisIndex: 0, filterMode: 'none' }]
+      : [],
+    series: seriesList.map((s) => ({
+      name: s.name,
+      type: 'bar',
+      data: s.data,
+      itemStyle: { color: s.color, borderRadius: [2, 2, 0, 0] },
+      label: barLabel
+    }))
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Data: daily update heatmap
+// ---------------------------------------------------------------------------
 
 function computeDailyUpdateCounts(tasks, startDate, endDate) {
   const counts = new Map();
@@ -182,6 +289,61 @@ function buildDailyUpdatesOption({ rangeStart, rangeEnd, data, maxValue, boardNa
   };
 }
 
+// ---------------------------------------------------------------------------
+// Data: task completions (generic, granularity-aware)
+// ---------------------------------------------------------------------------
+
+function computeCompletions(tasks, rangeStart, rangeEnd, granularity) {
+  const buckets = new Map();
+
+  for (const task of tasks || []) {
+    const done = safeDate(task?.doneDate);
+    if (!done || done < rangeStart || done > rangeEnd) continue;
+    const key = bucketKeyForDate(done, granularity);
+    buckets.set(key, (buckets.get(key) || 0) + 1);
+  }
+
+  const { keys, labels } = generateTimeSlots(rangeStart, rangeEnd, granularity);
+  const completedCounts = keys.map((k) => buckets.get(k) || 0);
+  return { labels, completedCounts };
+}
+
+// ---------------------------------------------------------------------------
+// Data: same-day vs planned completions (granularity-aware)
+// ---------------------------------------------------------------------------
+
+function computeSameDayCompletions(tasks, rangeStart, rangeEnd, granularity) {
+  const sameDayBuckets = new Map();
+  const plannedBuckets = new Map();
+
+  for (const task of tasks || []) {
+    const created = isoDateOnly(task?.creationDate);
+    const done = isoDateOnly(task?.doneDate);
+    if (!created || !done) continue;
+
+    const doneDate = safeDate(done);
+    if (!doneDate || doneDate < rangeStart || doneDate > rangeEnd) continue;
+
+    const key = bucketKeyForDate(doneDate, granularity);
+    if (created === done) {
+      sameDayBuckets.set(key, (sameDayBuckets.get(key) || 0) + 1);
+    } else {
+      plannedBuckets.set(key, (plannedBuckets.get(key) || 0) + 1);
+    }
+  }
+
+  const { keys, labels } = generateTimeSlots(rangeStart, rangeEnd, granularity);
+  const sameDayCounts = keys.map((k) => sameDayBuckets.get(k) || 0);
+  const plannedCounts = keys.map((k) => plannedBuckets.get(k) || 0);
+  const total = sameDayCounts.reduce((s, v) => s + v, 0);
+
+  return { labels, sameDayCounts, plannedCounts, total };
+}
+
+// ---------------------------------------------------------------------------
+// Data: lead time (weekly only — used for the lead time chart + KPIs)
+// ---------------------------------------------------------------------------
+
 function movingAverage(values, windowSize) {
   const w = Math.max(1, Number(windowSize) || 1);
   const out = [];
@@ -198,87 +360,6 @@ function movingAverage(values, windowSize) {
   return out;
 }
 
-function computeWeeklySameDayCompletions(tasks, rangeStart, rangeEnd) {
-  const buckets = new Map();
-
-  for (const task of tasks || []) {
-    const created = isoDateOnly(task?.creationDate);
-    const done = isoDateOnly(task?.doneDate);
-    if (!created || !done || created !== done) continue;
-
-    const doneDate = safeDate(done);
-    if (!doneDate || doneDate < rangeStart || doneDate > rangeEnd) continue;
-
-    const weekStart = startOfWeekMonday(doneDate);
-    const key = formatIsoDate(weekStart);
-    buckets.set(key, (buckets.get(key) || 0) + 1);
-  }
-
-  const weekStarts = eachWeekStartInclusive(rangeStart, rangeEnd);
-  const fmtShort = (ws) => {
-    const end = addDays(ws, 6);
-    const f = (d) => `${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-    return `${f(ws)} → ${f(end)}`;
-  };
-  const labels = weekStarts.map(fmtShort);
-  const counts = weekStarts.map((w) => buckets.get(formatIsoDate(w)) || 0);
-  const total = counts.reduce((s, v) => s + v, 0);
-
-  return { labels, counts, total };
-}
-
-function buildSameDaySparkOption({ labels, counts }) {
-  const theme = getChartTheme();
-  return {
-    backgroundColor: 'transparent',
-    grid: { left: 40, right: 40, top: 8, bottom: 32 },
-    xAxis: {
-      type: 'category',
-      data: labels,
-      axisLabel: { show: true, fontSize: 9, color: theme.muted, rotate: 30, hideOverlap: true },
-      axisLine: { show: false },
-      axisTick: { show: false }
-    },
-    yAxis: {
-      type: 'value',
-      name: 'Tasks',
-      min: 0,
-      nameTextStyle: { color: theme.muted },
-      axisLabel: { color: theme.muted },
-      axisLine: { lineStyle: { color: theme.borderSubtle } },
-      axisTick: { lineStyle: { color: theme.borderSubtle } },
-      splitLine: { lineStyle: { color: theme.borderSubtle } }
-    },
-    tooltip: {
-      trigger: 'axis',
-      axisPointer: { type: 'line' },
-      backgroundColor: theme.surface,
-      borderColor: theme.border,
-      textStyle: { color: theme.text },
-      formatter: (params) => {
-        const p = Array.isArray(params) ? params[0] : params;
-        const label = p?.axisValueLabel || '';
-        const v = p?.value ?? 0;
-        return `${label}<br/>Same-day: ${v}`;
-      }
-    },
-    series: [
-      {
-        type: 'bar',
-        data: counts,
-        itemStyle: { color: '#f59e0b', borderRadius: [2, 2, 0, 0] },
-        label: {
-          show: true,
-          position: 'top',
-          fontSize: 10,
-          color: theme.text,
-          formatter: (params) => params.value > 0 ? String(params.value) : ''
-        }
-      }
-    ]
-  };
-}
-
 function computeWeeklyLeadTimeAndCompletions(tasks, rangeStart, rangeEnd) {
   const buckets = new Map();
 
@@ -288,8 +369,7 @@ function computeWeeklyLeadTimeAndCompletions(tasks, rangeStart, rangeEnd) {
     if (!created || !done) continue;
     if (done < rangeStart || done > rangeEnd) continue;
 
-    const weekStart = startOfWeekMonday(done);
-    const key = formatIsoDate(weekStart);
+    const key = formatIsoDate(startOfWeekMonday(done));
     const leadDays = (done.getTime() - created.getTime()) / (24 * 60 * 60 * 1000);
     if (!Number.isFinite(leadDays) || leadDays < 0) continue;
 
@@ -299,9 +379,7 @@ function computeWeeklyLeadTimeAndCompletions(tasks, rangeStart, rangeEnd) {
     buckets.set(key, bucket);
   }
 
-  const weekStarts = eachWeekStartInclusive(rangeStart, rangeEnd);
-  const labels = weekStarts.map(formatWeekLabel);
-  const keys = weekStarts.map((w) => formatIsoDate(w));
+  const { keys, labels } = generateTimeSlots(rangeStart, rangeEnd, 'weekly');
 
   const completedCounts = keys.map((k) => buckets.get(k)?.count || 0);
   const avgLeadDays = keys.map((k) => {
@@ -311,14 +389,7 @@ function computeWeeklyLeadTimeAndCompletions(tasks, rangeStart, rangeEnd) {
   });
 
   const totalCompleted = completedCounts.reduce((s, v) => s + v, 0);
-  const leadDaysAll = keys
-    .map((k) => {
-      const b = buckets.get(k);
-      if (!b || b.count === 0) return null;
-      return b.leadSumDays / b.count;
-    })
-    .filter((v) => Number.isFinite(v));
-
+  const leadDaysAll = avgLeadDays.filter((v) => Number.isFinite(v));
   const avgLeadOverall = leadDaysAll.length
     ? (leadDaysAll.reduce((s, v) => s + v, 0) / leadDaysAll.length)
     : null;
@@ -363,12 +434,7 @@ function buildLeadTimeOption({ labels, avgLeadDays, trendLeadDays, completedCoun
       top: 8,
       textStyle: { color: theme.muted }
     },
-    grid: {
-      left: 40,
-      right: 40,
-      top: 50,
-      bottom: 40
-    },
+    grid: { left: 40, right: 40, top: 50, bottom: 40 },
     xAxis: {
       type: 'category',
       data: labels,
@@ -432,46 +498,9 @@ function buildLeadTimeOption({ labels, avgLeadDays, trendLeadDays, completedCoun
   };
 }
 
-function buildCompletedSparkOption({ labels, completedCounts }) {
-  const theme = getChartTheme();
-  return {
-    backgroundColor: 'transparent',
-    grid: { left: 8, right: 8, top: 8, bottom: 8 },
-    xAxis: {
-      type: 'category',
-      data: labels,
-      show: false
-    },
-    yAxis: {
-      type: 'value',
-      show: false,
-      min: 0
-    },
-    tooltip: {
-      trigger: 'axis',
-      axisPointer: { type: 'line' },
-      backgroundColor: theme.surface,
-      borderColor: theme.border,
-      textStyle: { color: theme.text },
-      formatter: (params) => {
-        const p = Array.isArray(params) ? params[0] : params;
-        const label = p?.axisValueLabel || '';
-        const v = p?.value ?? 0;
-        return `${label}<br/>Completed: ${v}`;
-      }
-    },
-    series: [
-      {
-        type: 'line',
-        data: completedCounts,
-        smooth: true,
-        symbol: 'none',
-        lineStyle: { width: 2, color: '#3b82f6' },
-        areaStyle: { color: 'rgba(59, 130, 246, 0.18)' }
-      }
-    ]
-  };
-}
+// ---------------------------------------------------------------------------
+// Data + chart: Cumulative Flow Diagram
+// ---------------------------------------------------------------------------
 
 function isHexColor(value) {
   return typeof value === 'string' && /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(value.trim());
@@ -569,7 +598,6 @@ function computeCumulativeFlow({ tasks, columns, rangeStart, rangeEnd, includeDo
   const sortedColumns = sortColumnsForCfd(columns);
   const columnById = new Map(sortedColumns.map((c) => [c.id, c]));
 
-  // Preserve workflow order; append any unknown columns referenced in history.
   const orderedIds = sortedColumns.map((c) => c.id);
   for (const id of countsByColumnId.keys()) {
     if (!orderedIds.includes(id)) orderedIds.push(id);
@@ -630,12 +658,7 @@ function buildCfdOption({ labels, seriesDefs, boardName }) {
       type: 'scroll',
       textStyle: { color: theme.muted }
     },
-    grid: {
-      left: 40,
-      right: 20,
-      top: 80,
-      bottom: 45
-    },
+    grid: { left: 40, right: 20, top: 80, bottom: 45 },
     xAxis: {
       type: 'category',
       data: labels,
@@ -656,11 +679,7 @@ function buildCfdOption({ labels, seriesDefs, boardName }) {
       splitLine: { lineStyle: { color: theme.borderSubtle } }
     },
     dataZoom: [
-      {
-        type: 'inside',
-        xAxisIndex: 0,
-        filterMode: 'none'
-      }
+      { type: 'inside', xAxisIndex: 0, filterMode: 'none' }
     ],
     series: plotSeries.map((s) => ({
       name: s.name,
@@ -676,6 +695,10 @@ function buildCfdOption({ labels, seriesDefs, boardName }) {
   };
 }
 
+// ---------------------------------------------------------------------------
+// Main
+// ---------------------------------------------------------------------------
+
 function main() {
   initializeThemeToggle();
   ensureBoardsInitialized();
@@ -683,6 +706,7 @@ function main() {
 
   const boardName = getActiveBoardName();
   const boardId = getActiveBoardId();
+  const displayName = boardName || (boardId || 'Active board');
 
   const badge = document.getElementById('reports-board-badge');
   if (badge) badge.textContent = (boardName || 'Board').slice(0, 2).toUpperCase();
@@ -690,10 +714,12 @@ function main() {
   const tasks = loadTasks();
   const columns = loadColumns();
 
-  // Daily updates (last 365 days)
+  // Collect all chart instances for a single resize handler
+  const charts = [];
+
+  // --- Daily updates (last 365 days) ---
   const dailyEnd = new Date();
-  const dailyStart = new Date();
-  dailyStart.setDate(dailyEnd.getDate() - 364); // inclusive range: 365 days
+  const dailyStart = addDays(dailyEnd, -364);
 
   const daily = computeDailyUpdateCounts(tasks, dailyStart, dailyEnd);
   const dailyDom = document.getElementById('reports-chart');
@@ -704,64 +730,87 @@ function main() {
       rangeEnd: dailyEnd,
       data: daily.data,
       maxValue: daily.max,
-      boardName: boardName || (boardId || 'Active board')
+      boardName: displayName
     }));
-    window.addEventListener('resize', () => dailyChart.resize());
+    charts.push(dailyChart);
   }
 
-  // Weekly completion + lead time (last 12 weeks)
+  // --- 12-week range (shared by completion, same-day, and lead time) ---
   const now = new Date();
   const endWeekRange = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
-  const startWeekRange = addDays(endWeekRange, -7 * 11); // inclusive: 12 weeks
+  const startWeekRange = addDays(endWeekRange, -7 * 11);
+
+  // --- Lead time + KPIs (weekly only) ---
   const weekly = computeWeeklyLeadTimeAndCompletions(tasks, startWeekRange, endWeekRange);
 
-  const completedThisWeek = weekly.completedCounts[weekly.completedCounts.length - 1] || 0;
-  const completedLastWeek = weekly.completedCounts[weekly.completedCounts.length - 2] || 0;
-  const avgLead12w = Number.isFinite(weekly.avgLeadOverall) ? `${weekly.avgLeadOverall.toFixed(1)}d` : '–';
+  const setTextById = (id, text) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = text;
+  };
 
-  const kpiThis = document.getElementById('reports-completed-this-week');
-  const kpiLast = document.getElementById('reports-completed-last-week');
-  const kpiAvgLead = document.getElementById('reports-avg-leadtime-12w');
-  if (kpiThis) kpiThis.textContent = String(completedThisWeek);
-  if (kpiLast) kpiLast.textContent = String(completedLastWeek);
-  if (kpiAvgLead) kpiAvgLead.textContent = avgLead12w;
+  setTextById('reports-completed-this-week', String(weekly.completedCounts[weekly.completedCounts.length - 1] || 0));
+  setTextById('reports-completed-last-week', String(weekly.completedCounts[weekly.completedCounts.length - 2] || 0));
+  setTextById('reports-avg-leadtime-12w', Number.isFinite(weekly.avgLeadOverall) ? `${weekly.avgLeadOverall.toFixed(1)}d` : '–');
+  setTextById('reports-completion-badge', String(weekly.totalCompleted));
+  setTextById('reports-leadtime-badge', String(weekly.totalCompleted));
 
-  const leadBadge = document.getElementById('reports-leadtime-badge');
-  if (leadBadge) leadBadge.textContent = String(weekly.totalCompleted);
-
+  // --- Task completion chart (dynamic granularity) ---
   const sparkDom = document.getElementById('reports-completed-spark');
+  const completionGranularityEl = document.getElementById('reports-completion-granularity');
   if (sparkDom) {
     const spark = echarts.init(sparkDom);
-    // Show only last 12 weeks labels on spark (shorten for tooltip only).
-    spark.setOption(buildCompletedSparkOption({ labels: weekly.labels, completedCounts: weekly.completedCounts }));
-    window.addEventListener('resize', () => spark.resize());
+    charts.push(spark);
+
+    const updateCompletionChart = () => {
+      const granularity = completionGranularityEl?.value || 'weekly';
+      const data = computeCompletions(tasks, startWeekRange, endWeekRange, granularity);
+      spark.setOption(buildBarChartOption({
+        labels: data.labels,
+        seriesList: [{ data: data.completedCounts, color: '#3b82f6' }],
+        granularity,
+        legend: false
+      }), true);
+    };
+
+    updateCompletionChart();
+    completionGranularityEl?.addEventListener('change', updateCompletionChart);
   }
 
-  // Same-day completions (created & done on the same day, last 12 weeks)
-  const sameDay = computeWeeklySameDayCompletions(tasks, startWeekRange, endWeekRange);
+  // --- Same-day completions (dynamic granularity) ---
+  const sameDayWeekly = computeSameDayCompletions(tasks, startWeekRange, endWeekRange, 'weekly');
 
-  const sdThis = sameDay.counts[sameDay.counts.length - 1] || 0;
-  const sdLast = sameDay.counts[sameDay.counts.length - 2] || 0;
-  const sdAvg = sameDay.counts.length
-    ? (sameDay.total / sameDay.counts.length).toFixed(1)
-    : '–';
-
-  const kpiSdThis = document.getElementById('reports-sameday-this-week');
-  const kpiSdLast = document.getElementById('reports-sameday-last-week');
-  const kpiSdAvg = document.getElementById('reports-sameday-avg');
-  const sdBadge = document.getElementById('reports-sameday-badge');
-  if (kpiSdThis) kpiSdThis.textContent = String(sdThis);
-  if (kpiSdLast) kpiSdLast.textContent = String(sdLast);
-  if (kpiSdAvg) kpiSdAvg.textContent = sdAvg;
-  if (sdBadge) sdBadge.textContent = String(sameDay.total);
+  setTextById('reports-sameday-this-week', String(sameDayWeekly.sameDayCounts[sameDayWeekly.sameDayCounts.length - 1] || 0));
+  setTextById('reports-sameday-last-week', String(sameDayWeekly.sameDayCounts[sameDayWeekly.sameDayCounts.length - 2] || 0));
+  setTextById('reports-sameday-avg', sameDayWeekly.sameDayCounts.length
+    ? (sameDayWeekly.total / sameDayWeekly.sameDayCounts.length).toFixed(1)
+    : '–');
+  setTextById('reports-sameday-badge', String(sameDayWeekly.total));
 
   const sdSparkDom = document.getElementById('reports-sameday-spark');
+  const sdGranularityEl = document.getElementById('reports-sameday-granularity');
   if (sdSparkDom) {
     const sdSpark = echarts.init(sdSparkDom);
-    sdSpark.setOption(buildSameDaySparkOption({ labels: sameDay.labels, counts: sameDay.counts }));
-    window.addEventListener('resize', () => sdSpark.resize());
+    charts.push(sdSpark);
+
+    const updateSameDayChart = () => {
+      const granularity = sdGranularityEl?.value || 'weekly';
+      const data = computeSameDayCompletions(tasks, startWeekRange, endWeekRange, granularity);
+      sdSpark.setOption(buildBarChartOption({
+        labels: data.labels,
+        seriesList: [
+          { name: 'Same-day', data: data.sameDayCounts, color: '#f59e0b' },
+          { name: 'Planned', data: data.plannedCounts, color: '#3b82f6' }
+        ],
+        granularity,
+        legend: true
+      }), true);
+    };
+
+    updateSameDayChart();
+    sdGranularityEl?.addEventListener('change', updateSameDayChart);
   }
 
+  // --- Lead time chart ---
   const leadDom = document.getElementById('reports-leadtime-chart');
   if (leadDom) {
     const leadChart = echarts.init(leadDom);
@@ -771,15 +820,16 @@ function main() {
       trendLeadDays: weekly.trendLeadDays,
       completedCounts: weekly.completedCounts
     }));
-    window.addEventListener('resize', () => leadChart.resize());
+    charts.push(leadChart);
   }
 
-  // Cumulative Flow Diagram (CFD)
+  // --- Cumulative Flow Diagram ---
   const cfdDom = document.getElementById('reports-cfd-chart');
   const cfdRangeEl = document.getElementById('reports-cfd-range');
   const cfdIncludeDoneEl = document.getElementById('reports-cfd-include-done');
   if (cfdDom) {
     const cfdChart = echarts.init(cfdDom);
+    charts.push(cfdChart);
 
     const updateCfd = () => {
       const rangeDaysRaw = Number.parseInt((cfdRangeEl?.value ?? '90').toString(), 10);
@@ -787,8 +837,7 @@ function main() {
       const includeDone = cfdIncludeDoneEl ? cfdIncludeDoneEl.checked === true : true;
 
       const cfdEnd = new Date();
-      const cfdStart = new Date();
-      cfdStart.setDate(cfdEnd.getDate() - (rangeDays - 1));
+      const cfdStart = addDays(cfdEnd, -(rangeDays - 1));
 
       const { labels, seriesDefs } = computeCumulativeFlow({
         tasks,
@@ -798,18 +847,18 @@ function main() {
         includeDone
       });
 
-      cfdChart.setOption(buildCfdOption({
-        labels,
-        seriesDefs,
-        boardName: boardName || (boardId || 'Active board')
-      }), true);
+      cfdChart.setOption(buildCfdOption({ labels, seriesDefs, boardName: displayName }), true);
     };
 
     updateCfd();
     cfdRangeEl?.addEventListener('change', updateCfd);
     cfdIncludeDoneEl?.addEventListener('change', updateCfd);
-    window.addEventListener('resize', () => cfdChart.resize());
   }
+
+  // Single resize handler for all charts
+  window.addEventListener('resize', () => {
+    for (const chart of charts) chart.resize();
+  });
 }
 
 main();
