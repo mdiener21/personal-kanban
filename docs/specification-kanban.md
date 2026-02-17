@@ -245,6 +245,14 @@
   - KPI tiles for "Completed this week", "Completed last week", and "Avg lead time (last 12 weeks)".
   - A small sparkline chart of tasks completed per week (last 12 weeks).
 
+#### Same-Day Completions
+
+- Reports dashboard shows a **same-day completions** section for ad-hoc tasks (created and done on the same calendar day):
+  - Compares `creationDate` and `doneDate` date portions (`YYYY-MM-DD`); counts tasks where they match.
+  - KPI tiles for "Same-day this week", "Same-day last week", and "Avg per week (12 weeks)".
+  - Badge showing total same-day tasks in the 12-week window.
+  - A bar sparkline chart showing same-day completions per week (last 12 weeks) in amber.
+
 #### Cumulative Flow Diagram (WIP)
 
 - Reports dashboard includes a **Cumulative Flow Diagram** (stacked area chart):
