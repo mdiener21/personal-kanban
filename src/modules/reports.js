@@ -198,6 +198,87 @@ function movingAverage(values, windowSize) {
   return out;
 }
 
+function computeWeeklySameDayCompletions(tasks, rangeStart, rangeEnd) {
+  const buckets = new Map();
+
+  for (const task of tasks || []) {
+    const created = isoDateOnly(task?.creationDate);
+    const done = isoDateOnly(task?.doneDate);
+    if (!created || !done || created !== done) continue;
+
+    const doneDate = safeDate(done);
+    if (!doneDate || doneDate < rangeStart || doneDate > rangeEnd) continue;
+
+    const weekStart = startOfWeekMonday(doneDate);
+    const key = formatIsoDate(weekStart);
+    buckets.set(key, (buckets.get(key) || 0) + 1);
+  }
+
+  const weekStarts = eachWeekStartInclusive(rangeStart, rangeEnd);
+  const fmtShort = (ws) => {
+    const end = addDays(ws, 6);
+    const f = (d) => `${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    return `${f(ws)} → ${f(end)}`;
+  };
+  const labels = weekStarts.map(fmtShort);
+  const counts = weekStarts.map((w) => buckets.get(formatIsoDate(w)) || 0);
+  const total = counts.reduce((s, v) => s + v, 0);
+
+  return { labels, counts, total };
+}
+
+function buildSameDaySparkOption({ labels, counts }) {
+  const theme = getChartTheme();
+  return {
+    backgroundColor: 'transparent',
+    grid: { left: 40, right: 40, top: 8, bottom: 32 },
+    xAxis: {
+      type: 'category',
+      data: labels,
+      axisLabel: { show: true, fontSize: 9, color: theme.muted, rotate: 30, hideOverlap: true },
+      axisLine: { show: false },
+      axisTick: { show: false }
+    },
+    yAxis: {
+      type: 'value',
+      name: 'Tasks',
+      min: 0,
+      nameTextStyle: { color: theme.muted },
+      axisLabel: { color: theme.muted },
+      axisLine: { lineStyle: { color: theme.borderSubtle } },
+      axisTick: { lineStyle: { color: theme.borderSubtle } },
+      splitLine: { lineStyle: { color: theme.borderSubtle } }
+    },
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: { type: 'line' },
+      backgroundColor: theme.surface,
+      borderColor: theme.border,
+      textStyle: { color: theme.text },
+      formatter: (params) => {
+        const p = Array.isArray(params) ? params[0] : params;
+        const label = p?.axisValueLabel || '';
+        const v = p?.value ?? 0;
+        return `${label}<br/>Same-day: ${v}`;
+      }
+    },
+    series: [
+      {
+        type: 'bar',
+        data: counts,
+        itemStyle: { color: '#f59e0b', borderRadius: [2, 2, 0, 0] },
+        label: {
+          show: true,
+          position: 'top',
+          fontSize: 10,
+          color: theme.text,
+          formatter: (params) => params.value > 0 ? String(params.value) : ''
+        }
+      }
+    ]
+  };
+}
+
 function computeWeeklyLeadTimeAndCompletions(tasks, rangeStart, rangeEnd) {
   const buckets = new Map();
 
@@ -654,6 +735,31 @@ function main() {
     // Show only last 12 weeks labels on spark (shorten for tooltip only).
     spark.setOption(buildCompletedSparkOption({ labels: weekly.labels, completedCounts: weekly.completedCounts }));
     window.addEventListener('resize', () => spark.resize());
+  }
+
+  // Same-day completions (created & done on the same day, last 12 weeks)
+  const sameDay = computeWeeklySameDayCompletions(tasks, startWeekRange, endWeekRange);
+
+  const sdThis = sameDay.counts[sameDay.counts.length - 1] || 0;
+  const sdLast = sameDay.counts[sameDay.counts.length - 2] || 0;
+  const sdAvg = sameDay.counts.length
+    ? (sameDay.total / sameDay.counts.length).toFixed(1)
+    : '–';
+
+  const kpiSdThis = document.getElementById('reports-sameday-this-week');
+  const kpiSdLast = document.getElementById('reports-sameday-last-week');
+  const kpiSdAvg = document.getElementById('reports-sameday-avg');
+  const sdBadge = document.getElementById('reports-sameday-badge');
+  if (kpiSdThis) kpiSdThis.textContent = String(sdThis);
+  if (kpiSdLast) kpiSdLast.textContent = String(sdLast);
+  if (kpiSdAvg) kpiSdAvg.textContent = sdAvg;
+  if (sdBadge) sdBadge.textContent = String(sameDay.total);
+
+  const sdSparkDom = document.getElementById('reports-sameday-spark');
+  if (sdSparkDom) {
+    const sdSpark = echarts.init(sdSparkDom);
+    sdSpark.setOption(buildSameDaySparkOption({ labels: sameDay.labels, counts: sameDay.counts }));
+    window.addEventListener('resize', () => sdSpark.resize());
   }
 
   const leadDom = document.getElementById('reports-leadtime-chart');

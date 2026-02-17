@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added (unreleased)
 
+- Same-day completions report section: KPIs (this week, last week, avg per week) and a 12-week bar sparkline showing tasks created and completed on the same day
+
 ### Changed (unreleased)
 
 - Column color picker now displays hex color code alongside the color selector, matching the label editor UX

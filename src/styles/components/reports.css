@@ -139,6 +139,13 @@ body.reports-page .rpt-card-title {
   line-height: 1.15;
 }
 
+body.reports-page .rpt-card-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin: 2px 0 0;
+  line-height: 1.3;
+}
+
 body.reports-page .rpt-controls {
   display: inline-flex;
   align-items: center;

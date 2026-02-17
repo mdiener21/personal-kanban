@@ -26,7 +26,7 @@
   <main class="rpt-main" aria-label="Reports dashboard">
     <section class="reports-kpis" aria-label="Weekly completion summary">
       <div class="rpt-card-header">
-        <h2 class="rpt-card-title">Weekly completion</h2>
+        <h2 class="rpt-card-title">Weekly Task completion</h2>
       </div>
 
       <div class="rpt-kpi-grid" role="group" aria-label="Completion KPIs">
@@ -50,11 +50,40 @@
       </div>
     </section>
 
+    <section class="reports-kpis" aria-label="Same-day completions summary">
+      <div class="rpt-card-header">
+        <h2 class="rpt-card-title">Same-day Task completions</h2>
+        <div class="rpt-badge" id="reports-sameday-badge" title="Same-day tasks (last 12 weeks)">0</div>
+      </div>
+      <p class="rpt-card-hint">A downward trend means less ad-hoc work and more planned tasks getting done — that's progress.</p>
+
+      <div class="rpt-kpi-grid" role="group" aria-label="Same-day completion KPIs">
+        <div class="rpt-kpi">
+          <div class="rpt-kpi-label">Same-day this week</div>
+          <div class="rpt-kpi-value" id="reports-sameday-this-week">0</div>
+        </div>
+        <div class="rpt-kpi">
+          <div class="rpt-kpi-label">Same-day last week</div>
+          <div class="rpt-kpi-value" id="reports-sameday-last-week">0</div>
+        </div>
+        <div class="rpt-kpi">
+          <div class="rpt-kpi-label">Avg per week (12 weeks)</div>
+          <div class="rpt-kpi-value" id="reports-sameday-avg">–</div>
+        </div>
+      </div>
+
+      <div class="rpt-spark" aria-label="Same-day completions per week sparkline">
+        <div class="rpt-spark-title">Same-day completions per week (last 12 weeks)</div>
+        <div id="reports-sameday-spark" class="rpt-chart"></div>
+      </div>
+    </section>
+
     <section class="reports-kpis" aria-label="Lead time report">
       <div class="rpt-card-header">
         <h2 class="rpt-card-title">Lead time (creation → done)</h2>
         <div class="rpt-badge" id="reports-leadtime-badge" title="Completed tasks (last 12 weeks)">0</div>
       </div>
+      <p class="rpt-card-hint">A falling trend line means tasks move from creation to done faster — your workflow is getting more efficient.</p>
       <div id="reports-leadtime-chart" class="rpt-chart"></div>
     </section>
 
