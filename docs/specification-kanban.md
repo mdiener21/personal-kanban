@@ -154,6 +154,7 @@
       - Red/danger: when within urgent threshold (default: < 3 days to due)
       - Amber/warning: when within warning threshold (default: 3-10 days to due)
       - Default/muted: when beyond warning threshold (default: > 10 days to due)
+    - **Done column**: Tasks in the Done column show only the formatted due date without countdown text or urgency coloring (neutral styling). When a task is dragged into or out of Done, the due date display updates immediately.
     - Countdown respects the `showDueDate` setting
   - Age is based on `creationDate` and displayed as `1y 6M 40d` for larger than 1 year,  `0d` for < 1 day, `Nd` for days, and `NM` for months (30 days per month, floor)
     - Years shown only if age ≥ 1 year
