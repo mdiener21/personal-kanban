@@ -324,11 +324,17 @@ function createTaskElement(task, settings, labelsMap = null, today = null) {
 
       if (daysUntilDue !== null) {
         const countdown = formatCountdown(daysUntilDue);
-        const urgentThreshold = settings?.countdownUrgentThreshold ?? 3;
-        const warningThreshold = settings?.countdownWarningThreshold ?? 10;
-        const countdownClass = getCountdownClassName(daysUntilDue, urgentThreshold, warningThreshold);
-        dueDateEl.textContent = `Due ${formattedDate} (${countdown})`;
-        dueDateEl.classList.add(countdownClass);
+        const isDone = task.column === 'done';
+        if (isDone) {
+          dueDateEl.textContent = `Due ${formattedDate}`;
+          dueDateEl.classList.add('countdown-none');
+        } else {
+          const urgentThreshold = settings?.countdownUrgentThreshold ?? 3;
+          const warningThreshold = settings?.countdownWarningThreshold ?? 10;
+          const countdownClass = getCountdownClassName(daysUntilDue, urgentThreshold, warningThreshold);
+          dueDateEl.textContent = `Due ${formattedDate} (${countdown})`;
+          dueDateEl.classList.add(countdownClass);
+        }
       } else {
         // Invalid date, show as-is
         dueDateEl.textContent = 'Due ' + formattedDate;
@@ -676,6 +682,49 @@ export function syncCollapsedTitles() {
     const columnName = h2.textContent.replace(/\s*\(\d+\)$/, ''); // Remove existing count
     h2.textContent = `${columnName} (${taskCount})`;
   });
+}
+
+/**
+ * Update the due-date element on a moved task card to reflect its new column.
+ * Tasks in the done column should not show overdue/urgency styling.
+ */
+export function syncMovedTaskDueDate(taskId, toColumn) {
+  if (!taskId) return;
+
+  const taskEl = document.querySelector(`.task[data-task-id="${taskId}"]`);
+  if (!taskEl) return;
+
+  const dueDateEl = taskEl.querySelector('.task-date');
+  if (!dueDateEl) return;
+
+  const tasks = loadTasks();
+  const task = tasks.find((t) => t.id === taskId);
+  if (!task) return;
+
+  const dueDateRaw = typeof task.dueDate === 'string' ? task.dueDate.trim() : '';
+  if (!dueDateRaw) return;
+
+  const settings = loadSettings();
+  const formattedDate = formatDisplayDate(dueDateRaw, settings?.locale);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const daysUntilDue = calculateDaysUntilDue(dueDateRaw, today);
+  if (daysUntilDue === null) return;
+
+  // Remove existing countdown classes
+  dueDateEl.classList.remove('countdown-urgent', 'countdown-warning', 'countdown-normal', 'countdown-none');
+
+  if (toColumn === 'done') {
+    dueDateEl.textContent = `Due ${formattedDate}`;
+    dueDateEl.classList.add('countdown-none');
+  } else {
+    const countdown = formatCountdown(daysUntilDue);
+    const urgentThreshold = settings?.countdownUrgentThreshold ?? 3;
+    const warningThreshold = settings?.countdownWarningThreshold ?? 10;
+    const countdownClass = getCountdownClassName(daysUntilDue, urgentThreshold, warningThreshold);
+    dueDateEl.textContent = `Due ${formattedDate} (${countdown})`;
+    dueDateEl.classList.add(countdownClass);
+  }
 }
 
 // Render all columns and tasks

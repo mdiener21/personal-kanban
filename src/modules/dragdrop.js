@@ -232,15 +232,16 @@ function initTaskSortables() {
 
         if (dropResult) {
           // Import helpers dynamically to avoid circular dependencies
-          const { syncTaskCounters, syncCollapsedTitles } = await import('./render.js');
+          const { syncTaskCounters, syncCollapsedTitles, syncMovedTaskDueDate } = await import('./render.js');
           const { refreshNotifications } = await import('./notifications.js');
-          
+
           // Update UI elements that depend on task positions without full re-render
           syncTaskCounters();
-          
+
           // If column changed, update collapsed titles and notifications
           if (dropResult.didChangeColumn) {
             syncCollapsedTitles();
+            syncMovedTaskDueDate(dropResult.movedTaskId, dropResult.toColumn);
             refreshNotifications();
           }
         }
