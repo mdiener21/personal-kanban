@@ -15,9 +15,10 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
-  release:
+  release-pr:
     runs-on: ubuntu-latest
 
     steps:
@@ -54,33 +55,38 @@ jobs:
       - name: Update package-lock.json
         run: npm install --package-lock-only
 
-      - name: Commit changelog and version bump
+      - name: Clean generated release notes artifact
+        run: rm -f .release-notes.md
+
+      - name: Create release pull request
+        id: release_pr
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: Bump version to v${{ steps.prepare.outputs.version }} and update changelog
+          branch: release/v${{ steps.prepare.outputs.version }}
+          base: main
+          title: Bump version to v${{ steps.prepare.outputs.version }} and update changelog
+          body: |
+            Automated release preparation for **v${{ steps.prepare.outputs.version }}**.
+
+            This PR includes:
+            - `package.json` version bump
+            - `package-lock.json` sync update
+            - `CHANGELOG.md` promotion from Unreleased
+
+            After merge to `main`, workflow `.github/workflows/publish-release.yml` will:
+            - create/push tag `v${{ steps.prepare.outputs.version }}`
+            - publish GitHub Release notes from `CHANGELOG.md`
+          labels: |
+            release
+          delete-branch: true
+          add-paths: |
+            package.json
+            package-lock.json
+            CHANGELOG.md
+
+      - name: Output PR details
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          git add package.json package-lock.json CHANGELOG.md
-
-          if git diff --staged --quiet; then
-            echo "No changes detected to commit."
-            exit 1
-          fi
-
-          git commit -m "Bump version to v${{ steps.prepare.outputs.version }} and update changelog"
-
-      - name: Create release tag
-        run: |
-          git tag -a "v${{ steps.prepare.outputs.version }}" -m "v${{ steps.prepare.outputs.version }}"
-
-      - name: Push commit and tag
-        run: |
-          git push origin HEAD:main
-          git push origin "v${{ steps.prepare.outputs.version }}"
-
-      - name: Publish GitHub Release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release create "v${{ steps.prepare.outputs.version }}" \
-            --title "v${{ steps.prepare.outputs.version }}" \
-            --notes-file .release-notes.md
+          echo "Release PR number: ${{ steps.release_pr.outputs.pull-request-number }}"
+          echo "Release PR URL: ${{ steps.release_pr.outputs.pull-request-url }}"

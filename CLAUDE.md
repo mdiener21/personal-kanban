@@ -87,8 +87,9 @@ When asked to create a release/tag for unreleased changes:
 2. **Build** — workflow runs `npm ci` and `npm run build`.
 3. **Version + changelog update** — workflow runs `scripts/prepare-release.mjs` to bump `package.json` and move Unreleased changelog entries into `## [X.Y.Z] - YYYY-MM-DD`.
 4. **Lockfile update** — workflow runs `npm install --package-lock-only`.
-5. **Commit + tag + push** — workflow commits `package.json`, `package-lock.json`, and `CHANGELOG.md`, then creates/pushes `vX.Y.Z`.
-6. **Publish release** — workflow creates GitHub Release `vX.Y.Z` with release notes from the updated changelog section.
+5. **Create release PR** — workflow commits release files on branch `release/vX.Y.Z` and opens/updates a PR into `main`.
+6. **Merge release PR** — once merged, `.github/workflows/publish-release.yml` runs automatically on `main`.
+7. **Tag + publish** — publish workflow creates/pushes `vX.Y.Z` and creates GitHub Release with notes extracted from `CHANGELOG.md`.
 
 Fallback manual path should follow the same sequence if automation is unavailable.
 
@@ -98,7 +99,7 @@ Fallback manual path should follow the same sequence if automation is unavailabl
 - **Changelog format**: Keep a Changelog. Sections: `### Added/Changed/Removed (version)`
 - **Commit message**: `Bump version to vX.Y.Z and update changelog`
 - **Tag**: Annotated `vX.Y.Z` with brief comma-separated summary
-- **Release automation**: `.github/workflows/release.yml` + `scripts/prepare-release.mjs`
+- **Release automation**: `.github/workflows/release.yml` + `.github/workflows/publish-release.yml` + `scripts/prepare-release.mjs` + `scripts/extract-release-notes.mjs`
 - **Docs to update on feature changes**: `CHANGELOG.md`, `docs/specification-kanban.md`, `CLAUDE.md` (if module structure changes)
 
 ## Vite Configuration

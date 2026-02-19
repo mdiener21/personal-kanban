@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "release:prepare": "node scripts/prepare-release.mjs",
     "release:generate": "gh workflow run release.yml",
+    "release:publish": "gh workflow run publish-release.yml",
     "test": "playwright test",
     "test:ui": "playwright test --ui",
     "test:debug": "playwright test --debug"

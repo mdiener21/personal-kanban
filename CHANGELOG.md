@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed (unreleased)
 
+- Release automation switched to PR-first flow: `Generate Release` now opens/updates a release PR, and `Publish Release` publishes tag + GitHub Release automatically after merge to `main`
+
 ### Removed (unreleased)
 
 ## [1.1.3] - 2026-02-19

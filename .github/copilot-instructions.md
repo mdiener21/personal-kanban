@@ -87,8 +87,9 @@ When asked to generate a release:
 2. **Build** — workflow runs `npm ci` and `npm run build`.
 3. **Version bump** — workflow runs `scripts/prepare-release.mjs` to bump `package.json` version and promote `CHANGELOG.md` Unreleased entries into a new versioned section.
 4. **Lockfile update** — workflow runs `npm install --package-lock-only` so `package-lock.json` matches the new version.
-5. **Commit + tag + push** — workflow commits `package.json`, `package-lock.json`, `CHANGELOG.md`, creates tag `vX.Y.Z`, and pushes commit/tag to `main`.
-6. **Publish release** — workflow creates GitHub Release `vX.Y.Z` and uses generated changelog text as the release notes body.
+5. **Create release PR** — workflow commits release files on branch `release/vX.Y.Z` and opens/updates a PR into `main`.
+6. **Merge release PR** — once merged, workflow `.github/workflows/publish-release.yml` runs automatically on `main`.
+7. **Tag + publish** — publish workflow creates tag `vX.Y.Z` and publishes GitHub Release notes from `CHANGELOG.md`.
 
 If workflow automation is unavailable, fall back to the manual process above using the same sequence.
 
@@ -98,6 +99,6 @@ If workflow automation is unavailable, fall back to the manual process above usi
 - **Changelog format**: Keep a Changelog. Sections: `### Added/Changed/Removed (version)`
 - **Commit message**: `Bump version to vX.Y.Z and update changelog`
 - **Tag**: Annotated `vX.Y.Z` with brief comma-separated summary
-- **Release automation**: `.github/workflows/release.yml` + `scripts/prepare-release.mjs`
+- **Release automation**: `.github/workflows/release.yml` + `.github/workflows/publish-release.yml` + `scripts/prepare-release.mjs` + `scripts/extract-release-notes.mjs`
 - **Docs to update on feature changes**: `CHANGELOG.md`, `docs/specification-kanban.md`, `CLAUDE.md`, `.github/copilot-instructions.md` (if module structure changes)
 

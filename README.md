@@ -102,12 +102,15 @@ npm run preview
 
 ### Generate a Release
 
-Use the `Generate Release` workflow to automate:
+Use the `Generate Release` workflow to automate release preparation:
 - `npm ci` + `npm run build`
 - version bump (`package.json` + `package-lock.json`)
 - changelog promotion from `Unreleased`
-- commit + tag (`vX.Y.Z`) + push
-- GitHub Release publication with changelog notes
+- creation/update of a release PR (`release/vX.Y.Z` → `main`)
+
+After the release PR is merged, `Publish Release` runs automatically on `main` and:
+- creates/pushes tag `vX.Y.Z`
+- publishes GitHub Release with notes extracted from `CHANGELOG.md`
 
 GitHub CLI example:
 
