@@ -25,19 +25,34 @@ The specification files include core data structures and details to be maintaine
 - `src/kanban.js` - Main entry, wires UI handlers and calls `renderBoard()`
 - `src/index.html` - Main board UI
 - `src/reports.html` - Separate reports page with ECharts visualizations
+- `src/calendar.html` - Calendar view showing tasks by due date
 
 ### Module Structure (src/modules/)
-- **render.js** - Centralized rendering via `renderBoard()`. After any data change, call this to refresh UI.
+
+- **render.js** - Centralized rendering via `renderBoard()`. After any data change, call this to refresh UI. Exports sync helpers (`syncTaskCounters`, `syncCollapsedTitles`, `syncMovedTaskDueDate`) for incremental updates.
 - **storage.js** - Multi-board localStorage persistence. Keys: `kanbanBoards`, `kanbanActiveBoardId`, `kanbanBoard:<boardId>:columns|tasks|labels|settings`
-- **icons.js** - Lucide icons tree-shaking. To add an icon: import from `lucide`, add to `icons` object, call `renderIcons()` after dynamic DOM changes.
-- **dragdrop.js** - SortableJS-based drag/drop for tasks and columns
-- **accordion.js** - Reusable collapsible accordion. `createAccordionSection(title, items, expanded, renderItem)` builds a section with chevron toggle, count badge, and a body populated via the `renderItem` callback.
+- **tasks.js** - Task CRUD, drag-drop position updates (`updateTaskPositionsFromDrop`, `moveTaskToTopInColumn`)
+- **columns.js** - Column CRUD, collapse toggle, position updates
+- **boards.js** - Multi-board management, board create/switch, template system
+- **dragdrop.js** - SortableJS-based drag/drop for tasks and columns. Done column has `sort: false` for performance.
 - **modals.js** - Modal UX (close via Escape/backdrop). Uses DOM ids from index.html.
 - **dialog.js** - `confirmDialog()` / `alertDialog()` instead of `window.confirm`
+- **icons.js** - Lucide icons tree-shaking. To add an icon: import from `lucide`, add to `icons` object, call `renderIcons()` after dynamic DOM changes.
+- **notifications.js** - Due date notification banner and modal
+- **settings.js** - Per-board settings modal and persistence
+- **labels.js** - Label management modal UI
+- **dateutils.js** - Due date countdown calculations and formatting
+- **calendar.js** - Calendar page rendering with ECharts
+- **reports.js** - Reports page with ECharts (lead time, completions, cumulative flow)
+- **accordion.js** - Reusable collapsible accordion. `createAccordionSection(title, items, expanded, renderItem)` builds a section with chevron toggle, count badge, and a body populated via the `renderItem` callback.
 - **importexport.js** - Per-board JSON export/import. Must update if data shapes change.
+- **theme.js** - Light/dark theme toggle and persistence
+- **validation.js** - Form validation helpers
+- **utils.js** - UUID generation and shared utilities
 
 ### Data Flow Pattern
-```
+
+```text
 load → modify → save → renderBoard()
 ```
 
@@ -45,11 +60,11 @@ Many modules use `await import('./render.js')` to call `renderBoard()` and avoid
 
 ### Domain Objects
 
-**Task**: `id`, `title`, `description`, `priority` (low|medium|high), `dueDate` (YYYY-MM-DD), `column`, `order`, `labels[]`, `creationDate`, `changeDate`, `doneDate`
+**Task**: `id`, `title`, `description`, `priority` (urgent|high|medium|low|none), `dueDate` (YYYY-MM-DD), `column`, `order`, `labels[]`, `creationDate`, `changeDate`, `doneDate`, `columnHistory[]`
 
 **Column**: `id`, `name`, `color` (hex), `order`, `collapsed`
 
-**Label**: `id`, `name` (max 40 chars), `color` (hex)
+**Label**: `id`, `name` (max 40 chars), `color` (hex), `group`
 
 ## Key Conventions
 
@@ -89,4 +104,4 @@ When asked to create a release/tag for unreleased changes:
 - Root: `src/`
 - Output: `dist/`
 - Base path: `./` (relative, for static hosting)
-- Two entry points: index.html and reports.html
+- Three entry points: index.html, reports.html, and calendar.html

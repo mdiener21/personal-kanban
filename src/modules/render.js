@@ -649,9 +649,10 @@ function updateColumnSelect() {
 
 /**
  * Sync task counters without full re-render (performance optimization)
+ * @param {Array} [tasksCache] - Optional pre-loaded tasks array to avoid redundant localStorage reads
  */
-export function syncTaskCounters() {
-  const tasks = loadTasks();
+export function syncTaskCounters(tasksCache) {
+  const tasks = tasksCache || loadTasks();
   const labelsById = new Map(loadLabels().map((l) => [l.id, { name: (l.name || '').toString().trim().toLowerCase(), group: (l.group || '').toString().trim().toLowerCase() }]));
   const queryLower = (boardFilterQuery || '').toString().trim().toLowerCase();
   
@@ -671,14 +672,16 @@ export function syncTaskCounters() {
 
 /**
  * Sync collapsed column titles without full re-render (performance optimization)
+ * @param {Array} [tasksCache] - Optional pre-loaded tasks array to avoid redundant localStorage reads
  */
-export function syncCollapsedTitles() {
+export function syncCollapsedTitles(tasksCache) {
+  const tasks = tasksCache || loadTasks();
   document.querySelectorAll('.task-column.is-collapsed').forEach(columnEl => {
     const columnId = columnEl.dataset.column;
     const h2 = columnEl.querySelector('h2');
     if (!columnId || !h2) return;
-    
-    const taskCount = getTaskCountInColumn(columnId);
+
+    const taskCount = tasks.filter(t => t.column === columnId).length;
     const columnName = h2.textContent.replace(/\s*\(\d+\)$/, ''); // Remove existing count
     h2.textContent = `${columnName} (${taskCount})`;
   });
@@ -688,7 +691,7 @@ export function syncCollapsedTitles() {
  * Update the due-date element on a moved task card to reflect its new column.
  * Tasks in the done column should not show overdue/urgency styling.
  */
-export function syncMovedTaskDueDate(taskId, toColumn) {
+export function syncMovedTaskDueDate(taskId, toColumn, tasksCache) {
   if (!taskId) return;
 
   const taskEl = document.querySelector(`.task[data-task-id="${taskId}"]`);
@@ -697,7 +700,7 @@ export function syncMovedTaskDueDate(taskId, toColumn) {
   const dueDateEl = taskEl.querySelector('.task-date');
   if (!dueDateEl) return;
 
-  const tasks = loadTasks();
+  const tasks = tasksCache || loadTasks();
   const task = tasks.find((t) => t.id === taskId);
   if (!task) return;
 

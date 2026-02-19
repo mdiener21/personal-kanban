@@ -162,14 +162,21 @@ function updateCollapsedHoverFromPoint(x, y) {
 function initTaskSortables() {
   const taskLists = document.querySelectorAll('.tasks');
   const forceFallback = shouldForceFallbackForTasks();
-  
+
   taskLists.forEach(taskList => {
+    // Disable sorting within the Done column for performance.
+    // Tasks dropped into Done are placed at the top automatically;
+    // internal reordering among completed tasks is unnecessary.
+    const columnEl = taskList.closest('.task-column');
+    const isDoneColumn = columnEl?.dataset?.column === 'done';
+
     const sortable = new Sortable(taskList, {
       group: {
         name: 'tasks',
         pull: true,
         put: true
       },
+      sort: !isDoneColumn, // Skip position calculations for Done column
       animation: 150,
       delay: 150, // Delay before drag starts (allows scrolling on mobile)
       delayOnTouchOnly: true, // Only apply delay on touch devices
@@ -222,26 +229,36 @@ function initTaskSortables() {
         
         // Update task positions in storage (optimized - no full re-render)
         const dropResult = updateTaskPositionsFromDrop(evt);
+        let cachedTasks = dropResult?.tasks || null;
+
         const toColumnEl = evt.to?.closest('.task-column');
-        if (dropResult && toColumnEl?.classList.contains('is-collapsed')) {
-          moveTaskToTopInColumn(dropResult.movedTaskId, dropResult.toColumn);
+        const isDropIntoDone = dropResult?.toColumn === 'done';
+
+        if (dropResult && (toColumnEl?.classList.contains('is-collapsed') || isDropIntoDone)) {
+          cachedTasks = moveTaskToTopInColumn(dropResult.movedTaskId, dropResult.toColumn, cachedTasks);
+
+          // Move the DOM element to the top of the list so the user sees it snap there
+          if (isDropIntoDone && evt.item && evt.to) {
+            evt.to.prepend(evt.item);
+          }
         }
 
         clearCollapsedDropHover();
         hideCollapsedDropZones();
 
         if (dropResult) {
+
           // Import helpers dynamically to avoid circular dependencies
           const { syncTaskCounters, syncCollapsedTitles, syncMovedTaskDueDate } = await import('./render.js');
           const { refreshNotifications } = await import('./notifications.js');
 
           // Update UI elements that depend on task positions without full re-render
-          syncTaskCounters();
+          syncTaskCounters(cachedTasks);
 
           // If column changed, update collapsed titles and notifications
           if (dropResult.didChangeColumn) {
-            syncCollapsedTitles();
-            syncMovedTaskDueDate(dropResult.movedTaskId, dropResult.toColumn);
+            syncCollapsedTitles(cachedTasks);
+            syncMovedTaskDueDate(dropResult.movedTaskId, dropResult.toColumn, cachedTasks);
             refreshNotifications();
           }
         }

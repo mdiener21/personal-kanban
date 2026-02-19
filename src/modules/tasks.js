@@ -220,14 +220,15 @@ export function updateTaskPositionsFromDrop(evt) {
     movedTaskId,
     fromColumn,
     toColumn,
-    didChangeColumn
+    didChangeColumn,
+    tasks: updatedTasks
   };
 }
 
-export function moveTaskToTopInColumn(taskId, columnId) {
-  if (!taskId || !columnId) return;
+export function moveTaskToTopInColumn(taskId, columnId, tasksCache) {
+  if (!taskId || !columnId) return null;
 
-  const tasks = loadTasks();
+  const tasks = tasksCache || loadTasks();
   const columnTasks = tasks
     .filter((task) => task.column === columnId && task.id !== taskId)
     .slice()
@@ -250,7 +251,11 @@ export function moveTaskToTopInColumn(taskId, columnId) {
     return task;
   });
 
-  if (didUpdate) saveTasks(updatedTasks);
+  if (didUpdate) {
+    saveTasks(updatedTasks);
+    return updatedTasks;
+  }
+  return tasks;
 }
 
 // Update task positions after drag (legacy - kept for compatibility)
