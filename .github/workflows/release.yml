@@ -60,6 +60,7 @@ jobs:
 
       - name: Create release pull request
         id: release_pr
+        continue-on-error: true
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -88,5 +89,11 @@ jobs:
 
       - name: Output PR details
         run: |
-          echo "Release PR number: ${{ steps.release_pr.outputs.pull-request-number }}"
-          echo "Release PR URL: ${{ steps.release_pr.outputs.pull-request-url }}"
+          if [ -n "${{ steps.release_pr.outputs.pull-request-url }}" ]; then
+            echo "Release PR number: ${{ steps.release_pr.outputs.pull-request-number }}"
+            echo "Release PR URL: ${{ steps.release_pr.outputs.pull-request-url }}"
+          else
+            echo "Workflow created branch release/v${{ steps.prepare.outputs.version }} but could not open a PR."
+            echo "Enable repository setting: Allow GitHub Actions to create and approve pull requests."
+            echo "Manual PR URL: https://github.com/${{ github.repository }}/compare/main...release/v${{ steps.prepare.outputs.version }}?expand=1"
+          fi

@@ -120,6 +120,9 @@ gh workflow run release.yml --ref main -f bump=patch
 
 Use `bump=minor` or `bump=major` when needed.
 
+If your repo blocks Actions from opening PRs, enable repository setting:
+`Settings → Actions → General → Workflow permissions → Allow GitHub Actions to create and approve pull requests`.
+
 ### Run Tests
 
 Run all Playwright E2E tests:

@@ -91,6 +91,8 @@ When asked to create a release/tag for unreleased changes:
 6. **Merge release PR** — once merged, `.github/workflows/publish-release.yml` runs automatically on `main`.
 7. **Tag + publish** — publish workflow creates/pushes `vX.Y.Z` and creates GitHub Release with notes extracted from `CHANGELOG.md`.
 
+If PR creation fails in workflow, enable repository setting: `Allow GitHub Actions to create and approve pull requests`.
+
 Fallback manual path should follow the same sequence if automation is unavailable.
 
 ### Release conventions
