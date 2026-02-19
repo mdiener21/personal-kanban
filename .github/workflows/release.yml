@@ -1,0 +1,86 @@
+name: Generate Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: Version bump type
+        required: true
+        default: patch
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Ensure main branch
+        run: |
+          if [ "${GITHUB_REF}" != "refs/heads/main" ]; then
+            echo "This workflow must run from main. Current ref: ${GITHUB_REF}"
+            exit 1
+          fi
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build project
+        run: npm run build
+
+      - name: Prepare version and changelog
+        id: prepare
+        run: |
+          NEW_VERSION=$(node scripts/prepare-release.mjs --bump "${{ github.event.inputs.bump }}" --notes-file .release-notes.md)
+          echo "version=${NEW_VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Update package-lock.json
+        run: npm install --package-lock-only
+
+      - name: Commit changelog and version bump
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add package.json package-lock.json CHANGELOG.md
+
+          if git diff --staged --quiet; then
+            echo "No changes detected to commit."
+            exit 1
+          fi
+
+          git commit -m "Bump version to v${{ steps.prepare.outputs.version }} and update changelog"
+
+      - name: Create release tag
+        run: |
+          git tag -a "v${{ steps.prepare.outputs.version }}" -m "v${{ steps.prepare.outputs.version }}"
+
+      - name: Push commit and tag
+        run: |
+          git push origin HEAD:main
+          git push origin "v${{ steps.prepare.outputs.version }}"
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "v${{ steps.prepare.outputs.version }}" \
+            --title "v${{ steps.prepare.outputs.version }}" \
+            --notes-file .release-notes.md

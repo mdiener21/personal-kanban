@@ -100,6 +100,23 @@ Built files are in `dist/`.
 npm run preview
 ```
 
+### Generate a Release
+
+Use the `Generate Release` workflow to automate:
+- `npm ci` + `npm run build`
+- version bump (`package.json` + `package-lock.json`)
+- changelog promotion from `Unreleased`
+- commit + tag (`vX.Y.Z`) + push
+- GitHub Release publication with changelog notes
+
+GitHub CLI example:
+
+```bash
+gh workflow run release.yml --ref main -f bump=patch
+```
+
+Use `bump=minor` or `bump=major` when needed.
+
 ### Run Tests
 
 Run all Playwright E2E tests:

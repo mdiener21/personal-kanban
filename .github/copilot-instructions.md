@@ -79,18 +79,18 @@ Mutations generally follow: **load → modify → save → `renderBoard()`**.
 
 ## Release Process
 
-When asked to create a release/tag for unreleased changes:
+Preferred approach: run the manual GitHub Actions workflow `Generate Release` (`.github/workflows/release.yml`).
 
-1. **Determine next version** — read `package.json` `"version"`, bump patch (e.g. 1.0.10 → 1.0.11). Ask only if minor/major bump seems warranted.
-2. **Verify unreleased entries** — read `CHANGELOG.md` top, confirm entries exist under Unreleased sections.
-3. **Update `package.json`** — bump `"version"`.
-4. **Update `CHANGELOG.md`** — move Unreleased entries into a new `## [X.Y.Z] - YYYY-MM-DD` section. Rename headers from `(unreleased)` to `(X.Y.Z)`. Keep empty Unreleased placeholders at top.
-5. **Build** — `npm run build` must succeed.
-6. **Commit** — `git add package.json CHANGELOG.md && git commit -m "Bump version to vX.Y.Z and update changelog"` (include Co-Authored-By).
-7. **Tag** — `git tag -a vX.Y.Z -m "vX.Y.Z – short summary"`.
-8. **Verify** — `git log --oneline -3 && git tag -l --sort=-v:refname | head -3`.
-9. **Push tag (only if explicitly asked)** — `git push origin vX.Y.Z` (example: `git push origin v1.0.12`).
-10. **Do NOT push** branches/commits unless explicitly asked.
+When asked to generate a release:
+
+1. **Trigger workflow** — run workflow dispatch on `main` with bump type (`patch|minor|major`).
+2. **Build** — workflow runs `npm ci` and `npm run build`.
+3. **Version bump** — workflow runs `scripts/prepare-release.mjs` to bump `package.json` version and promote `CHANGELOG.md` Unreleased entries into a new versioned section.
+4. **Lockfile update** — workflow runs `npm install --package-lock-only` so `package-lock.json` matches the new version.
+5. **Commit + tag + push** — workflow commits `package.json`, `package-lock.json`, `CHANGELOG.md`, creates tag `vX.Y.Z`, and pushes commit/tag to `main`.
+6. **Publish release** — workflow creates GitHub Release `vX.Y.Z` and uses generated changelog text as the release notes body.
+
+If workflow automation is unavailable, fall back to the manual process above using the same sequence.
 
 ### Release conventions
 
@@ -98,5 +98,6 @@ When asked to create a release/tag for unreleased changes:
 - **Changelog format**: Keep a Changelog. Sections: `### Added/Changed/Removed (version)`
 - **Commit message**: `Bump version to vX.Y.Z and update changelog`
 - **Tag**: Annotated `vX.Y.Z` with brief comma-separated summary
+- **Release automation**: `.github/workflows/release.yml` + `scripts/prepare-release.mjs`
 - **Docs to update on feature changes**: `CHANGELOG.md`, `docs/specification-kanban.md`, `CLAUDE.md`, `.github/copilot-instructions.md` (if module structure changes)
 

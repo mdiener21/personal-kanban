@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Column color picker now displays hex color code alongside the color selector, matching the label editor UX
 - Added a quick-access Notifications bell beside the menu button while keeping Notifications in the controls dropdown; both buttons now show the same live notification count badge and open the same modal
 - Improved drag-drop performance for Done column: disabled internal sorting of done (tasks always placed at top of done) and eliminated redundant localStorage reads during drop operations
+- Added a manual GitHub Actions release pipeline (`Generate Release`) that runs build, bumps version/changelog, pushes commit and tag, and publishes a GitHub Release with changelog notes
 
 ### Removed (unreleased)
 
