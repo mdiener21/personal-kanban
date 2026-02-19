@@ -318,12 +318,13 @@ The notification system alerts users to tasks with approaching or past due dates
 - **Tasks**: Draggable within and between columns, placeholder shows drop location
 - **Task List Auto-Scroll**: Dragging near the top/bottom of a scrollable column auto-scrolls the list so tasks can be moved beyond the visible viewport
 - **Collapsed Columns**: Accept task drops; hovering shows a dashed outline and the dropped task is placed at the top of the column
+- **Done Column Drop Behavior**: Tasks dropped into the Done column are always placed at the top (order 1), regardless of where in the list the user drops them. Internal reordering within Done is disabled (`sort: false` on SortableJS) for performance — this eliminates expensive position calculations when dragging over a column with many completed tasks.
 - **Columns**: Draggable via grip handle only, placeholder shows drop position
 - **Order Tracking**: Both tasks and columns have order property (1-based), updated on drop
 - **Performance Optimization**: Task drops use incremental updates instead of full board re-render:
-  - `updateTaskPositionsFromDrop()` updates only the moved task and recomputes order for affected columns
+  - `updateTaskPositionsFromDrop()` updates only the moved task and recomputes order for affected columns; returns the updated tasks array for reuse by downstream helpers
   - Only updates `columnHistory` and timestamps when task changes columns (not for reorders within same column)
-  - Syncs task counters and collapsed column titles without rebuilding the entire DOM
+  - Syncs task counters, collapsed column titles, and moved task due dates using a single cached tasks array passed through the drop handler chain, avoiding redundant `loadTasks()` / localStorage reads
   - Notifications refresh only when tasks move between columns
 - **Auto-save**: On drop, recalculates positions for affected columns and saves to localStorage
 
