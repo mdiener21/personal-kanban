@@ -112,6 +112,8 @@ After the release PR is merged, `Publish Release` runs automatically on `main` a
 - creates/pushes tag `vX.Y.Z`
 - publishes GitHub Release with notes extracted from `CHANGELOG.md`
 
+`Publish Release` is triggered on every push to `main`, but it only creates a tag/release when that version tag does not already exist.
+
 GitHub CLI example:
 
 ```bash
