@@ -10,9 +10,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added (unreleased)
 
+### Changed (unreleased)
+
+### Removed (unreleased)
+
+## [1.1.3] - 2026-02-19
+
+### Added (1.1.3)
+
 - Same-day completions report section: KPIs (this week, last week, avg per week) and a 12-week bar sparkline showing tasks created and completed on the same day
 
-### Changed (unreleased)
+### Changed (1.1.3)
 
 - Tasks in the Done column no longer show overdue/urgency countdown styling; due date is displayed without countdown text in neutral styling. Updates immediately on drag-drop.
 - Column color picker now displays hex color code alongside the color selector, matching the label editor UX
@@ -20,7 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improved drag-drop performance for Done column: disabled internal sorting of done (tasks always placed at top of done) and eliminated redundant localStorage reads during drop operations
 - Added a manual GitHub Actions release pipeline (`Generate Release`) that runs build, bumps version/changelog, pushes commit and tag, and publishes a GitHub Release with changelog notes
 
-### Removed (unreleased)
+### Removed (1.1.3)
 
 ## [1.1.2] - 2026-02-14
 
