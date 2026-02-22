@@ -1,0 +1,31 @@
+services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: kanban
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./api/db/migrations/000001_init.up.sql:/docker-entrypoint-initdb.d/01_init.sql
+      - ./api/db/migrations/000002_email_auth.up.sql:/docker-entrypoint-initdb.d/02_email_auth.sql
+
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/kanban?sslmode=disable
+      - PORT=8080
+      - JWT_SECRET=change-me
+      - FRONTEND_URL=http://localhost:3000
+      - AUTH_CALLBACK_URL=http://localhost:8080/auth
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:

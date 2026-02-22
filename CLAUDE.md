@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Local-first personal kanban board with no backend. `docs/specification-kanban.md` outlines structure and features, all state lives in browser localStorage. Built with vanilla JavaScript, HTML, and CSS using Vite for bundling.
+Local-first personal kanban board with optional use of a backend self hosted. `docs/specification-kanban.md` outlines structure and features, all state lives in browser localStorage. Built with vanilla JavaScript, HTML, and CSS using Vite for bundling.
 
 ## Commands
 
@@ -69,7 +69,7 @@ Many modules use `await import('./render.js')` to call `renderBoard()` and avoid
 ## Key Conventions
 
 - **Technology constraints**: Vanilla JS/CSS/HTML only. No frameworks. Dependencies limited to Lucide, SortableJS, ECharts.
-- **Mobile-first**: All interactions must work on small screens.
+- **Mobile-first**: All interactions must work on mobile, tab and desktop screens.
 - **Specification doc**: `docs/specification-kanban.md` - keep updated when features change.
 - **Changelog**: `CHANGELOG.md` - update [Unreleased] section following Keep a Changelog format.
 - **Theme**: Light/dark via `document.documentElement.dataset.theme`. Persistence key: `kanban-theme`.

@@ -2,16 +2,20 @@
 
 ## Technology Rules and Principles
 
-- Only vanilla CSS, JavaScript, and HTML
+- Only vanilla CSS, JavaScript, Go and HTML
 - Minimal dependencies:
   - **Lucide icons**: Tree-shaken ES module import (not CDN) via `src/modules/icons.js`
   - **SortableJS**: Drag-and-drop library for tasks and columns
   - **Apache ECharts (Reports and Calendar only)**: Modular import via `echarts/core` + explicit `echarts.use()` registration in `src/modules/reports.js` and in `src/modules/calendar.js`
-- Storage: browser localStorage only
-- Data persistence: JSON import/export to local disk
-- No server, no frameworks
+- Storage: browser localStorage, optional backend Postgresql database using a Go API
+- Data persistence: JSON import/export to local disk, or optional backend API
+- Minimal dependencies, no frameworks
 - Build tooling: Vite (ES modules)
   - Reports bundling: Rollup chunk splitting keeps ECharts and ZRender in dedicated vendor chunks (`vendor-echarts`, `vendor-zrender`) to avoid oversized entry chunks.
+- Backend: Golang API with PostgreSQL
+- Authentication:
+  - Social Auth (Google, Apple, Microsoft) via OAuth2/OIDC
+  - Email/Password Auth with email verification
 
 ## AI LLM Rules
 
@@ -79,6 +83,7 @@
 - **Boards registry**:
   - `kanbanBoards`: array of Board metadata
   - `kanbanActiveBoardId`: last active board id (restored on page load)
+  - `kanbanAuthToken`: JWT token for cloud sync (if logged in)
 - **Per-board data (namespaced)**:
   - `kanbanBoard:<boardId>:tasks`
   - `kanbanBoard:<boardId>:columns`
@@ -88,6 +93,15 @@
 - All CRUD operations load/save against the currently active board.
 - **Export** operates on the active board.
 - **Import** creates a **new board** from the JSON and switches to it.
+
+### Online Sync
+
+- Users can opt-in to online storage by clicking **Go Online**.
+- Authentication is handled via Social Auth (Google, Apple, and Microsoft options) or Email/Password.
+- Email/Password registration requires clicking a verification link sent to the user's email.
+- Once logged in, a **Sync** button allows pushing local data to the cloud or pulling remote data to the local machine.
+- Cloud data is stored in a PostgreSQL database managed by a Golang API.
+- Sync is currently a bulk operation (Push all or Pull all).
 
 ## UI Components
 
@@ -199,6 +213,8 @@
   - Help button (opens help modal)
   - Manage Labels button
   - Settings button (opens Settings modal)
+  - Go Online / Login button
+  - Sync / Logout (when logged in)
   - Notifications button (opens notifications modal, shows badge with count)
   - Add Column button
   - View Calendar link (opens `calendar.html`)
