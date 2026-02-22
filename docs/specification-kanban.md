@@ -2,14 +2,14 @@
 
 ## Technology Rules and Principles
 
-- Only vanilla CSS, JavaScript, and HTML
+- Only vanilla CSS, JavaScript, Go and HTML
 - Minimal dependencies:
   - **Lucide icons**: Tree-shaken ES module import (not CDN) via `src/modules/icons.js`
   - **SortableJS**: Drag-and-drop library for tasks and columns
   - **Apache ECharts (Reports and Calendar only)**: Modular import via `echarts/core` + explicit `echarts.use()` registration in `src/modules/reports.js` and in `src/modules/calendar.js`
-- Storage: browser localStorage only
-- Data persistence: JSON import/export to local disk
-- No server, no frameworks
+- Storage: browser localStorage, optional backend Postgresql database using a Go API
+- Data persistence: JSON import/export to local disk, or optional backend API
+- Minimal dependencies, no frameworks
 - Build tooling: Vite (ES modules)
   - Reports bundling: Rollup chunk splitting keeps ECharts and ZRender in dedicated vendor chunks (`vendor-echarts`, `vendor-zrender`) to avoid oversized entry chunks.
 - Backend: Golang API with PostgreSQL
@@ -96,7 +96,7 @@
 
 ### Online Sync
 
-- Users can opt-in to cloud storage by clicking **Go Online**.
+- Users can opt-in to online storage by clicking **Go Online**.
 - Authentication is handled via Social Auth (Google, Apple, and Microsoft options) or Email/Password.
 - Email/Password registration requires clicking a verification link sent to the user's email.
 - Once logged in, a **Sync** button allows pushing local data to the cloud or pulling remote data to the local machine.

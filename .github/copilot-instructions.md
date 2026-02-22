@@ -1,7 +1,7 @@
 # Copilot instructions (personal-kanban)
 
 ## Big picture
-- This is a **local-first, no-backend** kanban app: all state lives in **browser `localStorage`** and the UI is plain DOM.
+- This is a **local-first, backend optional** kanban app: all state lives in **browser `localStorage`** and the UI is plain DOM.
 - Build tooling is **Vite** with **`src/` as the Vite root** and output to `dist/`.
   - Edit source files in `src/` (do **not** hand-edit `dist/`).
 - Specification is in `docs/specification-kanban.md` (**always keep it updated** as features change).
