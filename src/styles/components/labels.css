@@ -76,9 +76,9 @@
 /* Active labels row (in modal) */
 .active-labels {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 6px;
-  overflow-x: auto;
+  flex-wrap: wrap;
   padding: 4px 0;
   margin-bottom: 8px;
 }

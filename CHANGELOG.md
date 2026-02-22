@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
 ## Unreleased
 
 ### Added (unreleased)
@@ -12,6 +13,79 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed (unreleased)
 
 ### Removed (unreleased)
+
+## [1.1.4] - 2026-02-19
+
+### Added (1.1.4)
+
+### Changed (1.1.4)
+
+- Release automation switched to PR-first flow: `Generate Release` now opens/updates a release PR, and `Publish Release` publishes tag + GitHub Release automatically after merge to `main`
+
+### Removed (1.1.4)
+
+## [1.1.3] - 2026-02-19
+
+### Added (1.1.3)
+
+- Same-day completions report section: KPIs (this week, last week, avg per week) and a 12-week bar sparkline showing tasks created and completed on the same day
+
+### Changed (1.1.3)
+
+- Tasks in the Done column no longer show overdue/urgency countdown styling; due date is displayed without countdown text in neutral styling. Updates immediately on drag-drop.
+- Column color picker now displays hex color code alongside the color selector, matching the label editor UX
+- Added a quick-access Notifications bell beside the menu button while keeping Notifications in the controls dropdown; both buttons now show the same live notification count badge and open the same modal
+- Improved drag-drop performance for Done column: disabled internal sorting of done (tasks always placed at top of done) and eliminated redundant localStorage reads during drop operations
+- Added a manual GitHub Actions release pipeline (`Generate Release`) that runs build, bumps version/changelog, pushes commit and tag, and publishes a GitHub Release with changelog notes
+
+### Removed (1.1.3)
+
+## [1.1.2] - 2026-02-14
+
+### Added (1.1.2)
+
+- Create Board modal now includes a Template dropdown to create a new board from a built-in template (or start blank)
+
+### Changed (1.1.2)
+
+- Task edit modal redesigned with 2-column layout on desktop
+  - Left column: title, description, priority, due date, column selector
+  - Right column: labels section
+  - Modal width increased to 850px on desktop for better space utilization
+  - Remains single-column on mobile devices for optimal touch interaction
+- Active labels in task modal now wrap to multiple lines instead of horizontal scrolling when many labels are selected
+- Manage Boards modal now closes immediately after clicking "Open" on a board
+
+### Removed (1.1.2)
+
+## [1.1.0] - 2026-02-14
+
+The jump to 1.1.0 reflects a substantial release with many new features, quality-of-life improvements, and stronger end-to-end test coverage.
+
+### Added (2026-02-14)
+
+- Due date countdown timer showing time remaining in task footer
+  - Countdown displays beside due date in format "Due MM/DD/YYYY (countdown)"
+  - Shows months and days for periods ≥ 30 days (e.g., "2 months 5 days", "1 month")
+  - Shows only days for periods < 30 days (e.g., "5 days", "tomorrow", "today")
+  - Three-tier color coding for quick visual prioritization (configurable in Settings):
+    - Red: within urgent threshold (default: < 3 days to due)
+    - Amber: within warning threshold (default: 3-10 days to due)
+    - Default: beyond warning threshold (default: > 10 days to due)
+  - Overdue tasks show "overdue by X days" or "overdue by X months Y days"
+- Countdown color threshold settings in Settings modal
+  - Urgent threshold: customize when countdown shows red (default: 3 days)
+  - Warning threshold: customize when countdown shows amber (default: 10 days)
+  - Per-board configuration allows different workflows for different boards
+- Shared date utility module (`dateutils.js`) for consistent countdown calculations across features
+
+### Changed (2026-02-14)
+
+- Dragging tasks onto collapsed columns now highlights the column with a dashed outline and drops the task at the top of that column
+- Task drag now auto-scrolls within tall columns so tasks can be dropped beyond the visible viewport
+- Mobile task drag now auto-scrolls the column as you drag toward the top or bottom edge
+
+### Removed (2026-02-14)
 
 
 ## [1.0.13] - 2026-02-10

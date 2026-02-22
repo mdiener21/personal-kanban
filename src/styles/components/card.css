@@ -133,6 +133,25 @@
 
 .task-date { white-space: nowrap; }
 
+/* Due date countdown styling */
+.task-date.countdown-urgent {
+  color: var(--color-danger);
+  font-weight: 600;
+}
+
+.task-date.countdown-warning {
+  color: var(--color-warning);
+  font-weight: 600;
+}
+
+.task-date.countdown-normal {
+  color: var(--text-muted);
+}
+
+.task-date.countdown-none {
+  color: var(--text-muted);
+}
+
 /* Priority badge – shared base for cards, notifications, and banners */
 .task-priority,
 .notification-banner-item .priority-badge,

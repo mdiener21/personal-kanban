@@ -25,7 +25,7 @@
   /* Mobile header: brand left, menu button right, search below */
   .controls {
     display: grid;
-    grid-template-columns: 1fr auto;
+    grid-template-columns: 1fr auto auto;
     grid-template-rows: auto auto;
     gap: 8px;
     padding: 8px;
@@ -47,10 +47,15 @@
     max-width: 200px;
   }
 
-  #desktop-menu-btn {
+  #notifications-quick-btn {
     grid-column: 2;
     grid-row: 1;
     margin-left: auto;
+  }
+
+  #desktop-menu-btn {
+    grid-column: 3;
+    grid-row: 1;
   }
 
   .board-search {

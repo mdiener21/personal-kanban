@@ -6,7 +6,7 @@
 - Minimal dependencies:
   - **Lucide icons**: Tree-shaken ES module import (not CDN) via `src/modules/icons.js`
   - **SortableJS**: Drag-and-drop library for tasks and columns
-  - **Apache ECharts (Reports only)**: Modular import via `echarts/core` + explicit `echarts.use()` registration in `src/modules/reports.js`
+  - **Apache ECharts (Reports and Calendar only)**: Modular import via `echarts/core` + explicit `echarts.use()` registration in `src/modules/reports.js` and in `src/modules/calendar.js`
 - Storage: browser localStorage only
 - Data persistence: JSON import/export to local disk
 - No server, no frameworks
@@ -19,7 +19,7 @@
 
 ## AI LLM Rules
 
-- Always update the specification upon completing new tasks to keep the specification up to date.
+- Always update the specification in `docs/specification-kanban.md` upon completing new tasks to keep the specification up to date technology agnostic.
 - Always follow the Technology Rules and Principles section in the document
 
 ## Core Data Structures
@@ -91,7 +91,8 @@
   - `kanbanBoard:<boardId>:settings`
 - Legacy storage (`kanbanTasks`, `kanbanColumns`, `kanbanLabels`) is migrated into a default board on first run.
 - All CRUD operations load/save against the currently active board.
-- Export/Import operates on the active board.
+- **Export** operates on the active board.
+- **Import** creates a **new board** from the JSON and switches to it.
 
 ### Online Sync
 
@@ -124,7 +125,7 @@
   - Sorting permanently reorders tasks (updates the `order` property)
 - **Permanent Done column**: The column with id `done` cannot be deleted.
 - **Reorder**: Drag via grip icon handle, updates order property
-- **Collapse**: Toggle button (left of the grip handle) collapses a column into a ~20px vertical bar; state is stored per column. When collapsed, the column header displays the task count in the format "ColumnName (count)".
+- **Collapse**: Toggle button (left of the grip handle) collapses a column into a ~20px vertical bar; state is stored per column. When collapsed, the column header displays the task count in the format "ColumnName (count)". Dragging a task over a collapsed column shows a dashed outline, and dropping places the task at the top of that column.
 - **Actions**: Plus icon (add task), pencil (edit), trash (delete)
 
 #### Column Header Actions
@@ -155,8 +156,20 @@
   - Optional description (clamped to ~2 lines)
   - Labels (colored badges)
   - Footer: optional updated timestamp; bottom row shows due date + age in the same row (depending on Settings)
-- **Footer**: Can show `changeDate` ("Updated …") and task age ("Age …") depending on Settings toggles.
+- **Footer**: Can show `changeDate` ("Updated …"), due date with countdown, and task age ("Age …") depending on Settings toggles.
   - `changeDate` is displayed using the user-selected locale (via `toLocaleString(locale)`)
+  - Due date shows formatted date with countdown timer in parentheses:
+    - Format: "Due MM/DD/YYYY (countdown)"
+    - Countdown shows time remaining:
+      - Less than 30 days: "3 days", "tomorrow", "today"
+      - 30 days or more: "2 months 5 days", "1 month"
+    - Overdue tasks show: "overdue by 2 days" or "overdue by 1 month 5 days"
+    - Color coding (thresholds configurable in **Settings**):
+      - Red/danger: when within urgent threshold (default: < 3 days to due)
+      - Amber/warning: when within warning threshold (default: 3-10 days to due)
+      - Default/muted: when beyond warning threshold (default: > 10 days to due)
+    - **Done column**: Tasks in the Done column show only the formatted due date without countdown text or urgency coloring (neutral styling). When a task is dragged into or out of Done, the due date display updates immediately.
+    - Countdown respects the `showDueDate` setting
   - Age is based on `creationDate` and displayed as `1y 6M 40d` for larger than 1 year,  `0d` for < 1 day, `Nd` for days, and `NM` for months (30 days per month, floor)
     - Years shown only if age ≥ 1 year
     - Months shown only if age ≥ 1 month
@@ -207,6 +220,8 @@
   - View Calendar link (opens `calendar.html`)
   - Export button (downloads JSON)
   - Import button (file picker for JSON)
+- A quick-access notifications bell button is shown beside the menu toggle in the header.
+  - It opens the same notifications modal and shows the same live count badge as the menu notification item.
 
 ### Settings
 
@@ -215,6 +230,8 @@
   - Toggle to show/hide task priority
   - Toggle to show/hide task due date
   - Number input to set the notifications upcoming window (days)
+  - Number input to set the countdown urgent threshold (days) - tasks due within this threshold show in red
+  - Number input to set the countdown warning threshold (days) - tasks due within this threshold show in amber
   - Toggle to show/hide task age
   - Toggle to show/hide task updated date/time (`changeDate`)
   - Locale dropdown for formatting the updated timestamp
@@ -244,6 +261,14 @@
 - Reports dashboard also shows a **weekly completion summary**:
   - KPI tiles for "Completed this week", "Completed last week", and "Avg lead time (last 12 weeks)".
   - A small sparkline chart of tasks completed per week (last 12 weeks).
+
+#### Same-Day Completions
+
+- Reports dashboard shows a **same-day completions** section for ad-hoc tasks (created and done on the same calendar day):
+  - Compares `creationDate` and `doneDate` date portions (`YYYY-MM-DD`); counts tasks where they match.
+  - KPI tiles for "Same-day this week", "Same-day last week", and "Avg per week (12 weeks)".
+  - Badge showing total same-day tasks in the 12-week window.
+  - A bar sparkline chart showing same-day completions per week (last 12 weeks) in amber.
 
 #### Cumulative Flow Diagram (WIP)
 
@@ -284,8 +309,8 @@ The notification system alerts users to tasks with approaching or past due dates
 
 #### Notifications Modal
 
-- Accessed via the bell icon in the board controls menu
-- Bell icon shows a badge with the count of qualifying tasks
+- Accessed via either bell icon (quick-access header bell or board controls menu bell)
+- Both bell icons show a badge with the count of qualifying tasks
 - Lists all tasks with due dates within the configured upcoming window (default 3 days) or overdue
 - Includes a toggle to show/hide the notification banner
 - Each notification shows: task title, due date status, priority
@@ -307,12 +332,15 @@ The notification system alerts users to tasks with approaching or past due dates
 ### Drag and Drop
 
 - **Tasks**: Draggable within and between columns, placeholder shows drop location
+- **Task List Auto-Scroll**: Dragging near the top/bottom of a scrollable column auto-scrolls the list so tasks can be moved beyond the visible viewport
+- **Collapsed Columns**: Accept task drops; hovering shows a dashed outline and the dropped task is placed at the top of the column
+- **Done Column Drop Behavior**: Tasks dropped into the Done column are always placed at the top (order 1), regardless of where in the list the user drops them. Internal reordering within Done is disabled (`sort: false` on SortableJS) for performance — this eliminates expensive position calculations when dragging over a column with many completed tasks.
 - **Columns**: Draggable via grip handle only, placeholder shows drop position
 - **Order Tracking**: Both tasks and columns have order property (1-based), updated on drop
 - **Performance Optimization**: Task drops use incremental updates instead of full board re-render:
-  - `updateTaskPositionsFromDrop()` updates only the moved task and recomputes order for affected columns
+  - `updateTaskPositionsFromDrop()` updates only the moved task and recomputes order for affected columns; returns the updated tasks array for reuse by downstream helpers
   - Only updates `columnHistory` and timestamps when task changes columns (not for reorders within same column)
-  - Syncs task counters and collapsed column titles without rebuilding the entire DOM
+  - Syncs task counters, collapsed column titles, and moved task due dates using a single cached tasks array passed through the drop handler chain, avoiding redundant `loadTasks()` / localStorage reads
   - Notifications refresh only when tasks move between columns
 - **Auto-save**: On drop, recalculates positions for affected columns and saves to localStorage
 
@@ -349,7 +377,10 @@ The notification system alerts users to tasks with approaching or past due dates
 ### Boards
 
 - **Select active board**: via the board dropdown; selection persists and is restored on next page load.
-- **Create board**: via Manage Boards modal → "Add Board" button → opens a modal form with board name input. New boards start with default columns + labels, and empty tasks.
+- **Create board**: via Manage Boards modal → "Add Board" button → opens the Create New Board modal.
+  - Fields: board name (required) and a template dropdown.
+  - Template dropdown defaults to "Blank board"; selecting a template creates the new board pre-populated with that template’s columns, tasks, labels, and settings.
+  - Blank boards start with default columns + labels, and empty tasks.
 - **Manage boards**: via Manage Boards modal:
   - List boards
   - Open a board (sets active and renders)

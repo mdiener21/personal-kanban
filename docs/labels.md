@@ -3,11 +3,11 @@
 [![GitHub stars](https://img.shields.io/github/stars/mdiener21/personal-kanban.svg?style=social)](https://github.com/mdiener21/personal-kanban/stargazers)
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-Visit%20Now-blue)](https://mdiener21.github.io/personal-kanban/)
 
-> **Unlock the power of smart organization!** Labels and groups help you categorize, filter, and find tasks effortlessly—turning chaos into clarity.
+> Labels help you categorize and filter tasks without changing your workflow columns.
 
-Labels are your secret weapon for task management. Use columns to track status, state, progress (e.g., To Do → In Progress → Done), and labels for context,  and filtering. With **label groups**, you can organize labels into logical categories, making everything even more intuitive.
+Use **columns** to track workflow state (To Do → In Progress → Done) and use **labels** for categories like type, area, context, and activity. With **label groups**, you can keep labels organized and easy to scan.
 
-**🚀 [Try the Live Demo](https://mdiener21.github.io/personal-kanban/) and see labels in action!**
+**🚀 [Use it LIVE here](https://mdiener21.github.io/personal-kanban/) and see labels in action!**
 
 ## 📁 Quick Example Boards
 
@@ -18,8 +18,20 @@ Kickstart your setup with these ready-to-import boards featuring label examples:
 - **[Personal-Work-Kanban-Template.json](example-boards/Personal-Work-Kanban-Template.json)** — Balanced personal and work tasks.
 - **[Personal_Demo_board.json](example-boards/Personal_Demo_board.json)** — Demo board with sample labels.
 - **[Development_board.json](example-boards/Development_board.json)** — Software development kanban.
+- **[Project-Management-Board-Template.json](example-boards/Project-Management-Board-Template.json)** — Type/Area label groups.
+- **[Sales_board_template.json](example-boards/Sales_board_template.json)** — Source/Industry/Region/Activity groups.
 
 **Import Tip**: Click **Import** in the app and select any JSON file above!
+
+Import creates a **new board** from the JSON and switches to it.
+
+## ✅ Labels vs Columns vs Priority (fast rules)
+
+- **Columns = state**: To Do / In Progress / Review / Done.
+- **Priority = urgency**: Use the built-in priority field (urgent/high/medium/low/none) instead of creating “Urgent” labels.
+- **Labels = category**: Use labels to answer “what kind of work is this?” or “where does it belong?”
+
+Avoid using labels like **Blocked**, **Won/Lost**, **In Review**, etc. Those are clearer as columns.
 
 ## 🎯 How Labels & Groups Work
 
@@ -38,29 +50,33 @@ Kickstart your setup with these ready-to-import boards featuring label examples:
 4. **Assign to Tasks**: In the task modal, check labels organized by group.
 5. **Search**: Filter labels by name or group in the management modal.
 
-## 📋 Label Group Examples by Board Type
+## 📋 Label Group Examples (copy/paste ideas)
 
-Here are curated label groups and labels for different workflows. Mix and match to suit your needs!
+These are starter sets. Keep them small and grow them as needed.
 
-### 🏢 For a Project Management (Kanban-Style) Board
+### 🏢 Project management
 
-Group labels by type, and status for agile project tracking.
+**Type**
 
-#### Type
+- Bug
+- Feature
+- Enhancement
+- Research
+- Tech Debt
 
-- **Bug** (Purple) — Issues to fix
-- **Feature** (Blue) — New functionality
-- **Research** (Teal) — Investigation needed
-- **Meeting Notes** (Gray) — Follow-ups from discussions
-- **Follow Up** (Pink) — Pending actions
+**Area**
 
-#### Status or State
+- Frontend
+- Backend
+- Docs
 
-Normally the column represents the state of a `task` and here you could mix it up with a label.
+**Activity**
 
-- **Blocked** (Red) — Stuck, needs unblocking
-- **In Review** (Yellow) — Awaiting feedback
-- **Approved** (Green) — Ready to proceed
+- Meeting
+- Follow Up
+- Review
+
+Tip: Use columns like **Review** or **Blocked** for state instead of labels.
 
 ---
 
@@ -171,25 +187,38 @@ Stay on top of academics and life with structured groups.
 
 ### 💼 For a Sales Board
 
-Track leads and activities with sales-focused groups.
+Track *what* the lead is (industry/region/source) and *what you did* (activity). Keep pipeline state in columns.
 
-#### Leads
+**Source**
 
-- **New Lead** (Blue) — Fresh prospects
-- **Contacted** (Yellow) — Initial outreach
-- **Qualified** (Green) — Viable opportunities
-- **Proposal Sent** (Purple) — Offers submitted
-- **Negotiation** (Orange) — Bargaining phase
-- **Won** (Gold) — Closed deals
-- **Lost** (Red) — Missed opportunities
+- Inbound
+- Outbound
+- Partner
 
-#### Activities
+**Industry**
 
-- **Call** (Blue) — Phone conversations
-- **Email** (Green) — Written communication
-- **Meeting** (Purple) — In-person or virtual
-- **Follow Up** (Yellow) — Next steps
-- **Demo** (Orange) — Product showcases
+- SaaS
+- Finance
+- Healthcare
+- Manufacturing
+
+**Region**
+
+- North America
+- Europe
+
+**Deal Size**
+
+- Mid-Market
+- Enterprise
+
+**Activity**
+
+- Email
+- Call
+- Meeting
+- Follow Up
+- Demo
 
 ---
 

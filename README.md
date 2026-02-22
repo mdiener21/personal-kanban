@@ -108,6 +108,31 @@ To run the Golang API and PostgreSQL database:
 npm run preview
 ```
 
+### Generate a Release
+
+Use the `Generate Release` workflow to automate release preparation:
+- `npm ci` + `npm run build`
+- version bump (`package.json` + `package-lock.json`)
+- changelog promotion from `Unreleased`
+- creation/update of a release PR (`release/vX.Y.Z` → `main`)
+
+After the release PR is merged, `Publish Release` runs automatically on `main` and:
+- creates/pushes tag `vX.Y.Z`
+- publishes GitHub Release with notes extracted from `CHANGELOG.md`
+
+`Publish Release` is triggered on every push to `main`, but it only creates a tag/release when that version tag does not already exist.
+
+GitHub CLI example:
+
+```bash
+gh workflow run release.yml --ref main -f bump=patch
+```
+
+Use `bump=minor` or `bump=major` when needed.
+
+If your repo blocks Actions from opening PRs, enable repository setting:
+`Settings → Actions → General → Workflow permissions → Allow GitHub Actions to create and approve pull requests`.
+
 ### Run Tests
 
 Run all Playwright E2E tests:

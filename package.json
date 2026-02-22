@@ -1,12 +1,15 @@
 {
   "name": "personal-kanban",
-  "version": "1.0.13",
+  "version": "1.1.4",
   "type": "module",
   "description": "A local-first personal kanban board for personal task management.",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "release:prepare": "node scripts/prepare-release.mjs",
+    "release:generate": "gh workflow run release.yml",
+    "release:publish": "gh workflow run publish-release.yml",
     "test": "playwright test",
     "test:ui": "playwright test --ui",
     "test:debug": "playwright test --debug"

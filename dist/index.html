@@ -7,10 +7,10 @@
   <title>Personal Kanban Board</title>
   <!-- Kanban favicon (inline SVG data URI) -->
   <link rel="icon" href="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='2' y='3' width='6' height='18' rx='1.5' fill='%233b82f6'/%3E%3Crect x='9' y='3' width='6' height='12' rx='1.5' fill='%2360a5fa'/%3E%3Crect x='16' y='3' width='6' height='8' rx='1.5' fill='%2393c5fd'/%3E%3C/svg%3E">
-  <script type="module" crossorigin src="./assets/index-CNJpYfrQ.js"></script>
+  <script type="module" crossorigin src="./assets/index-BqFNHXZ3.js"></script>
   <link rel="modulepreload" crossorigin href="./assets/vendor-pJTqpwCg.js">
-  <link rel="modulepreload" crossorigin href="./assets/theme-i8PqWue1.js">
-  <link rel="stylesheet" crossorigin href="./assets/theme-jzNs1Y5f.css">
+  <link rel="modulepreload" crossorigin href="./assets/theme-LZpruhkc.js">
+  <link rel="stylesheet" crossorigin href="./assets/theme-CgeqkjAL.css">
 </head>
 <body>
   <!-- Skip link for accessibility -->
@@ -90,6 +90,11 @@
         </button>
       </div>
       
+      <button id="notifications-quick-btn" class="control-btn icon-only" type="button" aria-haspopup="dialog" aria-label="Notifications">
+        <span data-lucide="bell" aria-hidden="true"></span>
+        <span id="notification-quick-badge" class="notification-badge hidden" aria-label="notifications count"></span>
+      </button>
+
       <button id="desktop-menu-btn" class="control-btn icon-only" type="button" aria-label="Menu" aria-expanded="false" aria-controls="board-controls-menu">
         <span data-lucide="ellipsis-vertical" aria-hidden="true"></span>
       </button>
@@ -129,48 +134,54 @@
         </div>
       </header>
       <form id="task-form" novalidate>
-        <div class="form-group">
-          <label for="task-title">Title <span aria-hidden="true">*</span></label>
-          <input id="task-title" type="text" required placeholder="Enter task title..." aria-required="true">
-        </div>
-        <div class="form-group">
-          <label for="task-description">Description</label>
-          <textarea id="task-description" rows="3" placeholder="Enter task description..."></textarea>
-        </div>
-        <div class="form-group">
-          <label for="task-priority">Priority</label>
-          <select id="task-priority">
-            <option value="urgent">Urgent</option>
-            <option value="high">High</option>
-            <option value="medium">Medium</option>
-            <option value="low">Low</option>
-            <option value="none" selected>None</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="task-due-date">Due Date</label>
-          <input id="task-due-date" type="date">
-        </div>
-        <div class="form-group">
-          <label for="task-column">Column</label>
-          <select id="task-column" aria-describedby="task-column-help">
-            <!-- Options populated dynamically -->
-          </select>
-          <span id="task-column-help" class="sr-only">Select which column to place this task in</span>
-        </div>
-        <fieldset class="form-group">
-          <legend>Labels</legend>
-          <div id="task-active-labels" class="active-labels" role="list" aria-label="Selected labels"></div>
-          <div class="task-label-search-row">
-            <input type="text" id="task-label-search" placeholder="Search labels…" autocomplete="off" aria-label="Filter available labels">
-            <button id="task-add-label-btn" type="button" class="icon-btn" aria-label="Add a new label" title="Add label">
-              <span data-lucide="plus" aria-hidden="true"></span>
-            </button>
+        <div class="task-form-columns">
+          <div class="task-form-column-left">
+            <div class="form-group">
+              <label for="task-title">Title <span aria-hidden="true">*</span></label>
+              <input id="task-title" type="text" required placeholder="Enter task title..." aria-required="true">
+            </div>
+            <div class="form-group">
+              <label for="task-description">Description</label>
+              <textarea id="task-description" rows="3" placeholder="Enter task description..."></textarea>
+            </div>
+            <div class="form-group">
+              <label for="task-priority">Priority</label>
+              <select id="task-priority">
+                <option value="urgent">Urgent</option>
+                <option value="high">High</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+                <option value="none" selected>None</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="task-due-date">Due Date</label>
+              <input id="task-due-date" type="date">
+            </div>
+            <div class="form-group">
+              <label for="task-column">Column</label>
+              <select id="task-column" aria-describedby="task-column-help">
+                <!-- Options populated dynamically -->
+              </select>
+              <span id="task-column-help" class="sr-only">Select which column to place this task in</span>
+            </div>
           </div>
-          <div id="task-labels-selection" class="labels-selection" role="listbox" aria-label="Available labels">
-            <!-- Labels populated dynamically -->
+          <div class="task-form-column-right">
+            <fieldset class="form-group">
+              <legend>Labels</legend>
+              <div id="task-active-labels" class="active-labels" role="list" aria-label="Selected labels"></div>
+              <div class="task-label-search-row">
+                <input type="text" id="task-label-search" placeholder="Search labels…" autocomplete="off" aria-label="Filter available labels">
+                <button id="task-add-label-btn" type="button" class="icon-btn" aria-label="Add a new label" title="Add label">
+                  <span data-lucide="plus" aria-hidden="true"></span>
+                </button>
+              </div>
+              <div id="task-labels-selection" class="labels-selection" role="listbox" aria-label="Available labels">
+                <!-- Labels populated dynamically -->
+              </div>
+            </fieldset>
           </div>
-        </fieldset>
+        </div>
         <div class="form-actions">
           <button type="button" id="cancel-task-btn" class="btn btn-secondary">Cancel</button>
           <button type="submit" id="task-submit-btn" class="btn btn-primary">Add Task</button>
@@ -196,8 +207,10 @@
         </div>
         <div class="form-group">
           <label for="column-color">Color</label>
-          <input type="color" id="column-color" value="#3b82f6" aria-describedby="column-color-help">
-          <span id="column-color-help" class="sr-only">Choose accent color for the column</span>
+          <div class="color-picker-row">
+            <input type="color" id="column-color" value="#3b82f6">
+            <input type="text" id="column-color-hex" class="color-hex-display" value="#3b82f6" maxlength="7" spellcheck="false" aria-label="Hex color code">
+          </div>
         </div>
         <div class="form-actions">
           <button type="button" id="cancel-column-btn" class="btn btn-secondary">Cancel</button>
@@ -244,7 +257,7 @@
       <div class="form-actions">
         <button id="add-board-btn" type="button" class="btn btn-primary">
           <span data-lucide="kanban" aria-hidden="true"></span>
-          <span> Add Board</span>
+          <span> Create Board</span>
         </button>
         <button id="boards-import-btn" type="button" class="btn btn-secondary">
           <span data-lucide="upload" aria-hidden="true"></span>
@@ -289,6 +302,34 @@
             inputmode="numeric"
             aria-label="Number of days ahead to include for notifications"
           >
+        </div>
+        <div class="form-group">
+          <label for="settings-countdown-urgent-threshold">Countdown: urgent threshold (days)</label>
+          <input
+            id="settings-countdown-urgent-threshold"
+            type="number"
+            min="1"
+            max="365"
+            step="1"
+            inputmode="numeric"
+            aria-label="Days until due date to show countdown in red (urgent)"
+            title="Tasks due within this many days show in red"
+          >
+          <small class="form-help">Tasks due within this many days show in <span style="font-weight:800; color:red">red</span></small>
+        </div>
+        <div class="form-group">
+          <label for="settings-countdown-warning-threshold">Countdown: warning threshold (days)</label>
+          <input
+            id="settings-countdown-warning-threshold"
+            type="number"
+            min="1"
+            max="365"
+            step="1"
+            inputmode="numeric"
+            aria-label="Days until due date to show countdown in amber (warning)"
+            title="Tasks due within this many days show in amber (must be > urgent threshold)"
+          >
+          <small class="form-help">Tasks due within this many days show in <span style="font-weight:800; color:#ffd000">amber</span> (must be ≥ urgent threshold)</small>
         </div>
         <div class="form-group checkbox-group">
           <label>
@@ -360,6 +401,12 @@
         <div class="form-group">
           <label for="board-create-name">Board Name <span aria-hidden="true">*</span></label>
           <input type="text" id="board-create-name" required placeholder="Enter board name..." aria-required="true">
+        </div>
+        <div class="form-group">
+          <label for="board-create-template">Template</label>
+          <select id="board-create-template" aria-label="Select a board template">
+            <option value="" selected>Blank board</option>
+          </select>
         </div>
         <div class="form-actions">
           <button type="button" id="cancel-board-create-btn" class="btn btn-secondary">Cancel</button>
