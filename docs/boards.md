@@ -9,16 +9,6 @@ Personal Kanban Boards adapt to any workflow. Below, explore common board types 
 
 **🚀 [Try the Live Demo](https://mdiener21.github.io/personal-kanban/) and experiment with boards!**
 
-## ✅ Best Practices for Creating Boards
-
-- **Model workflow state as columns**: Use columns like **To Do → In Progress → Review → Done** to represent the *status* of work.
-- **Use priority**  not labels for priorities (we have a dedicated priority function for you with sensible defaults )
-- **Use labels for “what it is,” not “where it is”**: Good label examples include *type* (Bug, Feature), *area* (Finance, HR), *context* (Home, Work), or *activity* (Email, Meeting, Meeting-Prep, Task).
-- **Avoid labels like “Blocked”, “Won/Lost”, “Backlog”, “New Lead”**: These read as states and are clearer as columns.
-- **Start simple (3–6 columns)**: Add more columns only when you repeatedly ask “what’s the next step?”
-- **Keep column names action-oriented**: Prefer “Ready for Review” over vague terms like “Waiting”.
-- **Add a dedicated “Blocked” column if you need it**: It makes stuck work visible without mixing it into labels.
-
 ## 📁 Quick Example Boards
 
 Jumpstart with these pre-built boards:
@@ -56,7 +46,7 @@ Adjust based on your needs—add, rename, or reorder columns anytime.
 - Review
 - Done
 
-**Typical Labels:** Bug, Enhancement, Feature Request, Research, Tech Debt.
+**Typical Labels:** Bug, Feature Request, Research, High Priority, Blocked.
 
 **Why it works:** Keeps development streamlined and visible.
 
@@ -107,7 +97,7 @@ Adjust based on your needs—add, rename, or reorder columns anytime.
 - Negotiation
 - Done
 
-**Typical Labels:** Lead Source, Industry, Region, Deal Size, Follow Up.
+**Typical Labels:** New Lead, Follow Up, Demo, Won, Lost.
 
 **Why it works:** Visualizes the sales funnel for better conversions.
 
@@ -153,7 +143,6 @@ Adjust based on your needs—add, rename, or reorder columns anytime.
 **Perfect for:** Internal tasks, finance, and operations.
 
 **Recommended Columns:**
-- Idea Backlog
 - Backlog
 - In Progress
 - Waiting / External
@@ -210,7 +199,7 @@ Adjust based on your needs—add, rename, or reorder columns anytime.
 - Ready for Release
 - Shipped
 
-**Typical Labels:** Feature, Bug, Tech Debt, UX, DevOps, Security, Release.
+**Typical Labels:** Backlog, Roadmap, Feature, Bug, Release.
 
 **Why it works:** Aligns teams on product evolution.
 
@@ -218,4 +207,98 @@ Adjust based on your needs—add, rename, or reorder columns anytime.
 
 **Mix & Match**: Combine elements from different boards to fit your unique needs. Labels add extra filtering power!
 
-**Loved these templates? ⭐ [Star the repo](https://github.com/mdiener21/personal-kanban) to support and inspire more!**
+**Loved these templates? ⭐ [Star the repo](https://github.com/mdiener21/personal-kanban) to support and inspire more!** Share your custom boards in discussions. 🚀
+
+**Typical labels:**
+Blog, Video, Social Media, SEO.
+
+---
+
+## 6. 📢 Marketing Campaign Board
+
+**Perfect for:** Ads, promotions, and campaign management.
+
+**Recommended Columns:**
+- Campaign Ideas
+- Planning
+- In Production
+- Scheduled
+- Live
+- Review
+
+**Typical Labels:** Ad Copy, Design, Promotion, Performance Review.
+
+**Why it works:** Tracks campaigns from concept to results.
+
+---
+
+## 7. 🏢 Startup / Business Operations Board
+
+**Perfect for:** Internal tasks, finance, and operations.
+
+**Recommended Columns:**
+- Backlog
+- In Progress
+- Waiting / External
+- Completed
+
+**Typical Labels:** Finance, Legal, HR, Invoices, Strategy.
+
+**Why it works:** Keeps business ops efficient and accountable.
+
+---
+
+## 8. 🎨 Creative / Vision Board
+
+**Perfect for:** Inspiration, goals, and personal growth.
+
+**Recommended Columns:**
+- Ideas
+- In Focus
+- In Progress
+- Achieved
+
+**Typical Labels:** Goals, Future, Wellness, Travel, Creativity.
+
+**Why it works:** Fuels motivation and long-term vision.
+
+---
+
+## 9. 🎉 Event Planning Board
+
+**Perfect for:** Weddings, conferences, and parties.
+
+**Recommended Columns:**
+- Ideas
+- Planning
+- Booked
+- Ready
+- Event Done
+
+**Typical Labels:** Venue, Catering, Invitations, Schedule.
+
+**Why it works:** Ensures no detail is overlooked.
+
+---
+
+## 10. 🚀 Product Development Board
+
+**Perfect for:** Roadmaps, releases, and product teams.
+
+**Recommended Columns:**
+- Idea Backlog
+- Planned
+- In Development
+- Testing
+- Ready for Release
+- Shipped
+
+**Typical Labels:** Backlog, Roadmap, Feature, Bug, Release.
+
+**Why it works:** Aligns teams on product evolution.
+
+---
+
+**Mix & Match**: Combine elements from different boards to fit your unique needs. Labels add extra filtering power!
+
+**Loved these templates? ⭐ [Star the repo](https://github.com/mdiener21/personal-kanban) to support and inspire more!** Share your custom boards in discussions. 🚀

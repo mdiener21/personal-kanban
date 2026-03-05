@@ -2,16 +2,16 @@ package repository
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 
 	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5"
 	"github.com/mdiener21/personal-kanban/api/db"
 	"github.com/mdiener21/personal-kanban/api/models"
 )
 
 func GetBoardsByUserID(ctx context.Context, userID uuid.UUID) ([]models.Board, error) {
-	rows, err := db.Pool.Query(ctx, "SELECT id, name, created_at FROM boards WHERE user_id = $1", userID)
+	rows, err := db.DB.QueryContext(ctx, "SELECT id, name, created_at FROM boards WHERE user_id = ?", userID)
 	if err != nil {
 		return nil, err
 	}
@@ -31,7 +31,7 @@ func GetBoardsByUserID(ctx context.Context, userID uuid.UUID) ([]models.Board, e
 
 func GetFullBoard(ctx context.Context, boardID uuid.UUID, userID uuid.UUID) (*models.Board, error) {
 	var b models.Board
-	err := db.Pool.QueryRow(ctx, "SELECT id, name, created_at FROM boards WHERE id = $1 AND user_id = $2", boardID, userID).
+	err := db.DB.QueryRowContext(ctx, "SELECT id, name, created_at FROM boards WHERE id = ? AND user_id = ?", boardID, userID).
 		Scan(&b.ID, &b.Name, &b.CreatedAt)
 	if err != nil {
 		return nil, err
@@ -39,7 +39,7 @@ func GetFullBoard(ctx context.Context, boardID uuid.UUID, userID uuid.UUID) (*mo
 	b.UserID = userID
 
 	// Load Columns
-	colRows, err := db.Pool.Query(ctx, "SELECT id, name, color, collapsed, \"order\" FROM columns WHERE board_id = $1 ORDER BY \"order\"", boardID)
+	colRows, err := db.DB.QueryContext(ctx, "SELECT id, name, color, collapsed, \"order\" FROM columns WHERE board_id = ? ORDER BY \"order\"", boardID)
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +54,7 @@ func GetFullBoard(ctx context.Context, boardID uuid.UUID, userID uuid.UUID) (*mo
 	}
 
 	// Load Labels
-	lblRows, err := db.Pool.Query(ctx, "SELECT id, name, color, \"group\" FROM labels WHERE board_id = $1", boardID)
+	lblRows, err := db.DB.QueryContext(ctx, "SELECT id, name, color, \"group\" FROM labels WHERE board_id = ?", boardID)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +69,7 @@ func GetFullBoard(ctx context.Context, boardID uuid.UUID, userID uuid.UUID) (*mo
 	}
 
 	// Load Tasks
-	taskRows, err := db.Pool.Query(ctx, "SELECT id, column_id, title, description, priority, due_date, \"order\", creation_date, change_date, done_date FROM tasks WHERE board_id = $1 ORDER BY \"order\"", boardID)
+	taskRows, err := db.DB.QueryContext(ctx, "SELECT id, column_id, title, description, priority, due_date, \"order\", creation_date, change_date, done_date FROM tasks WHERE board_id = ? ORDER BY \"order\"", boardID)
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +92,7 @@ func GetFullBoard(ctx context.Context, boardID uuid.UUID, userID uuid.UUID) (*mo
 
 	if len(taskIDs) > 0 {
 		// Load All Task Labels for this board
-		tlRows, err := db.Pool.Query(ctx, "SELECT task_id, label_id FROM task_labels WHERE board_id = $1", boardID)
+		tlRows, err := db.DB.QueryContext(ctx, "SELECT task_id, label_id FROM task_labels WHERE board_id = ?", boardID)
 		if err != nil {
 			return nil, err
 		}
@@ -109,7 +109,7 @@ func GetFullBoard(ctx context.Context, boardID uuid.UUID, userID uuid.UUID) (*mo
 		}
 
 		// Load All Task History for this board
-		hRows, err := db.Pool.Query(ctx, "SELECT ch.task_id, ch.column_id, ch.at FROM column_history ch JOIN tasks t ON ch.task_id = t.id WHERE t.board_id = $1 ORDER BY ch.at", boardID)
+		hRows, err := db.DB.QueryContext(ctx, "SELECT ch.task_id, ch.column_id, ch.at FROM column_history ch JOIN tasks t ON ch.task_id = t.id WHERE t.board_id = ? ORDER BY ch.at", boardID)
 		if err != nil {
 			return nil, err
 		}
@@ -128,9 +128,9 @@ func GetFullBoard(ctx context.Context, boardID uuid.UUID, userID uuid.UUID) (*mo
 
 	// Load Settings
 	var s models.Settings
-	err = db.Pool.QueryRow(ctx, "SELECT show_priority, show_due_date, show_age, show_change_date, locale, default_priority, notification_days FROM settings WHERE board_id = $1", boardID).
+	err = db.DB.QueryRowContext(ctx, "SELECT show_priority, show_due_date, show_age, show_change_date, locale, default_priority, notification_days FROM settings WHERE board_id = ?", boardID).
 		Scan(&s.ShowPriority, &s.ShowDueDate, &s.ShowAge, &s.ShowChangeDate, &s.Locale, &s.DefaultPriority, &s.NotificationDays)
-	if err != nil && err != pgx.ErrNoRows {
+	if err != nil && err != sql.ErrNoRows {
 		return nil, err
 	}
 	if err == nil {
@@ -142,17 +142,17 @@ func GetFullBoard(ctx context.Context, boardID uuid.UUID, userID uuid.UUID) (*mo
 }
 
 func SyncBoards(ctx context.Context, userID uuid.UUID, payload models.SyncPayload) error {
-	tx, err := db.Pool.Begin(ctx)
+	tx, err := db.DB.BeginTx(ctx, nil)
 	if err != nil {
 		return err
 	}
-	defer tx.Rollback(ctx)
+	defer tx.Rollback()
 
 	for _, b := range payload.Boards {
 		// Check ownership if board exists
 		var ownerID uuid.UUID
-		err = tx.QueryRow(ctx, "SELECT user_id FROM boards WHERE id = $1", b.ID).Scan(&ownerID)
-		if err != nil && err != pgx.ErrNoRows {
+		err = tx.QueryRowContext(ctx, "SELECT user_id FROM boards WHERE id = ?", b.ID).Scan(&ownerID)
+		if err != nil && err != sql.ErrNoRows {
 			return err
 		}
 
@@ -163,32 +163,32 @@ func SyncBoards(ctx context.Context, userID uuid.UUID, payload models.SyncPayloa
 		}
 
 		// Upsert board
-		_, err = tx.Exec(ctx, "INSERT INTO boards (id, user_id, name, created_at) VALUES ($1, $2, $3, $4) ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name", b.ID, userID, b.Name, b.CreatedAt)
+		_, err = tx.ExecContext(ctx, "INSERT INTO boards (id, user_id, name, created_at) VALUES (?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name", b.ID, userID, b.Name, b.CreatedAt)
 		if err != nil {
 			return err
 		}
 
 		// Delete existing board data to refresh (simple sync strategy)
-		_, err = tx.Exec(ctx, "DELETE FROM columns WHERE board_id = $1", b.ID)
+		_, err = tx.ExecContext(ctx, "DELETE FROM columns WHERE board_id = ?", b.ID)
 		if err != nil {
 			return err
 		}
-		_, err = tx.Exec(ctx, "DELETE FROM labels WHERE board_id = $1", b.ID)
+		_, err = tx.ExecContext(ctx, "DELETE FROM labels WHERE board_id = ?", b.ID)
 		if err != nil {
 			return err
 		}
-		_, err = tx.Exec(ctx, "DELETE FROM tasks WHERE board_id = $1", b.ID)
+		_, err = tx.ExecContext(ctx, "DELETE FROM tasks WHERE board_id = ?", b.ID)
 		if err != nil {
 			return err
 		}
-		_, err = tx.Exec(ctx, "DELETE FROM settings WHERE board_id = $1", b.ID)
+		_, err = tx.ExecContext(ctx, "DELETE FROM settings WHERE board_id = ?", b.ID)
 		if err != nil {
 			return err
 		}
 
 		// Insert Columns
 		for _, c := range b.Columns {
-			_, err = tx.Exec(ctx, "INSERT INTO columns (board_id, id, name, color, collapsed, \"order\") VALUES ($1, $2, $3, $4, $5, $6)", b.ID, c.ID, c.Name, c.Color, c.Collapsed, c.Order)
+			_, err = tx.ExecContext(ctx, "INSERT INTO columns (board_id, id, name, color, collapsed, \"order\") VALUES (?, ?, ?, ?, ?, ?)", b.ID, c.ID, c.Name, c.Color, c.Collapsed, c.Order)
 			if err != nil {
 				return err
 			}
@@ -196,7 +196,7 @@ func SyncBoards(ctx context.Context, userID uuid.UUID, payload models.SyncPayloa
 
 		// Insert Labels
 		for _, l := range b.Labels {
-			_, err = tx.Exec(ctx, "INSERT INTO labels (board_id, id, name, color, \"group\") VALUES ($1, $2, $3, $4, $5)", b.ID, l.ID, l.Name, l.Color, l.Group)
+			_, err = tx.ExecContext(ctx, "INSERT INTO labels (board_id, id, name, color, \"group\") VALUES (?, ?, ?, ?, ?)", b.ID, l.ID, l.Name, l.Color, l.Group)
 			if err != nil {
 				return err
 			}
@@ -204,7 +204,7 @@ func SyncBoards(ctx context.Context, userID uuid.UUID, payload models.SyncPayloa
 
 		// Insert Tasks
 		for _, t := range b.Tasks {
-			_, err = tx.Exec(ctx, "INSERT INTO tasks (id, board_id, column_id, title, description, priority, due_date, \"order\", creation_date, change_date, done_date) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
+			_, err = tx.ExecContext(ctx, "INSERT INTO tasks (id, board_id, column_id, title, description, priority, due_date, \"order\", creation_date, change_date, done_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
 				t.ID, b.ID, t.ColumnID, t.Title, t.Description, t.Priority, t.DueDate, t.Order, t.CreationDate, t.ChangeDate, t.DoneDate)
 			if err != nil {
 				return err
@@ -212,7 +212,7 @@ func SyncBoards(ctx context.Context, userID uuid.UUID, payload models.SyncPayloa
 
 			// Insert Task Labels
 			for _, lid := range t.Labels {
-				_, err = tx.Exec(ctx, "INSERT INTO task_labels (task_id, label_id, board_id) VALUES ($1, $2, $3)", t.ID, lid, b.ID)
+				_, err = tx.ExecContext(ctx, "INSERT INTO task_labels (task_id, label_id, board_id) VALUES (?, ?, ?)", t.ID, lid, b.ID)
 				if err != nil {
 					return err
 				}
@@ -220,7 +220,7 @@ func SyncBoards(ctx context.Context, userID uuid.UUID, payload models.SyncPayloa
 
 			// Insert History
 			for _, h := range t.History {
-				_, err = tx.Exec(ctx, "INSERT INTO column_history (task_id, column_id, at) VALUES ($1, $2, $3)", t.ID, h.ColumnID, h.At)
+				_, err = tx.ExecContext(ctx, "INSERT INTO column_history (task_id, column_id, at) VALUES (?, ?, ?)", t.ID, h.ColumnID, h.At)
 				if err != nil {
 					return err
 				}
@@ -230,7 +230,7 @@ func SyncBoards(ctx context.Context, userID uuid.UUID, payload models.SyncPayloa
 		// Insert Settings
 		if b.Settings != nil {
 			s := b.Settings
-			_, err = tx.Exec(ctx, "INSERT INTO settings (board_id, show_priority, show_due_date, show_age, show_change_date, locale, default_priority, notification_days) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+			_, err = tx.ExecContext(ctx, "INSERT INTO settings (board_id, show_priority, show_due_date, show_age, show_change_date, locale, default_priority, notification_days) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
 				b.ID, s.ShowPriority, s.ShowDueDate, s.ShowAge, s.ShowChangeDate, s.Locale, s.DefaultPriority, s.NotificationDays)
 			if err != nil {
 				return err
@@ -238,10 +238,10 @@ func SyncBoards(ctx context.Context, userID uuid.UUID, payload models.SyncPayloa
 		}
 	}
 
-	return tx.Commit(ctx)
+	return tx.Commit()
 }
 
 func DeleteBoard(ctx context.Context, boardID uuid.UUID, userID uuid.UUID) error {
-	_, err := db.Pool.Exec(ctx, "DELETE FROM boards WHERE id = $1 AND user_id = $2", boardID, userID)
+	_, err := db.DB.ExecContext(ctx, "DELETE FROM boards WHERE id = ? AND user_id = ?", boardID, userID)
 	return err
 }

@@ -16,6 +16,8 @@ WORKDIR /app
 COPY --from=builder /app/main .
 COPY .env.example .env
 
+RUN mkdir -p /app/data
+
 EXPOSE 8080
 
 CMD ["./main"]
