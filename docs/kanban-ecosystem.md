@@ -61,7 +61,7 @@ Search query link  https://github.com/topics/kanban?o=desc&s=stars
 | `KBoards` – Next.js Kanban                                                                       | TypeScript       |        ~3 | MIT                | Jan 2 2026 ([GitHub][9])                                                  |
 | `SmartTodo` – Socket.io Kanban                                                                   | TypeScript       |        ~0 | MIT                | Jan 4 2026 ([GitHub][9])                                                  |
 | Additional simple Kanban starters                                                                | Various          |       low | MIT                | 2025-2026 ([GitHub][9])                                                   |
-| [Plane](https://github.com/makeplane/plane)  | Django, React, Node |      low | MIT                | 2025-2026 ([GitHub][9])     
+| [Plane](https://github.com/makeplane/plane)  | Django, React, Node |      low | MIT                | 2025-2026 ([GitHub][9])
 
 
 [1]: https://github.com/wekan/wekan?utm_source=chatgpt.com "GitHub - wekan/wekan: The Open Source kanban (built ..."

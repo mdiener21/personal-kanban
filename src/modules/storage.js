@@ -89,17 +89,15 @@ function defaultColumns() {
   return [
     { id: 'todo', name: 'To Do', color: '#3583ff' },
     { id: 'inprogress', name: 'In Progress', color: '#f59e0b' },
-    { id: 'done', name: 'Done', color: '#505050' }
+    { id: 'done', name: 'Done', color: '#16a34a' }
   ];
 }
 
 function defaultLabels() {
   return [
-    { id: 'task-ez2522q8', name: 'Task', color: '#f59e0b', group: 'Activity' },
-    { id: 'meeting-gy2462e7', name: 'Meeting', color: '#ffd001', group: 'Activity' },
-    { id: 'email-gy2462e7', name: 'Email', color: '#d4a300', group: 'Activity' },
-    { id: 'idea-ju2554t6', name: 'Idea', color: '#25b631', group: '' },
-    { id: 'goal-hr2475r4', name: 'Goal', color: '#1b7cbd', group: '' },
+    { id: 'urgent', name: 'Urgent', color: '#ef4444', group: '' },
+    { id: 'feature', name: 'Feature', color: '#3b82f6', group: '' },
+    { id: 'task', name: 'Task', color: '#f59e0b', group: '' }
   ];
 }
 
@@ -204,15 +202,12 @@ function defaultSettings() {
     showPriority: true,
     showDueDate: true,
     showAge: true,
-    showChangeDate: false,
+    showChangeDate: true,
     locale,
     defaultPriority: 'none',
     // Number of days ahead (inclusive) to consider tasks "upcoming" for notifications.
     // Overdue tasks are always included.
-    notificationDays: 3,
-    // Countdown color thresholds
-    countdownUrgentThreshold: 3,   // Red: tasks due within this many days
-    countdownWarningThreshold: 10  // Amber: tasks due within this many days (must be >= urgent threshold)
+    notificationDays: 3
   };
 }
 
@@ -506,27 +501,7 @@ function normalizeSettings(raw) {
     ? Math.min(365, Math.max(0, rawNotificationDays))
     : 3;
 
-  const rawUrgentThreshold = Number.parseInt((obj.countdownUrgentThreshold ?? '').toString(), 10);
-  const countdownUrgentThreshold = Number.isFinite(rawUrgentThreshold)
-    ? Math.min(365, Math.max(1, rawUrgentThreshold))
-    : 3;
-
-  const rawWarningThreshold = Number.parseInt((obj.countdownWarningThreshold ?? '').toString(), 10);
-  const countdownWarningThreshold = Number.isFinite(rawWarningThreshold)
-    ? Math.min(365, Math.max(countdownUrgentThreshold, rawWarningThreshold))
-    : 10;
-
-  return {
-    showPriority,
-    showDueDate,
-    showAge,
-    showChangeDate,
-    locale,
-    defaultPriority,
-    notificationDays,
-    countdownUrgentThreshold,
-    countdownWarningThreshold
-  };
+  return { showPriority, showDueDate, showAge, showChangeDate, locale, defaultPriority, notificationDays };
 }
 
 export function loadSettings() {
