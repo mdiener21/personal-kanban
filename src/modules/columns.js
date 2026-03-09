@@ -1,5 +1,5 @@
 import { generateUUID } from './utils.js';
-import { loadColumns, saveColumns, loadTasks, saveTasks } from './storage.js';
+import { loadColumns, saveColumns, loadTasks, saveTasks, COLUMN_ID_DONE } from './storage.js';
 
 function isHexColor(value) {
   return typeof value === 'string' && /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(value.trim());
@@ -49,7 +49,7 @@ export function updateColumn(columnId, name, color) {
 
 // Delete a column
 export function deleteColumn(columnId) {
-  if (columnId === 'done') {
+  if (columnId === COLUMN_ID_DONE) {
     return false;
   }
 

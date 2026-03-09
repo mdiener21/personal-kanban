@@ -5,14 +5,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
-    environment:
-      - DATABASE_PATH=/app/data/kanban.db
-      - PORT=8080
-      - JWT_SECRET=change-me
-      - FRONTEND_URL=http://localhost:3000
-      - AUTH_CALLBACK_URL=http://localhost:8080/auth
     volumes:
-      - kanban_data:/app/data
+      - pb_data:/app/pb_data
 
 volumes:
-  kanban_data:
+  pb_data:

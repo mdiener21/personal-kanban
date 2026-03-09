@@ -97,11 +97,11 @@ npm run build
 Built files are in `dist/`.
 
 ### Backend Setup (Optional)
-To run the Golang API and SQLite database:
+To run the PocketBase backend:
 1. Ensure you have Docker and Docker Compose installed.
-2. Configure your social auth and SMTP credentials in `api/.env` (copy from `api/.env.example`).
-3. Run `docker-compose up -d`.
-4. The API will be available at `http://localhost:8080`.
+2. Run `docker-compose up -d`.
+3. The PocketBase admin UI will be available at `http://localhost:8080/_/`.
+4. Configure OAuth2 providers in the PocketBase Admin UI (Settings > Auth providers).
 
 ### Preview Production Build
 ```bash

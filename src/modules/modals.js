@@ -1,4 +1,4 @@
-import { loadLabels, loadColumns, loadTasks, loadSettings } from './storage.js';
+import { loadLabels, loadColumns, loadTasks, loadSettings, COLUMN_ID_TODO } from './storage.js';
 import { addTask, updateTask, deleteTask } from './tasks.js';
 import { addColumn, updateColumn, deleteColumn } from './columns.js';
 import { addLabel, updateLabel, deleteLabel } from './labels.js';
@@ -151,7 +151,7 @@ function renderActiveTaskLabels() {
 export { setupModalCloseHandlers };
 
 export function showModal(columnName) {
-  currentColumn = columnName || loadColumns()[0]?.id || 'todo';
+  currentColumn = columnName || loadColumns()[0]?.id || COLUMN_ID_TODO;
   editingTaskId = null;
   selectedTaskLabels = [];
   returnToTaskModalAfterLabelsManager = false;

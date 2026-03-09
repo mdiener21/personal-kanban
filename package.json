@@ -18,6 +18,7 @@
   "dependencies": {
     "echarts": "^6.0.0",
     "lucide": "^0.469.0",
+    "pocketbase": "^0.26.8",
     "sortablejs": "^1.15.6"
   }
 }

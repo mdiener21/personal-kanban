@@ -85,19 +85,29 @@ export function setActiveBoardId(boardId) {
   localStorage.setItem(ACTIVE_BOARD_KEY, id);
 }
 
+// Use stable UUIDs for defaults so they don't change on every reload
+// These MUST be valid hex UUIDs
+export const COLUMN_ID_TODO = '00000000-0000-4000-a001-000000000001';
+export const COLUMN_ID_INPROGRESS = '00000000-0000-4000-a001-000000000002';
+export const COLUMN_ID_DONE = '00000000-0000-4000-a001-000000000003';
+
 function defaultColumns() {
   return [
-    { id: 'todo', name: 'To Do', color: '#3583ff' },
-    { id: 'inprogress', name: 'In Progress', color: '#f59e0b' },
-    { id: 'done', name: 'Done', color: '#16a34a' }
+    { id: COLUMN_ID_TODO, name: 'To Do', color: '#3583ff' },
+    { id: COLUMN_ID_INPROGRESS, name: 'In Progress', color: '#f59e0b' },
+    { id: COLUMN_ID_DONE, name: 'Done', color: '#16a34a' }
   ];
 }
 
+const LABEL_ID_URGENT = '00000000-0000-4000-b001-000000000001';
+const LABEL_ID_FEATURE = '00000000-0000-4000-b001-000000000002';
+const LABEL_ID_TASK = '00000000-0000-4000-b001-000000000003';
+
 function defaultLabels() {
   return [
-    { id: 'urgent', name: 'Urgent', color: '#ef4444', group: '' },
-    { id: 'feature', name: 'Feature', color: '#3b82f6', group: '' },
-    { id: 'task', name: 'Task', color: '#f59e0b', group: '' }
+    { id: LABEL_ID_URGENT, name: 'Urgent', color: '#ef4444', group: '' },
+    { id: LABEL_ID_FEATURE, name: 'Feature', color: '#3b82f6', group: '' },
+    { id: LABEL_ID_TASK, name: 'Task', color: '#f59e0b', group: '' }
   ];
 }
 
@@ -110,11 +120,11 @@ function defaultTasks() {
       description: 'Identify current location and access requirements.',
       priority: 'high',
       dueDate: '',
-      column: 'todo',
-      labels: ['urgent'],
+      column: COLUMN_ID_TODO,
+      labels: [LABEL_ID_URGENT],
       creationDate: created,
       changeDate: created,
-      columnHistory: [{ column: 'todo', at: created }]
+      columnHistory: [{ column: COLUMN_ID_TODO, at: created }]
     },
     {
       id: generateUUID(),
@@ -122,11 +132,11 @@ function defaultTasks() {
       description: 'Coordinate with Dr. Strange and plan retrieval.',
       priority: 'urgent',
       dueDate: '',
-      column: 'inprogress',
-      labels: ['feature'],
+      column: COLUMN_ID_INPROGRESS,
+      labels: [LABEL_ID_FEATURE],
       creationDate: created,
       changeDate: created,
-      columnHistory: [{ column: 'inprogress', at: created }]
+      columnHistory: [{ column: COLUMN_ID_INPROGRESS, at: created }]
     },
     {
       id: generateUUID(),
@@ -134,11 +144,11 @@ function defaultTasks() {
       description: 'Determine safe extraction approach.',
       priority: 'medium',
       dueDate: '',
-      column: 'inprogress',
+      column: COLUMN_ID_INPROGRESS,
       labels: [],
       creationDate: created,
       changeDate: created,
-      columnHistory: [{ column: 'inprogress', at: created }]
+      columnHistory: [{ column: COLUMN_ID_INPROGRESS, at: created }]
     },
     {
       id: generateUUID(),
@@ -146,11 +156,11 @@ function defaultTasks() {
       description: 'Dig a deep hole to hide the stone from the Collector, avoid escalation.',
       priority: 'low',
       dueDate: '',
-      column: 'inprogress',
-      labels: ['task'],
+      column: COLUMN_ID_INPROGRESS,
+      labels: [LABEL_ID_TASK],
       creationDate: created,
       changeDate: created,
-      columnHistory: [{ column: 'inprogress', at: created }]
+      columnHistory: [{ column: COLUMN_ID_INPROGRESS, at: created }]
     },
     {
       id: generateUUID(),
@@ -158,11 +168,11 @@ function defaultTasks() {
       description: 'A bag with good durability and space is needed to hold all the stones securely.',
       priority: 'none',
       dueDate: '',
-      column: 'inprogress',
-      labels: ['task'],
+      column: COLUMN_ID_INPROGRESS,
+      labels: [LABEL_ID_TASK],
       creationDate: created,
       changeDate: created,
-      columnHistory: [{ column: 'inprogress', at: created }]
+      columnHistory: [{ column: COLUMN_ID_INPROGRESS, at: created }]
     },
     {
       id: generateUUID(),
@@ -170,12 +180,12 @@ function defaultTasks() {
       description: 'Verify secure containment after retrieval.',
       priority: 'high',
       dueDate: '',
-      column: 'done',
-      labels: ['urgent', 'feature'],
+      column: COLUMN_ID_DONE,
+      labels: [LABEL_ID_URGENT, LABEL_ID_FEATURE],
       creationDate: created,
       changeDate: created,
       doneDate: created,
-      columnHistory: [{ column: 'done', at: created }]
+      columnHistory: [{ column: COLUMN_ID_DONE, at: created }]
     },
     {
       id: generateUUID(),
@@ -183,12 +193,12 @@ function defaultTasks() {
       description: '',
       priority: 'low',
       dueDate: '',
-      column: 'done',
+      column: COLUMN_ID_DONE,
       labels: [],
       creationDate: created,
       changeDate: created,
       doneDate: created,
-      columnHistory: [{ column: 'done', at: created }]
+      columnHistory: [{ column: COLUMN_ID_DONE, at: created }]
     }
   ];
 }
@@ -239,15 +249,82 @@ function migrateLegacySingleBoardIntoDefault() {
   return hadLegacy;
 }
 
+function migrateToUUIDs() {
+  const boards = listBoards();
+  const idMap = {
+    'todo': COLUMN_ID_TODO,
+    'inprogress': COLUMN_ID_INPROGRESS,
+    'done': COLUMN_ID_DONE,
+    'urgent': LABEL_ID_URGENT,
+    'feature': LABEL_ID_FEATURE,
+    'task': LABEL_ID_TASK
+  };
+
+  boards.forEach(board => {
+    const boardId = board.id;
+
+    // Migrate Columns
+    const colsKey = keyFor(boardId, 'columns');
+    const cols = safeParseArray(localStorage.getItem(colsKey));
+    if (cols) {
+      const migratedCols = cols.map(c => ({
+        ...c,
+        id: idMap[c.id] || c.id
+      }));
+      localStorage.setItem(colsKey, JSON.stringify(migratedCols));
+    }
+
+    // Migrate Labels
+    const labelsKey = keyFor(boardId, 'labels');
+    const labels = safeParseArray(localStorage.getItem(labelsKey));
+    if (labels) {
+      const migratedLabels = labels.map(l => ({
+        ...l,
+        id: idMap[l.id] || l.id
+      }));
+      localStorage.setItem(labelsKey, JSON.stringify(migratedLabels));
+    }
+
+    // Migrate Tasks
+    const tasksKey = keyFor(boardId, 'tasks');
+    const tasks = safeParseArray(localStorage.getItem(tasksKey));
+    if (tasks) {
+      const migratedTasks = tasks.map(t => {
+        const migratedLabels = (t.labels || []).map(lid => idMap[lid] || lid);
+        const migratedHistory = (t.columnHistory || []).map(h => ({
+          ...h,
+          column: idMap[h.column] || h.column
+        }));
+
+        return {
+          ...t,
+          column: idMap[t.column] || t.column,
+          labels: migratedLabels,
+          columnHistory: migratedHistory
+        };
+      });
+      localStorage.setItem(tasksKey, JSON.stringify(migratedTasks));
+    }
+  });
+
+  localStorage.setItem('kanbanMigratedToUUIDs', 'true');
+}
+
 export function ensureBoardsInitialized() {
   const boards = listBoards();
   if (boards.length > 0) {
+    // Migration check
+    if (localStorage.getItem('kanbanMigratedToUUIDs') !== 'true') {
+      migrateToUUIDs();
+    }
+
     // Ensure active board is valid
     if (!getActiveBoardId()) setActiveBoardId(boards[0].id);
     return;
   }
 
   migrateLegacySingleBoardIntoDefault();
+  localStorage.setItem('kanbanMigratedToUUIDs', 'true');
 }
 
 export function createBoard(name) {
@@ -317,9 +394,9 @@ function isHexColor(value) {
 }
 
 function defaultColumnColor(id) {
-  if (id === 'todo') return '#3b82f6';
-  if (id === 'inprogress') return '#f59e0b';
-  if (id === 'done') return '#16a34a';
+  if (id === COLUMN_ID_TODO) return '#3b82f6';
+  if (id === COLUMN_ID_INPROGRESS) return '#f59e0b';
+  if (id === COLUMN_ID_DONE) return '#16a34a';
   return '#3b82f6';
 }
 
@@ -331,10 +408,10 @@ function normalizeColumn(c) {
 
 function ensureDoneColumn(columns) {
   const list = Array.isArray(columns) ? columns.slice() : [];
-  if (list.some((c) => c && c.id === 'done')) return list;
+  if (list.some((c) => c && c.id === COLUMN_ID_DONE)) return list;
 
   const maxOrder = list.reduce((max, c) => Math.max(max, Number.isFinite(c?.order) ? c.order : 0), 0);
-  list.push({ id: 'done', name: 'Done', color: '#16a34a', order: maxOrder + 1, collapsed: false });
+  list.push({ id: COLUMN_ID_DONE, name: 'Done', color: '#16a34a', order: maxOrder + 1, collapsed: false });
   return list;
 }
 
@@ -347,7 +424,7 @@ export function loadColumns() {
   if (parsed) {
     const normalized = ensureDoneColumn(parsed.map(normalizeColumn));
     // Persist back if done column was missing.
-    if (!normalized.some((c) => c && c.id === 'done') || normalized.length !== parsed.length) {
+    if (!normalized.some((c) => c && c.id === COLUMN_ID_DONE) || normalized.length !== parsed.length) {
       localStorage.setItem(keyFor(boardId, 'columns'), JSON.stringify(normalized));
     }
     return normalized;
@@ -382,7 +459,7 @@ export function loadTasks() {
         didChange = true;
       }
 
-      const isDone = task.column === 'done';
+      const isDone = task.column === COLUMN_ID_DONE;
       const hasDoneDate = typeof task.doneDate === 'string' && task.doneDate.trim() !== '';
       const changeDate = typeof task.changeDate === 'string' && task.changeDate.trim() ? task.changeDate.trim() : '';
       const creationDate = typeof task.creationDate === 'string' && task.creationDate.trim() ? task.creationDate.trim() : '';
@@ -408,7 +485,7 @@ export function loadTasks() {
       const rawHistory = task.columnHistory;
       const history = Array.isArray(rawHistory) ? rawHistory : null;
       const seededAt = changeDate || creationDate || nowIso();
-      const seededColumn = typeof task.column === 'string' ? task.column.trim() : '';
+      const seededColumn = task.column;
 
       if (!history || history.length === 0) {
         if (seededAt && seededColumn) {
@@ -418,7 +495,7 @@ export function loadTasks() {
       } else {
         const cleaned = history
           .map((e) => {
-            const column = typeof e?.column === 'string' ? e.column.trim() : '';
+            const column = e?.column;
             const at = typeof e?.at === 'string' ? e.at.trim() : '';
             if (!column || !at) return null;
             return { column, at };

@@ -1,5 +1,5 @@
 import { generateUUID } from './utils.js';
-import { loadTasks, saveTasks } from './storage.js';
+import { loadTasks, saveTasks, COLUMN_ID_DONE } from './storage.js';
 
 const ALLOWED_PRIORITIES = new Set(['urgent', 'high', 'medium', 'low', 'none']);
 
@@ -50,7 +50,7 @@ export function addTask(title, description, priority, dueDate, columnName, label
     creationDate: nowIso,
     changeDate: nowIso,
     columnHistory: [{ column: columnName, at: nowIso }],
-    ...(columnName === 'done' ? { doneDate: nowIso } : {})
+    ...(columnName === COLUMN_ID_DONE ? { doneDate: nowIso } : {})
   };
 
   updatedTasks.push(newTask);
@@ -86,9 +86,9 @@ export function updateTask(taskId, title, description, priority, dueDate, column
       tasks[taskIndex].columnHistory.push({ column: nextColumn, at: nowIso });
     }
 
-    if (prevColumn !== 'done' && nextColumn === 'done') {
+    if (prevColumn !== COLUMN_ID_DONE && nextColumn === COLUMN_ID_DONE) {
       tasks[taskIndex].doneDate = nowIso;
-    } else if (prevColumn === 'done' && nextColumn !== 'done') {
+    } else if (prevColumn === COLUMN_ID_DONE && nextColumn !== COLUMN_ID_DONE) {
       delete tasks[taskIndex].doneDate;
     }
 
@@ -192,9 +192,9 @@ export function updateTaskPositionsFromDrop(evt) {
         history.push({ column: toColumn, at: nowIso });
         nextTask.columnHistory = history;
 
-        if (task.column !== 'done' && toColumn === 'done') {
+        if (task.column !== COLUMN_ID_DONE && toColumn === COLUMN_ID_DONE) {
           nextTask.doneDate = nowIso;
-        } else if (task.column === 'done' && toColumn !== 'done') {
+        } else if (task.column === COLUMN_ID_DONE && toColumn !== COLUMN_ID_DONE) {
           delete nextTask.doneDate;
         }
       }
@@ -254,9 +254,9 @@ export function updateTaskPositions() {
         history.push({ column: nextColumn, at: nowIso });
         nextTask.columnHistory = history;
 
-        if (task.column !== 'done' && nextColumn === 'done') {
+        if (task.column !== COLUMN_ID_DONE && nextColumn === COLUMN_ID_DONE) {
           nextTask.doneDate = nowIso;
-        } else if (task.column === 'done' && nextColumn !== 'done') {
+        } else if (task.column === COLUMN_ID_DONE && nextColumn !== COLUMN_ID_DONE) {
           delete nextTask.doneDate;
         }
       }

@@ -12,10 +12,10 @@
 - No server, no frameworks
 - Build tooling: Vite (ES modules)
   - Reports bundling: Rollup chunk splitting keeps ECharts and ZRender in dedicated vendor chunks (`vendor-echarts`, `vendor-zrender`) to avoid oversized entry chunks.
-- Backend: Golang API with SQLite
+- Backend: [PocketBase](https://pocketbase.io/) (Golang-powered BaaS)
 - Authentication:
-  - Social Auth (Google, Apple, Microsoft) via OAuth2/OIDC
-  - Email/Password Auth with email verification
+  - Social Auth (Google, Apple, Microsoft) via PocketBase OAuth2
+  - Email/Password Auth via PocketBase Users collection
 
 ## AI LLM Rules
 
@@ -59,7 +59,7 @@
 
 ```javascript
 {
-  id: "column-id",
+  id: "uuid",
   name: "Column Name",
   color: "#hexcolor",
   collapsed: boolean, // optional, defaults false
@@ -71,7 +71,7 @@
 
 ```javascript
 {
-  id: "label-id",
+  id: "uuid",
   name: "Label Name", // max 40 characters
   color: "#hexcolor",
   group: "Group Name" // optional, defaults to "" (no group)
@@ -97,10 +97,10 @@
 
 - Users can opt-in to cloud storage by clicking **Go Online**.
 - Authentication is handled via Social Auth (Google, Apple, and Microsoft options) or Email/Password.
-- Email/Password registration requires clicking a verification link sent to the user's email.
 - Once logged in, a **Sync** button allows pushing local data to the cloud or pulling remote data to the local machine.
-- Cloud data is stored in a SQLite database managed by a Golang API.
-- Sync is currently a bulk operation (Push all or Pull all).
+- Cloud data is stored in a PocketBase instance (SQLite-based).
+- Each board is stored as a record in the `boards` collection, with the full board JSON in a `data` field.
+- Sync is currently a bulk operation (Push all local boards to PocketBase or Pull all remote boards from PocketBase).
 
 ## UI Components
 

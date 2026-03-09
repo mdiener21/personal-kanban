@@ -11,20 +11,12 @@ import { confirmDialog } from './modules/dialog.js';
 import { initializeSettingsUI } from './modules/settings.js';
 import { initializeNotifications } from './modules/notifications.js';
 import { ensureBoardsInitialized, setActiveBoardId, listBoards, getBoardById, loadColumns, loadTasks, loadLabels, loadSettings, saveColumns, saveTasks, saveLabels, saveSettings, createBoard } from './modules/storage.js';
-import { setToken, getToken, getUserInfo, loginWithProvider, syncData, fetchBoards, fetchFullBoard, loginUser, registerUser } from './modules/sync.js';
+import { getPb, isAuthenticated, getUser, loginWithProvider, loginUser, registerUser, logoutUser, pushBoard, pullBoards } from './modules/sync.js';
 import { setupModalCloseHandlers, hideLoginModal } from './modules/modals.js';
 
 // Add task button listeners
 document.addEventListener('DOMContentLoaded', async () => {
-  // Handle token in URL from social auth callback
   const urlParams = new URLSearchParams(window.location.search);
-  const token = urlParams.get('token');
-  if (token) {
-    setToken(token);
-    // Remove token from URL
-    const nextUrl = window.location.pathname + (window.location.hash || '');
-    window.history.replaceState({}, '', nextUrl);
-  }
 
   // Deep-link support (e.g., from calendar.html): open a task modal by ID.
   const openTaskId = (urlParams.get('openTaskId') || '').trim();
@@ -72,8 +64,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   const logoutBtn = document.getElementById('logout-btn');
 
   async function updateAuthUI() {
-    const user = await getUserInfo();
-    if (user) {
+    if (isAuthenticated()) {
+      const user = getUser();
       loginBtn.classList.add('hidden');
       userInfo.classList.remove('hidden');
       userNameEl.textContent = user.name || user.email;
@@ -93,9 +85,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   setupModalCloseHandlers('login-modal', hideLoginModal);
 
   providerBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', async () => {
       const provider = btn.dataset.provider;
-      loginWithProvider(provider);
+      try {
+        await loginWithProvider(provider);
+        hideLoginModal();
+        updateAuthUI();
+      } catch (err) {
+        console.error('OAuth2 login failed', err);
+      }
     });
   });
 
@@ -146,11 +144,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       if (isSignupMode) {
         await registerUser(email, password, name);
-        authMessage.textContent = 'Registration successful! Please check your email to verify your account.';
+        authMessage.textContent = 'Registration successful! You can now log in.';
         authMessage.style.color = 'green';
       } else {
-        const { token } = await loginUser(email, password);
-        setToken(token);
+        await loginUser(email, password);
         hideLoginModal();
         updateAuthUI();
         alert('Logged in successfully!');
@@ -163,7 +160,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   logoutBtn.addEventListener('click', () => {
-    setToken(null);
+    logoutUser();
     updateAuthUI();
   });
 
@@ -180,12 +177,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
 
       if (ok) {
-        // PUSH
-        const boards = listBoards().map(b => {
+        // PUSH all local boards to PocketBase
+        const boards = listBoards();
+        for (const b of boards) {
           const originalActiveBoard = localStorage.getItem('kanbanActiveBoardId');
           localStorage.setItem('kanbanActiveBoardId', b.id);
 
-          const data = {
+          const fullBoardData = {
             ...b,
             columns: loadColumns(),
             tasks: loadTasks(),
@@ -194,14 +192,12 @@ document.addEventListener('DOMContentLoaded', async () => {
           };
 
           localStorage.setItem('kanbanActiveBoardId', originalActiveBoard);
-          return data;
-        });
-
-        await syncData({ boards });
+          await pushBoard(fullBoardData);
+        }
         alert('Data pushed to cloud successfully!');
       } else {
         // PULL
-        const remoteBoards = await fetchBoards();
+        const remoteBoards = await pullBoards();
         if (!remoteBoards || remoteBoards.length === 0) {
           alert('No data found in cloud.');
           return;
@@ -216,16 +212,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (!confirmPull) return;
 
-        // Clear local boards metadata first
-        localStorage.setItem('kanbanBoards', JSON.stringify([]));
-
-        for (const rb of remoteBoards) {
-          const fullBoard = await fetchFullBoard(rb.id);
-
-          // Register board metadata
-          const localBoards = JSON.parse(localStorage.getItem('kanbanBoards') || '[]');
+        // Register each pulled board
+        const localBoards = [];
+        for (const fullBoard of remoteBoards) {
           localBoards.push({ id: fullBoard.id, name: fullBoard.name, createdAt: fullBoard.createdAt });
-          localStorage.setItem('kanbanBoards', JSON.stringify(localBoards));
 
           // Save board data
           localStorage.setItem(`kanbanBoard:${fullBoard.id}:columns`, JSON.stringify(fullBoard.columns));
@@ -233,6 +223,8 @@ document.addEventListener('DOMContentLoaded', async () => {
           localStorage.setItem(`kanbanBoard:${fullBoard.id}:labels`, JSON.stringify(fullBoard.labels));
           localStorage.setItem(`kanbanBoard:${fullBoard.id}:settings`, JSON.stringify(fullBoard.settings));
         }
+
+        localStorage.setItem('kanbanBoards', JSON.stringify(localBoards));
 
         if (remoteBoards.length > 0) {
           setActiveBoardId(remoteBoards[0].id);

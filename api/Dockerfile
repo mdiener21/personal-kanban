@@ -13,11 +13,10 @@ FROM alpine:latest
 
 WORKDIR /app
 
-COPY --from=builder /app/main .
-COPY .env.example .env
+RUN apk add --no-cache ca-certificates
 
-RUN mkdir -p /app/data
+COPY --from=builder /app/main .
 
 EXPOSE 8080
 
-CMD ["./main"]
+CMD ["./main", "serve", "--http=0.0.0.0:8080"]
