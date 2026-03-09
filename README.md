@@ -29,6 +29,8 @@ Experience it firsthand: **[Try the Live Demo](https://mdiener21.github.io/perso
    <a href="https://mdiener21.github.io/personal-kanban/"><img width="794" height="636" alt="image" src="https://github.com/user-attachments/assets/8c743e44-6810-4497-b93c-7dcdade8a820"></a>
    <br><br>
    <a href="https://mdiener21.github.io/personal-kanban/"><img width="1092" height="745" alt="image" src="https://github.com/user-attachments/assets/dc143944-bff6-47aa-b71a-0db6788c6b19"></a>
+   <br><br>
+   <a href="https://mdiener21.github.io/personal-kanban/"><img width="1273" height="1168" alt="image" src="https://github.com/user-attachments/assets/871a95fb-f7f7-41f8-a1b3-dc74f38ff6a2"></a>
 
 </div>
 
@@ -42,7 +44,6 @@ Experience it firsthand: **[Try the Live Demo](https://mdiener21.github.io/perso
 - **🎨 Drag & Drop**: Effortlessly move tasks and columns for seamless workflow management.
 - **🏷️ Custom Labels & Colors**: Organize with personalized labels, groups, and column colors.
 - **💾 Easy Backup**: Export/import boards as JSON files to your favorite cloud storage (OneDrive, Google Drive, Dropbox).
-- **☁️ Cloud Sync**: Opt-in to online storage and sync your boards across devices using Social Auth (Google, Apple, Microsoft) or Email/Password.
 - **📱 Fully Responsive**: Optimized for mobile and desktop—work from anywhere.
 - **🥇 Free & Open Source**: Always free, no hidden costs or subscriptions.
 
@@ -96,27 +97,35 @@ npm run build
 ```
 Built files are in `dist/`.
 
-### Docker Setup (Full Stack)
-To run both the frontend and PocketBase backend together:
-1. Ensure you have Docker and Docker Compose installed.
-2. Build and start all services:
-   ```bash
-   docker compose up --build
-   ```
-3. The frontend will be available at `http://localhost:3000` and the PocketBase API at `http://localhost:8080`.
-4. Create a PocketBase superuser (required on first run):
-   ```bash
-   docker compose exec api ./main superuser create admin@example.com yourpassword
-   ```
-5. Access the PocketBase admin UI at `http://localhost:8080/_/` and log in with the superuser credentials.
-6. Configure OAuth2 providers in the PocketBase Admin UI (Settings > Auth providers).
-
-> **Note:** The frontend source (`client/src/`) is volume-mounted, so changes are reflected immediately via Vite hot-reload.
-
 ### Preview Production Build
 ```bash
 npm run preview
 ```
+
+### Generate a Release
+
+Use the `Generate Release` workflow to automate release preparation:
+- `npm ci` + `npm run build`
+- version bump (`package.json` + `package-lock.json`)
+- changelog promotion from `Unreleased`
+- creation/update of a release PR (`release/vX.Y.Z` → `main`)
+
+After the release PR is merged, `Publish Release` runs automatically on `main` and:
+- creates/pushes tag `vX.Y.Z`
+- publishes GitHub Release with notes extracted from `CHANGELOG.md`
+
+`Publish Release` is triggered on every push to `main`, but it only creates a tag/release when that version tag does not already exist.
+
+GitHub CLI example:
+
+```bash
+gh workflow run release.yml --ref main -f bump=patch
+```
+
+Use `bump=minor` or `bump=major` when needed.
+
+If your repo blocks Actions from opening PRs, enable repository setting:
+`Settings → Actions → General → Workflow permissions → Allow GitHub Actions to create and approve pull requests`.
 
 ### Run Tests
 

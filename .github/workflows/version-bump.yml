@@ -1,17 +1,11 @@
-name: Auto Version Bump
+name: Version Bump (Manual)
 
-# This workflow automatically bumps the minor version in package.json
-# on every commit to the main branch (e.g., 1.0.5 -> 1.1.0).
-# The version bump commit includes [skip ci] to prevent infinite loops.
+# Manual utility workflow to bump version and open a PR.
 #
-# This workflow creates a Pull Request with the version bump, which respects
-# branch protection rules. The PR can be manually reviewed and merged, or
-# you can enable auto-merge on the PR if desired.
+# Automated release publication is handled by `.github/workflows/release.yml`.
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch: {}
 
 permissions:
   contents: write
@@ -20,8 +14,6 @@ permissions:
 jobs:
   bump-version:
     runs-on: ubuntu-latest
-    # Skip if commit message contains [skip ci]
-    if: "!contains(github.event.head_commit.message, '[skip ci]')"
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
