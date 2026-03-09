@@ -1,0 +1,99 @@
+name: Generate Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: Version bump type
+        required: true
+        default: patch
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-pr:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Ensure main branch
+        run: |
+          if [ "${GITHUB_REF}" != "refs/heads/main" ]; then
+            echo "This workflow must run from main. Current ref: ${GITHUB_REF}"
+            exit 1
+          fi
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build project
+        run: npm run build
+
+      - name: Prepare version and changelog
+        id: prepare
+        run: |
+          NEW_VERSION=$(node scripts/prepare-release.mjs --bump "${{ github.event.inputs.bump }}" --notes-file .release-notes.md)
+          echo "version=${NEW_VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Update package-lock.json
+        run: npm install --package-lock-only
+
+      - name: Clean generated release notes artifact
+        run: rm -f .release-notes.md
+
+      - name: Create release pull request
+        id: release_pr
+        continue-on-error: true
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: Bump version to v${{ steps.prepare.outputs.version }} and update changelog
+          branch: release/v${{ steps.prepare.outputs.version }}
+          base: main
+          title: Bump version to v${{ steps.prepare.outputs.version }} and update changelog
+          body: |
+            Automated release preparation for **v${{ steps.prepare.outputs.version }}**.
+
+            This PR includes:
+            - `package.json` version bump
+            - `package-lock.json` sync update
+            - `CHANGELOG.md` promotion from Unreleased
+
+            After merge to `main`, workflow `.github/workflows/publish-release.yml` will:
+            - create/push tag `v${{ steps.prepare.outputs.version }}`
+            - publish GitHub Release notes from `CHANGELOG.md`
+          labels: |
+            release
+          delete-branch: true
+          add-paths: |
+            package.json
+            package-lock.json
+            CHANGELOG.md
+
+      - name: Output PR details
+        run: |
+          if [ -n "${{ steps.release_pr.outputs.pull-request-url }}" ]; then
+            echo "Release PR number: ${{ steps.release_pr.outputs.pull-request-number }}"
+            echo "Release PR URL: ${{ steps.release_pr.outputs.pull-request-url }}"
+          else
+            echo "Workflow created branch release/v${{ steps.prepare.outputs.version }} but could not open a PR."
+            echo "Enable repository setting: Allow GitHub Actions to create and approve pull requests."
+            echo "Manual PR URL: https://github.com/${{ github.repository }}/compare/main...release/v${{ steps.prepare.outputs.version }}?expand=1"
+          fi
