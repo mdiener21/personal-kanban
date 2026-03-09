@@ -1,4 +1,5 @@
 import { generateUUID } from './utils.js';
+import { notifyLocalDataChanged } from './autosync.js';
 
 const BOARDS_KEY = 'kanbanBoards';
 const ACTIVE_BOARD_KEY = 'kanbanActiveBoardId';
@@ -68,6 +69,7 @@ export function getActiveBoardName() {
 
 function saveBoards(boards) {
   localStorage.setItem(BOARDS_KEY, JSON.stringify(boards));
+  notifyLocalDataChanged({ scope: 'boards' });
 }
 
 export function getActiveBoardId() {
@@ -344,6 +346,7 @@ export function createBoard(name) {
   localStorage.setItem(keyFor(id, 'settings'), JSON.stringify(defaultSettings()));
 
   localStorage.setItem(ACTIVE_BOARD_KEY, id);
+  notifyLocalDataChanged({ scope: 'board', boardId: id, action: 'create' });
   return board;
 }
 
@@ -358,6 +361,7 @@ export function renameBoard(boardId, newName) {
 
   const updated = boards.map((b) => (b.id === id ? { ...b, name } : b));
   saveBoards(updated);
+  notifyLocalDataChanged({ scope: 'board', boardId: id, action: 'rename' });
   return true;
 }
 
@@ -385,6 +389,8 @@ export function deleteBoard(boardId) {
   if (active === id) {
     localStorage.setItem(ACTIVE_BOARD_KEY, remaining[0].id);
   }
+
+  notifyLocalDataChanged({ scope: 'board', boardId: id, action: 'delete' });
 
   return true;
 }
@@ -439,6 +445,7 @@ export function saveColumns(columns) {
   ensureBoardsInitialized();
   const boardId = getActiveBoardId() || DEFAULT_BOARD_ID;
   localStorage.setItem(keyFor(boardId, 'columns'), JSON.stringify(columns));
+  notifyLocalDataChanged({ scope: 'columns', boardId });
 }
 
 // Load tasks from localStorage
@@ -539,6 +546,7 @@ export function saveTasks(tasks) {
   const boardId = getActiveBoardId() || DEFAULT_BOARD_ID;
   localStorage.setItem(keyFor(boardId, 'tasks'), JSON.stringify(tasks));
   taskCacheByBoard.set(boardId, tasks);
+  notifyLocalDataChanged({ scope: 'tasks', boardId });
 }
 
 // Load labels from localStorage
@@ -562,6 +570,7 @@ export function saveLabels(labels) {
   ensureBoardsInitialized();
   const boardId = getActiveBoardId() || DEFAULT_BOARD_ID;
   localStorage.setItem(keyFor(boardId, 'labels'), JSON.stringify(labels));
+  notifyLocalDataChanged({ scope: 'labels', boardId });
 }
 
 function normalizeSettings(raw) {
@@ -598,4 +607,5 @@ export function saveSettings(settings) {
   const boardId = getActiveBoardId() || DEFAULT_BOARD_ID;
   const normalized = normalizeSettings(settings);
   localStorage.setItem(keyFor(boardId, 'settings'), JSON.stringify(normalized));
+  notifyLocalDataChanged({ scope: 'settings', boardId });
 }

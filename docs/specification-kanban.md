@@ -96,11 +96,20 @@
 ### Online Sync
 
 - Users can opt-in to cloud storage by clicking **Go Online**.
-- Authentication is handled via Social Auth (Google, Apple, and Microsoft options) or Email/Password.
-- Once logged in, a **Sync** button allows pushing local data to the cloud or pulling remote data to the local machine.
+- Authentication is handled via default Email/Password, with optional social providers (Google, Apple, Microsoft).
+- The login modal defaults to Email/Password when opened from Go Online.
+- Auth and sync UI orchestration is centralized in `src/modules/authsync.js`.
+- First-time cloud migration is a one-time **Push** operation from localStorage to PocketBase.
+- After a successful first push, auto-sync is enabled (`kanbanAutoSyncEnabled=true`) and future board/task/column/label/settings changes are pushed automatically in the background (debounced), while still being written to localStorage immediately.
+- When auto-sync is enabled, the manual **Sync** button is hidden.
+- Session checks for sync treat PocketBase auth as active when both token and user record are present, reducing false unauthenticated states after email/password login.
+- If stored PocketBase auth data is malformed, sync auth checks clear it to avoid repeated false-positive "logged in" states.
+- If Sync is clicked while unauthenticated, the login modal opens directly on the Email tab with an inline message.
+- OAuth login only accepts the allowlisted providers (`google`, `apple`, `microsoftonline`) from UI buttons.
+- Background auto-sync orchestration is implemented in `src/modules/autosync.js` and is triggered by `kanban-local-change` events emitted from storage save operations.
 - Cloud data is stored in a PocketBase instance (SQLite-based).
 - Each board is stored as a record in the `boards` collection, with the full board JSON in a `data` field.
-- Sync is currently a bulk operation (Push all local boards to PocketBase or Pull all remote boards from PocketBase).
+- Auto-sync pushes all local boards to PocketBase to preserve consistency across multi-board updates.
 
 ## UI Components
 

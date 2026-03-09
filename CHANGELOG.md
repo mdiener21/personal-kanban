@@ -9,7 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added (unreleased)
 
+- Auto-sync module (`client/src/modules/autosync.js`) with debounced background push queue for authenticated sessions.
+
 ### Changed (unreleased)
+
+- Sync authentication gating now treats a valid PocketBase auth token + user record as an authenticated session, preventing false logouts immediately after email/password login.
+- Clicking Sync while not authenticated now opens the login modal directly on the Email tab with guidance, instead of only showing an alert.
+- Sync now uses a refresh-capable auth check before prompting for re-login, so successful email/password sessions proceed to the Push/Pull dialog.
+- Refactored auth + sync UI/event wiring out of `kanban.js` into `client/src/modules/authsync.js` to reduce entrypoint complexity and centralize online-flow logic.
+- Hardened auth UI flow: OAuth providers are allowlisted, email credentials are normalized (`trim` + lowercase), and user-facing auth/sync errors are constrained to safe text.
+- Go Online now always opens the login modal on the Email tab by default.
+- Sync auth checks now self-heal from malformed `pocketbase_auth` localStorage payloads by rehydrating valid token+record data and clearing invalid values.
+- Storage save operations now emit `kanban-local-change` events so authenticated, auto-sync-enabled users persist updates to PocketBase automatically.
+- Cloud onboarding now uses a one-time push migration: after the first successful Push, auto-sync is enabled and the manual Sync button is hidden.
 
 ### Removed (unreleased)
 
