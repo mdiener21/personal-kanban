@@ -11,11 +11,14 @@ import { confirmDialog } from './modules/dialog.js';
 import { initializeSettingsUI } from './modules/settings.js';
 import { initializeNotifications } from './modules/notifications.js';
 import { ensureBoardsInitialized, setActiveBoardId } from './modules/storage.js';
+import { initializeAuthSyncUI } from './modules/authsync.js';
+import { initializeAutoSync } from './modules/autosync.js';
 
 // Add task button listeners
-document.addEventListener('DOMContentLoaded', () => {
-  // Deep-link support (e.g., from calendar.html): open a task modal by ID.
+document.addEventListener('DOMContentLoaded', async () => {
   const urlParams = new URLSearchParams(window.location.search);
+
+  // Deep-link support (e.g., from calendar.html): open a task modal by ID.
   const openTaskId = (urlParams.get('openTaskId') || '').trim();
   const openTaskBoardId = (urlParams.get('openTaskBoardId') || '').trim();
 
@@ -52,6 +55,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Initialize notifications
   initializeNotifications();
+
+  // Initialize background auto-sync (debounced, opt-in after first push)
+  initializeAutoSync();
+
+  initializeAuthSyncUI();
 
   // Export button listener
   document.getElementById('export-btn').addEventListener('click', async () => {
@@ -93,11 +101,11 @@ document.addEventListener('DOMContentLoaded', () => {
     menuBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       const isExpanded = menuBtn.getAttribute('aria-expanded') === 'true';
-
+      
       // Toggle menu
       controlsActions.classList.toggle('show');
       menuBtn.setAttribute('aria-expanded', String(!isExpanded));
-
+      
       // Close other menus if open (optional, but good practice)
       document.querySelectorAll('.column-menu').forEach(m => m.classList.add('hidden'));
     });

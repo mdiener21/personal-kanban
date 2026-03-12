@@ -12,6 +12,10 @@
 - No server, no frameworks
 - Build tooling: Vite (ES modules)
   - Reports bundling: Rollup chunk splitting keeps ECharts and ZRender in dedicated vendor chunks (`vendor-echarts`, `vendor-zrender`) to avoid oversized entry chunks.
+- Backend: [PocketBase](https://pocketbase.io/) (Golang-powered BaaS)
+- Authentication:
+  - Social Auth (Google, Apple, Microsoft) via PocketBase OAuth2
+  - Email/Password Auth via PocketBase Users collection
 
 ## AI LLM Rules
 
@@ -55,7 +59,7 @@
 
 ```javascript
 {
-  id: "column-id",
+  id: "uuid",
   name: "Column Name",
   color: "#hexcolor",
   collapsed: boolean, // optional, defaults false
@@ -67,7 +71,7 @@
 
 ```javascript
 {
-  id: "label-id",
+  id: "uuid",
   name: "Label Name", // max 40 characters
   color: "#hexcolor",
   group: "Group Name" // optional, defaults to "" (no group)
@@ -79,6 +83,7 @@
 - **Boards registry**:
   - `kanbanBoards`: array of Board metadata
   - `kanbanActiveBoardId`: last active board id (restored on page load)
+  - `kanbanAuthToken`: JWT token for cloud sync (if logged in)
 - **Per-board data (namespaced)**:
   - `kanbanBoard:<boardId>:tasks`
   - `kanbanBoard:<boardId>:columns`
@@ -86,8 +91,25 @@
   - `kanbanBoard:<boardId>:settings`
 - Legacy storage (`kanbanTasks`, `kanbanColumns`, `kanbanLabels`) is migrated into a default board on first run.
 - All CRUD operations load/save against the currently active board.
-- **Export** operates on the active board.
-- **Import** creates a **new board** from the JSON and switches to it.
+- Export/Import operates on the active board.
+
+### Online Sync
+
+- Users can opt-in to cloud storage by clicking **Go Online**.
+- Authentication is handled via default Email/Password, with optional social providers (Google, Apple, Microsoft).
+- The login modal defaults to Email/Password when opened from Go Online.
+- Auth and sync UI orchestration is centralized in `src/modules/authsync.js`.
+- First-time cloud migration is a one-time **Push** operation from localStorage to PocketBase.
+- After a successful first push, auto-sync is enabled (`kanbanAutoSyncEnabled=true`) and future board/task/column/label/settings changes are pushed automatically in the background (debounced), while still being written to localStorage immediately.
+- When auto-sync is enabled, the manual **Sync** button is hidden.
+- Session checks for sync treat PocketBase auth as active when both token and user record are present, reducing false unauthenticated states after email/password login.
+- If stored PocketBase auth data is malformed, sync auth checks clear it to avoid repeated false-positive "logged in" states.
+- If Sync is clicked while unauthenticated, the login modal opens directly on the Email tab with an inline message.
+- OAuth login only accepts the allowlisted providers (`google`, `apple`, `microsoftonline`) from UI buttons.
+- Background auto-sync orchestration is implemented in `src/modules/autosync.js` and is triggered by `kanban-local-change` events emitted from storage save operations.
+- Cloud data is stored in a PocketBase instance (SQLite-based).
+- Each board is stored as a record in the `boards` collection, with the full board JSON in a `data` field.
+- Auto-sync pushes all local boards to PocketBase to preserve consistency across multi-board updates.
 
 ## UI Components
 
@@ -199,6 +221,8 @@
   - Help button (opens help modal)
   - Manage Labels button
   - Settings button (opens Settings modal)
+  - Go Online / Login button
+  - Sync / Logout (when logged in)
   - Notifications button (opens notifications modal, shows badge with count)
   - Add Column button
   - View Calendar link (opens `calendar.html`)
