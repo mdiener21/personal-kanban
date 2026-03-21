@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed (unreleased)
 
 - Swim lane task cards now display the same column accent colors (left color bar, hover tint, border color) as standard column view
+- Collapsed workflow columns in swim lane view now accept drag-and-drop with visual hover feedback (dashed outline), matching standard column view behavior
 
 ### Changed (unreleased)
 

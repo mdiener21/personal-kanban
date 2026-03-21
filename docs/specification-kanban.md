@@ -131,6 +131,7 @@
 - Workflow columns remain collapsible while swim lane view is enabled.
   - Collapsing a workflow column applies across every swim lane row, turning that column into a narrow rail with compact summaries.
   - The collapsed workflow column header shows only the collapse/expand toggle button; the column title, task counter, and add-task button are hidden.
+  - Dragging a task over a collapsed column cell in swim lane view shows a dashed outline and tinted background; dropping places the task into the correct column and swim lane.
 - Individual swim lane cells (the intersection of a swim lane row and workflow column) can be collapsed independently.
   - Each cell has a small chevron toggle button that collapses/expands just the tasks in that cell.
   - When collapsed, the cell shows a compact task count summary (e.g., "3 tasks") and hides the task list.
