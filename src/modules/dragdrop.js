@@ -135,11 +135,14 @@ function clearCollapsedDropHover() {
   document
     .querySelectorAll(`.task-column.is-collapsed.${COLLAPSED_DROP_HOVER_CLASS}`)
     .forEach((column) => column.classList.remove(COLLAPSED_DROP_HOVER_CLASS));
+  document
+    .querySelectorAll(`.swimlane-cell.is-column-collapsed.${COLLAPSED_DROP_HOVER_CLASS}`)
+    .forEach((cell) => cell.classList.remove(COLLAPSED_DROP_HOVER_CLASS));
 }
 
-function setCollapsedDropHover(columnEl) {
+function setCollapsedDropHover(el) {
   clearCollapsedDropHover();
-  if (columnEl) columnEl.classList.add(COLLAPSED_DROP_HOVER_CLASS);
+  if (el) el.classList.add(COLLAPSED_DROP_HOVER_CLASS);
 }
 
 // Track touch/mouse position globally during drag
@@ -158,11 +161,20 @@ function trackPointer(evt) {
 function updateCollapsedHoverFromPoint(x, y) {
   if (!x && !y) return;
   const target = document.elementFromPoint(x, y);
-  const column = target?.closest?.('.task-column');
-  if (column && column.classList.contains('is-collapsed')) {
-    setCollapsedDropHover(column);
+  if (isSwimlaneViewEnabled()) {
+    const cell = target?.closest?.('.swimlane-cell');
+    if (cell && cell.classList.contains('is-column-collapsed')) {
+      setCollapsedDropHover(cell);
+    } else {
+      clearCollapsedDropHover();
+    }
   } else {
-    clearCollapsedDropHover();
+    const column = target?.closest?.('.task-column');
+    if (column && column.classList.contains('is-collapsed')) {
+      setCollapsedDropHover(column);
+    } else {
+      clearCollapsedDropHover();
+    }
   }
 }
 
@@ -221,7 +233,14 @@ function initTaskSortables() {
 
       onMove: function(evt) {
         activeTaskList = evt.to || activeTaskList;
-        if (!isSwimlaneViewEnabled()) {
+        if (isSwimlaneViewEnabled()) {
+          const targetCell = evt.to?.closest('.swimlane-cell');
+          if (targetCell && targetCell.classList.contains('is-column-collapsed')) {
+            setCollapsedDropHover(targetCell);
+          } else {
+            clearCollapsedDropHover();
+          }
+        } else {
           const targetColumn = evt.to?.closest('.task-column');
           if (targetColumn && targetColumn.classList.contains('is-collapsed')) {
             setCollapsedDropHover(targetColumn);
