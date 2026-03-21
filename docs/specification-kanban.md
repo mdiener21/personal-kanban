@@ -99,10 +99,10 @@
 - Each column: header (drag handle, title, task counter, actions) + task list + optional show-all button
 - Task counter: circular blue badge showing task count, updates on any task add/remove/move
 - Optional swim lane view turns the board into a row-by-column grid while preserving the same workflow columns.
-  - Top row shows workflow column headers with task counters, add-task actions, and column collapse controls.
+  - Top row shows workflow column headers with task counters, add-task actions, and column collapse controls (no corner cell).
   - The workflow column header row remains visible while the user scrolls vertically through the swim lane grid.
-  - Left column shows sticky lane headers with lane name, active-count badges, hidden-done summary, and collapse/expand control.
-  - Each lane row contains one task cell per workflow column.
+  - Each swim lane row renders its lane header as a full-width bar above the row of column cells, containing the collapse/expand toggle, lane name, active-count badges, and hidden-done summary. The lane header uses `position: sticky; left: 0` so it stays pinned to the left viewport edge during horizontal scrolling.
+  - Each lane row contains one task cell per workflow column in a `.swimlane-row-cells` sub-grid below the lane header.
   - Swim lanes are toggled entirely client-side without page reload.
 
 ### Swim Lanes
@@ -125,11 +125,12 @@
   - The `done` cell still renders as an active drop zone and shows compact helper text instead of the hidden cards.
   - Dragging a task into `done` in swim lane mode still persists the move and places the task at the top of the flattened done-column order.
 - Each swim lane row has an accordion-style collapse button.
-  - Collapsing a lane hides its row cells while keeping the lane header visible.
+  - Collapsing a lane hides all row cells; the lane header bar remains visible and stays sticky-left like expanded headers.
+  - The collapsed bar displays, left to right: collapse/expand chevron, lane label name, active task count badge, and done task count badge — all on one horizontal line.
   - Collapsed lane state is persisted per board using lane keys in Settings.
 - Workflow columns remain collapsible while swim lane view is enabled.
   - Collapsing a workflow column applies across every swim lane row, turning that column into a narrow rail with compact summaries.
-  - The collapsed workflow column header remains visible so the column can be expanded again.
+  - The collapsed workflow column header shows only the collapse/expand toggle button; the column title, task counter, and add-task button are hidden.
 - Individual swim lane cells (the intersection of a swim lane row and workflow column) can be collapsed independently.
   - Each cell has a small chevron toggle button that collapses/expands just the tasks in that cell.
   - When collapsed, the cell shows a compact task count summary (e.g., "3 tasks") and hides the task list.
@@ -141,6 +142,7 @@
   - In label or label-group mode, the swimlane's label is automatically pre-selected in the modal.
   - In priority mode, the priority dropdown is pre-set to the swimlane's priority value.
   - The "+" button does not appear in done-column cells or column-collapsed cells.
+- On mobile, swim lane rows switch from CSS grid to flex layout so lane headers remain sticky-visible on the left edge while the user swipes through columns. Each column is 85vw with snap-scroll matching the standard column view. Lane headers render as a narrow (36px) sticky-left strip with the lane name displayed vertically, maximising column space. Badges are hidden in expanded rows. Collapsed rows revert to a horizontal full-width bar. Snap is disabled during drag-drop.
 - Task ordering remains flattened per column in storage so switching swim lanes off returns to the standard column view without data loss.
 
 ### Column Features

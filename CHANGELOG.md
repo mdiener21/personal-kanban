@@ -24,12 +24,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed (unreleased)
 
+- Swim lane row headers now render as a full-width bar above the row of column cells instead of a sidebar column, with `sticky; left: 0` positioning so the header stays pinned to the left viewport edge during horizontal scrolling
+- Collapsed workflow column headers in swim lane view now show only the collapse/expand toggle, hiding the title, task counter, and add-task button
+- Removed the "Swim Lane" corner cell from the swim lane grid header
 - Board rendering now supports a swim lane grid mode while keeping the existing column-only layout unchanged when the feature is off
 - Board import/export now preserves swim lane settings and explicit task lane assignments
 - Swim lane controls moved out of the board toolbar into the Settings modal
 - Expanded swim lane rows now hide done-column cards by default to keep lanes compact while preserving Done as a drag-and-drop target
 - Swim lane workflow headers now stay visible during vertical scrolling, and column collapse continues to work while swim lanes are enabled
 - In priority-grouped swim lanes, dragging a task between lanes now updates the task priority to match the target lane
+- Collapsed swim lane rows now render as a single compact bar spanning all columns, showing chevron, lane name, active count, and done count in one horizontal line
+- Swim lane row toggle button moved to the left of the lane name for consistent expand/collapse control placement
+- Mobile swim lane layout switched from CSS grid to flex so lane headers (36px vertical strip) stay sticky-visible on the left edge while swiping through 85vw snap-scrolling columns
 
 ### Removed (unreleased)
 

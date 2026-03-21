@@ -691,9 +691,11 @@ function createSwimlaneHeaderCell(column, taskCount) {
   addBtn.addEventListener('click', () => showModal(column.id));
 
   header.appendChild(collapseBtn);
-  header.appendChild(title);
-  header.appendChild(counter);
-  header.appendChild(addBtn);
+  if (!isCollapsed) {
+    header.appendChild(title);
+    header.appendChild(counter);
+    header.appendChild(addBtn);
+  }
   return header;
 }
 
@@ -743,8 +745,8 @@ function createSwimlaneLaneHeader(lane, activeTaskCount, hiddenDoneCount, isColl
     if (toggleSwimLaneCollapsed(lane.key)) renderBoard();
   });
 
-  laneHeader.appendChild(main);
   laneHeader.appendChild(toggleBtn);
+  laneHeader.appendChild(main);
   return laneHeader;
 }
 
@@ -893,20 +895,13 @@ function renderSwimlaneBoard(container, sortedColumns, visibleTasks, labels, set
   const board = document.createElement('div');
   board.classList.add('swimlane-board');
   board.style.setProperty('--swimlane-column-count', String(sortedColumns.length));
-  board.style.setProperty(
-    '--swimlane-grid-template',
-    `minmax(200px, 220px) ${sortedColumns
-      .map((column) => (column?.collapsed === true ? '72px' : 'minmax(280px, 320px)'))
-      .join(' ')}`
-  );
+  const colTemplate = sortedColumns
+    .map((column) => (column?.collapsed === true ? '72px' : 'minmax(280px, 320px)'))
+    .join(' ');
+  board.style.setProperty('--swimlane-grid-template', colTemplate);
 
   const headerRow = document.createElement('div');
   headerRow.classList.add('swimlane-grid-header');
-
-  const corner = document.createElement('div');
-  corner.classList.add('swimlane-corner-cell');
-  corner.textContent = 'Swim Lane';
-  headerRow.appendChild(corner);
 
   sortedColumns.forEach((column) => {
     const taskCount = visibleTasks.filter((task) => task.column === column.id).length;
@@ -934,6 +929,9 @@ function renderSwimlaneBoard(container, sortedColumns, visibleTasks, labels, set
     const laneHeader = createSwimlaneLaneHeader(lane, activeTaskCount, hiddenDoneCount, collapsed, laneColor);
     row.appendChild(laneHeader);
 
+    const cellsWrapper = document.createElement('div');
+    cellsWrapper.classList.add('swimlane-row-cells');
+
     sortedColumns.forEach((column) => {
       const tasksInCell = (lane.cells[column.id] || []).slice().sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
       const cellCollapsed = isSwimLaneCellCollapsed(lane.key, column.id, settings);
@@ -944,9 +942,10 @@ function renderSwimlaneBoard(container, sortedColumns, visibleTasks, labels, set
           : cellCollapsed
             ? []
             : getVisibleTasksForLane(tasksInCell, column.id);
-      row.appendChild(createSwimlaneCell(column, lane, tasksInCell, visibleTasksInCell, settings, labelsMap, today, cellCollapsed));
+      cellsWrapper.appendChild(createSwimlaneCell(column, lane, tasksInCell, visibleTasksInCell, settings, labelsMap, today, cellCollapsed));
     });
 
+    row.appendChild(cellsWrapper);
     board.appendChild(row);
   });
 
