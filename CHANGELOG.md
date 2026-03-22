@@ -9,8 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added (unreleased)
 
+- Import preflight review now checks JSON schema and file size before saving any board data, then asks for confirmation with a summary of imported counts and warnings.
+
 
 ### Changed (unreleased)
+
+- Reports now escape user-controlled tooltip content, swimlane action buttons no longer rely on HTML injection for icons, and the app pages send a stricter Content Security Policy.
 
 
 ### Removed (unreleased)
