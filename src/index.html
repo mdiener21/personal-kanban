@@ -37,6 +37,11 @@
       <div id="board-controls-menu" class="controls-actions">
         <label class="sr-only" for="board-select">Select board</label>
         <select id="board-select" class="control-select" aria-label="Select board"></select>
+        <label class="control-btn swimlane-toggle-label" for="swimlane-quick-toggle">
+          <span data-lucide="rows-3" aria-hidden="true"></span>
+          <span>Swim Lanes</span>
+          <input id="swimlane-quick-toggle" type="checkbox" class="toggle-switch" aria-label="Toggle swim lanes">
+        </label>
         <button id="add-column-btn" class="control-btn" type="button" aria-haspopup="dialog">
           <span data-lucide="columns-3" aria-hidden="true"></span>
           <span style="color:green;">Add Column</span>
@@ -378,6 +383,10 @@
             <label for="settings-swimlane-label-group">Label group source</label>
             <select id="settings-swimlane-label-group" aria-label="Select label group for swim lanes"></select>
             <p class="form-help">Each label inside the selected group becomes its own swim lane row.</p>
+          </div>
+          <div id="settings-swimlane-order-field" class="form-group" hidden>
+            <label>Lane order <span class="form-help">(drag to reorder)</span></label>
+            <ul id="settings-swimlane-order-list" class="swimlane-order-list" role="list" aria-label="Swim lane order"></ul>
           </div>
         </section>
         <div class="form-actions">
