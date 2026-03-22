@@ -52,9 +52,8 @@ Avoid using labels like **Blocked**, **Won/Lost**, **In Review**, etc. Those are
 
 ## 📋 Label Group Examples (copy/paste ideas)
 
-These are starter sets. Keep them small and grow them as needed.
+These are starter sets. Keep them small and grow them as needed
 
-### 🏢 Project management
 
 **Type**
 
@@ -63,6 +62,12 @@ These are starter sets. Keep them small and grow them as needed.
 - Enhancement
 - Research
 - Tech Debt
+
+**People-Team-A**
+
+- John
+- Sarah
+- Lisa
 
 **Area**
 

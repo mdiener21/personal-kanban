@@ -1,0 +1,129 @@
+# Testing Strategy
+
+This project uses a lean four-layer test stack designed for a pure JavaScript Vite app:
+
+- `Vitest` for fast unit tests
+- `Vitest` + `@testing-library/dom` for DOM integration tests
+- `MSW` for mocked API behavior in Vitest suites
+- `Playwright` for end-to-end, visual, and accessibility smoke coverage
+
+## Goals
+
+- Keep pure logic tests fast and isolated.
+- Verify DOM behavior without requiring a real browser for every change.
+- Mock network behavior consistently even as the app adds more API-backed features.
+- Reserve Playwright for high-value user journeys and browser-level assertions.
+
+## Folder Layout
+
+```text
+tests/
+  unit/
+  dom/
+  e2e/
+  mocks/
+```
+
+Supporting folders remain valid:
+
+- `tests/fixtures/` for JSON data and large sample boards
+- `tests/helpers/` for shared test-only utilities
+- `tests/test-plans/` for manual or generated Playwright planning artifacts
+
+## Naming Convention
+
+### Unit tests
+
+- Location: `tests/unit/`
+- File name: `<module>.test.js`
+- Scope: pure functions, data normalization, storage wrappers, constants, validators, and state helpers
+
+Examples:
+
+- `tests/unit/storage.test.js`
+- `tests/unit/dateutils.test.js`
+- `tests/unit/swimlanes-utils.test.js`
+
+### DOM integration tests
+
+- Location: `tests/dom/`
+- File name: `<feature>.test.js`
+- Scope: rendered HTML, keyboard and pointer interactions, focus behavior, form validation, modal state, and accessibility-oriented DOM assertions
+
+Examples:
+
+- `tests/dom/accordion.test.js`
+- `tests/dom/task-modal.test.js`
+- `tests/dom/settings-panel.test.js`
+
+### Mock API files
+
+- Location: `tests/mocks/`
+- Shared entry points:
+  - `handlers.js`
+  - `server.js`
+- Feature-specific mock files should use `<feature>.handlers.js` when the suite grows beyond the shared default set.
+
+Examples:
+
+- `tests/mocks/handlers.js`
+- `tests/mocks/import-export.handlers.js`
+
+### End-to-end tests
+
+- Location: `tests/e2e/`
+- File name: `<journey>.spec.ts`
+- Scope: full user journeys, cross-module regressions, stable screenshots, and accessibility smoke checks on critical flows
+
+Examples:
+
+- `tests/e2e/create-task.spec.ts`
+- `tests/e2e/validation-missing-title.spec.ts`
+
+## Scripts
+
+- `npm test` — run unit, DOM, and E2E suites in sequence
+- `npm run test:unit` — run only unit tests
+- `npm run test:dom` — run only DOM integration tests
+- `npm run test:e2e` — run only Playwright E2E tests
+- `npm run test:ui` — open Playwright UI mode
+- `npm run test:debug` — run Playwright in debug mode
+
+## What Goes Where
+
+### Put a test in `tests/unit/` when:
+
+- It does not need `document`, layout, or events.
+- It only exercises inputs, outputs, and state transitions.
+- It should stay extremely fast and deterministic.
+
+### Put a test in `tests/dom/` when:
+
+- It needs `document.body`, event dispatching, or focus assertions.
+- It verifies modal behavior, menus, keyboard shortcuts, or rendered task/column UI.
+- It benefits from `@testing-library/dom` queries such as `getByRole()` or `getByText()`.
+
+### Use `tests/mocks/` when:
+
+- A Vitest suite needs consistent success, empty, error, or timeout responses.
+- You want to reuse the same network behavior across multiple DOM or integration tests.
+
+### Put a test in `tests/e2e/` when:
+
+- The behavior spans multiple modules or requires a real browser.
+- Drag-drop, routing, import/export flows, or persistent browser storage must be exercised together.
+- You need screenshots or accessibility smoke checks on stable views.
+
+## Recommended Growth Pattern
+
+1. Start with `tests/unit/` for new pure helpers.
+2. Add `tests/dom/` coverage when a feature has meaningful UI behavior.
+3. Add or extend `tests/mocks/` once the feature depends on network responses.
+4. Add `tests/e2e/` only for critical journeys and regressions that require a real browser.
+
+## Current Scaffold
+
+- `tests/dom/setup.js` resets `document.body` and browser-like globals between DOM tests.
+- `tests/dom/accordion.test.js` is the reference shape for a DOM integration test using `@testing-library/dom`.
+- `tests/dom/msw-example.test.js` demonstrates `Vitest` + `MSW` + `@testing-library/dom` working together.
+- `tests/mocks/handlers.js` and `tests/mocks/server.js` are the shared default mock entry points.

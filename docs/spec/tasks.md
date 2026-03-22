@@ -1,0 +1,53 @@
+# Tasks
+
+## Create and Edit
+
+- Tasks are created from a column header plus button or from a swim lane cell plus button
+- Task form fields: title, description, priority, due date, column, labels
+- Title is required and validates inline with red error styling
+- Edit mode opens with existing task values prefilled
+- The edit modal includes a fullscreen action on larger screens and a dedicated close button
+
+## Placement and Ordering
+
+- New tasks are inserted at the top of the selected column with `order = 1`
+- Standard drag and drop can move tasks between columns
+- In swim lane mode, a single drag can change both column and lane
+- Storage keeps task ordering flattened per column even while swim lanes are enabled
+
+## Card Display
+
+- Task cards show title, optional description, labels, priority badge, delete button, and optional footer metadata
+- Titles are clamped to one line and descriptions to a short preview
+- Footer content is controlled by settings and can include change date, due date, countdown, and task age
+
+## Due Dates and Age
+
+- `changeDate` is formatted with the selected locale using `toLocaleString(locale)`
+- Due dates are displayed as `Due MM/DD/YYYY (countdown)` when countdowns are enabled
+- Countdown text shows days for short ranges and months plus days for longer ranges
+- Overdue tasks display `overdue by ...`
+- Urgency coloring uses configurable red and amber thresholds from settings
+- Tasks in the Done column show due dates without countdown text or urgency coloring
+- Task age is derived from `creationDate` and displayed as years, months, and days as applicable
+
+## Labels in Task Modal
+
+- Selected labels are shown as colored pills with remove buttons
+- Available labels can be filtered through a search field
+- The label search field can open the Add Label modal without losing in-progress task edits
+- When no label matches a search, the UI offers a create-label action prefilled with the search term
+
+## Task List Size Controls
+
+- Columns with more than 12 tasks show a scrollbar and optional "Show all tasks (N)" control
+- Expanded task lists use up to `80vh`
+
+## Update Requirements
+
+Update this file when you change:
+
+- task fields or validation
+- task card layout or footer rules
+- task ordering or drag behavior
+- task modal fields or inline label UX

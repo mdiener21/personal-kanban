@@ -1,4 +1,6 @@
 Swimlane Cell Collapse/Expand Feature
+Note: this is an implementation planning artifact. Canonical shipped behavior and persisted-state rules now live in `docs/spec/swimlanes.md` and `docs/spec/settings.md`.
+
 Context
 In swimlane mode, users can collapse entire rows (swimlanes) or entire columns, but cannot collapse individual cells (the intersection of a swimlane and column). This feature adds a per-cell toggle so users can collapse tasks within a specific swimlane-column cell independently.
 
@@ -43,7 +45,8 @@ Add after existing swimlane cell styles:
 Hide toggle in done-column cells and column-collapsed cells
 5. Documentation Updates
 CHANGELOG.md — Add entry under [Unreleased] > Added
-docs/specification-kanban.md — Document new cell-collapse feature in swimlane section
+docs/spec/swimlanes.md — Document new cell-collapse feature in swim lane behavior
+docs/spec/settings.md — Document persisted `swimLaneCellCollapsedKeys` settings state
 Files to Modify
 File	Change
 src/modules/storage.js	Add swimLaneCellCollapsedKeys default + normalizer
@@ -51,7 +54,8 @@ src/modules/swimlanes.js	Add makeCellCollapseKey, isSwimLaneCellCollapsed, toggl
 src/modules/render.js	Add toggle button in createSwimlaneCell, update visibility logic in renderSwimlaneBoard
 src/styles/components/column.css	Cell-collapse toggle and collapsed-state styles
 CHANGELOG.md	Unreleased entry
-docs/specification-kanban.md	Feature documentation
+docs/spec/swimlanes.md	Feature documentation
+docs/spec/settings.md	Persisted settings documentation
 Edge Cases
 Done column / collapsed column cells: No toggle shown (existing behavior handles these)
 Row collapsed: Cell hidden entirely — toggle is irrelevant

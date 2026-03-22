@@ -1,5 +1,7 @@
 # User Story — Swim Lanes for Kanban Board
 
+Note: this is a feature planning artifact. Canonical shipped behavior now lives in `docs/spec/swimlanes.md`, `docs/spec/settings.md`, and related files linked from `docs/specification-kanban.md`.
+
 **Title:** Toggleable Swim Lanes in Kanban Board
 
 **As a** user managing tasks on a Kanban board
