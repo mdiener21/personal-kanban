@@ -1,5 +1,7 @@
 # Test Cases — Swim Lanes for Kanban App
 
+Note: this is a test-planning artifact. Canonical shipped behavior now lives in `docs/spec/swimlanes.md`, `docs/spec/settings.md`, and related files linked from `docs/specification-kanban.md`.
+
 Plan:
 
 1. Define the highest-value test areas for swim lanes.

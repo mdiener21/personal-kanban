@@ -66,7 +66,7 @@ Want more templates? See [boards.md](boards.md).
 | [User Guide (In-App Help)](help-how-to.md) | The canonical help text shown inside the app |
 | [Board Templates](boards.md) | Templates you can import + best practices for columns and workflows |
 | [Labels Guide](labels.md) | How to use labels and groups for filtering and categorization |
-| [Technical Specification](specification-kanban.md) | Data models, architecture, storage, rendering, and testing details |
+| [Specification Index](specification-kanban.md) | Canonical spec entrypoint, governance, and links to all feature/data spec files |
 | [Kanban Ecosystem](kanban-ecosystem.md) | Comparison with other open-source kanban tools |
 
 ---
@@ -85,7 +85,7 @@ New to Kanban? Here's where to start:
 
 Want to build on or contribute to the project?
 
-- **[Technical Specification](specification-kanban.md)** — Complete reference for data models (Board, Task, Column, Label), localStorage architecture, UI components, rendering pipeline, and test coverage
+- **[Specification Index](specification-kanban.md)** — Canonical entrypoint to the split specification set under `docs/spec/`, including data models, storage, UI behavior, and testing references
 - **[CLAUDE.md](../CLAUDE.md)** — Coding conventions and architecture guidelines
 - **[Main README](../README.md)** — Setup, build commands, and deployment
 

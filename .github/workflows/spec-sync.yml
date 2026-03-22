@@ -1,0 +1,24 @@
+name: Spec Sync
+
+on:
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch: {}
+
+jobs:
+  check-spec-sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Validate spec and changelog updates
+        run: node scripts/check-spec-sync.mjs --base "${{ github.event.pull_request.base.sha || github.sha }}" --head "${{ github.event.pull_request.head.sha || github.sha }}"

@@ -1,6 +1,22 @@
 import { test, expect } from '@playwright/test';
 import { seedSwimlaneBoard } from './swimlanes.helpers.js';
 
+async function dragByMouse(page, source, target) {
+  const sourceBox = await source.boundingBox();
+  const targetBox = await target.boundingBox();
+
+  if (!sourceBox || !targetBox) {
+    throw new Error('Expected draggable source and target drop zone to have bounding boxes.');
+  }
+
+  await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(targetBox.x + targetBox.width / 2, targetBox.y + targetBox.height * 0.75, {
+    steps: 20
+  });
+  await page.mouse.up();
+}
+
 test.describe('Swim lane drag and drop', () => {
   test.beforeEach(async ({ page }) => {
     await seedSwimlaneBoard(page, { swimLanesEnabled: true, swimLaneGroupBy: 'label' });
@@ -12,7 +28,7 @@ test.describe('Swim lane drag and drop', () => {
     const task = page.locator('.task[data-task-id="task-a"]');
     const target = page.locator('.swimlane-row[data-lane-label="Project B"] .swimlane-cell[data-column="inprogress"] .tasks');
 
-    await task.dragTo(target);
+    await dragByMouse(page, task, target);
 
     await expect(page.locator('.swimlane-row[data-lane-label="Project B"] .swimlane-cell[data-column="inprogress"] .task[data-task-id="task-a"]')).toBeVisible();
 

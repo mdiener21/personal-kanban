@@ -4,7 +4,7 @@
 - This is a **local-first, no-backend** kanban app: all state lives in **browser `localStorage`** and the UI is plain DOM.
 - Build tooling is **Vite** with **`src/` as the Vite root** and output to `dist/`.
   - Edit source files in `src/` (do **not** hand-edit `dist/`).
-- Specification is in `docs/specification-kanban.md` (**always keep it updated** as features change).
+- Specification entrypoint is `docs/specification-kanban.md`, and canonical feature/data specs live in `docs/spec/` (**always keep the relevant spec files updated** as features change).
 - Changelog is in `CHANGELOG.md` (**always update** the **[Unreleased]** section following **Keep a Changelog** whenever behavior/UI/data changes).
 
 ## Dev workflows
@@ -102,5 +102,4 @@ If workflow automation is unavailable, fall back to the manual process above usi
 - **Commit message**: `Bump version to vX.Y.Z and update changelog`
 - **Tag**: Annotated `vX.Y.Z` with brief comma-separated summary
 - **Release automation**: `.github/workflows/release.yml` + `.github/workflows/publish-release.yml` + `scripts/prepare-release.mjs` + `scripts/extract-release-notes.mjs`
-- **Docs to update on feature changes**: `CHANGELOG.md`, `docs/specification-kanban.md`, `CLAUDE.md`, `.github/copilot-instructions.md` (if module structure changes)
-
+- **Docs to update on feature changes**: `CHANGELOG.md`, relevant `docs/spec/*.md` files, `docs/specification-kanban.md` (when spec governance changes), `CLAUDE.md`, `.github/copilot-instructions.md` (if module structure changes)
