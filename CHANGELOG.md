@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added a split canonical specification set under `docs/spec/`, with `docs/specification-kanban.md` now acting as the spec index, governance entrypoint, and code-to-spec ownership map.
 - Added a pull request template and a CI spec-sync check that requires spec and changelog updates when files under `src/` change.
 
+### Fixed (unreleased)
+
+- Swimlane columns now expand to fill available window width, matching the non-swimlane board layout behavior.
+
 ### Changed (unreleased)
 
 - `npm test` now runs the full unit, DOM integration, and Playwright end-to-end suites in sequence.

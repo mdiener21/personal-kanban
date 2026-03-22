@@ -220,7 +220,7 @@ export function renderSwimlaneBoard(container, sortedColumns, visibleTasks, labe
   board.classList.add('swimlane-board');
   board.style.setProperty('--swimlane-column-count', String(sortedColumns.length));
   const colTemplate = sortedColumns
-    .map((column) => (column?.collapsed === true ? '72px' : 'minmax(280px, 320px)'))
+    .map((column) => (column?.collapsed === true ? '72px' : 'minmax(280px, 1fr)'))
     .join(' ');
   board.style.setProperty('--swimlane-grid-template', colTemplate);
 
