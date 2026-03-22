@@ -4,13 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Personal Kanban Board - A fully local task management tool with no server required">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
   <title>Personal Kanban Board</title>
   <!-- Kanban favicon (inline SVG data URI) -->
   <link rel="icon" href="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='2' y='3' width='6' height='18' rx='1.5' fill='%233b82f6'/%3E%3Crect x='9' y='3' width='6' height='12' rx='1.5' fill='%2360a5fa'/%3E%3Crect x='16' y='3' width='6' height='8' rx='1.5' fill='%2393c5fd'/%3E%3C/svg%3E">
-  <script type="module" crossorigin src="./assets/index-BYiVDsPo.js"></script>
-  <link rel="modulepreload" crossorigin href="./assets/vendor-pJTqpwCg.js">
-  <link rel="modulepreload" crossorigin href="./assets/theme-D1ke6aOn.js">
-  <link rel="stylesheet" crossorigin href="./assets/theme-B4RWlzGc.css">
+  <script type="module" crossorigin src="./assets/index-CGWrSS5m.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/vendor-CIfXl1xx.js">
+  <link rel="modulepreload" crossorigin href="./assets/theme-Bua43Ujx.js">
+  <link rel="modulepreload" crossorigin href="./assets/security-BNSenY0L.js">
+  <link rel="stylesheet" crossorigin href="./assets/theme-PLN8TJv9.css">
 </head>
 <body>
   <!-- Skip link for accessibility -->
@@ -39,6 +41,11 @@
       <div id="board-controls-menu" class="controls-actions">
         <label class="sr-only" for="board-select">Select board</label>
         <select id="board-select" class="control-select" aria-label="Select board"></select>
+        <label class="control-btn swimlane-toggle-label" for="swimlane-quick-toggle">
+          <span data-lucide="rows-3" aria-hidden="true"></span>
+          <span>Swim Lanes</span>
+          <input id="swimlane-quick-toggle" type="checkbox" class="toggle-switch" aria-label="Toggle swim lanes">
+        </label>
         <button id="add-column-btn" class="control-btn" type="button" aria-haspopup="dialog">
           <span data-lucide="columns-3" aria-hidden="true"></span>
           <span style="color:green;">Add Column</span>
@@ -380,6 +387,10 @@
             <label for="settings-swimlane-label-group">Label group source</label>
             <select id="settings-swimlane-label-group" aria-label="Select label group for swim lanes"></select>
             <p class="form-help">Each label inside the selected group becomes its own swim lane row.</p>
+          </div>
+          <div id="settings-swimlane-order-field" class="form-group" hidden>
+            <label>Lane order <span class="form-help">(drag to reorder)</span></label>
+            <ul id="settings-swimlane-order-list" class="swimlane-order-list" role="list" aria-label="Swim lane order"></ul>
           </div>
         </section>
         <div class="form-actions">
