@@ -2,9 +2,9 @@
 
 ## Overview
 
-- Swim lanes are a per-board presentation mode
+- Swim lanes are a per-board by label, label-group or priorty
 - A quick-access toggle in the board controls menu allows enabling/disabling swim lanes directly, without opening the Settings modal
-- The full swim lane configuration (grouping mode, label group selection) remains in Settings
+- The full swim lane configuration (grouping mode by label, label-group or priority selection) remains in Settings
 - The board becomes a grid of swim lane rows by workflow columns
 - Swim lanes can be toggled on and off without a page reload
 

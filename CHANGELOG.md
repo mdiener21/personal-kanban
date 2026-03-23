@@ -9,11 +9,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added (unreleased)
 
-### Chnaged (unreleased)
+### Changed (unreleased)
+
+### Depreciated (unreleased)
+
+### Removed (unreleased)
+
+### Fixed (unreleased)
+
+### Security (unreleased)
+
+## [1.2.3] - 2026-03-23
+
+### Fixed (1.2.3)
 
 - Swimlane active column width set to 100% to fit window flexibly and responsiveness
 
-### Removed (unreleased)
+## [1.2.2] - 2026-03-22
 
 ### Added (1.2.2)
 
@@ -26,11 +38,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed colored left-border accent from swimlane row headers.
 - Import preflight review now checks JSON schema and file size before saving any board data, then asks for confirmation with a summary of imported counts and warnings.
 - Added a built-in AI Agent Ops starter board template with beginner-friendly columns, pre-labeled starter tasks, and grouped Agent/Workstream/Artifact labels for managing 2-5 parallel agents.
-
-### Changed (1.2.2)
-
 - Reports now escape user-controlled tooltip content, swimlane action buttons no longer rely on HTML injection for icons, and the app pages send a stricter Content Security Policy.
 - The main README now highlights the AI Agent Ops starter template near the top to better attract agent-building users to the project.
+
+### Fixed (1.2.2)
 
 ### Removed (1.2.2)
 
