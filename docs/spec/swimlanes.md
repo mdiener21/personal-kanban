@@ -67,3 +67,17 @@
 - Lane headers remain sticky on the left edge while columns use snap-scrolling
 - Expanded lane headers show lane names vertically to preserve column width
 - Collapsed rows revert to a horizontal full-width bar
+
+## Design
+
+- Swim lane mode reuses the board's card language: white or themed surface panels, subtle borders, small-radius corners, and soft elevation for headers
+- The board sits inside a horizontally scrollable swim lane canvas with 16px row and column gaps so each row reads as a clean matrix of lane-by-column cells
+- Workflow columns are represented by a dedicated sticky header row at the top of the grid; each header uses the column accent color as a 4px leading stripe and keeps the task counter visible
+- Swim lane row headers are visually lighter than workflow columns: they are left-sticky text rows with a bottom accent border, bold lane title, compact metadata badges, and a chevron-only collapse affordance
+- Metadata badges use pill styling with muted borders and surface fills so active and done counts remain readable without competing with task cards
+- Swim lane cells use lightly tinted backgrounds derived from the owning column accent color, keeping column identity visible even when the grid is dense
+- Task stacks inside swim lane cells use a single-column card layout with generous vertical spacing, transparent cell interiors, and no extra framing beyond the cell container
+- Column collapse switches the corresponding header and cell summaries into vertical writing, creating narrow compact rails while preserving column identity and counts
+- Cell collapse uses a smaller inline chevron control and reduces the cell to its summary header, while row collapse hides the cell grid entirely and leaves only the sticky lane header bar visible
+- Add-task actions inside cells are small trailing icon buttons that match the collapse controls: bordered, compact, and only visually emphasized on hover
+- On mobile, the layout shifts from strict CSS grid rows to a horizontally scrollable flex presentation so columns remain usable on small screens while sticky lane headers continue to anchor context

@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added (unreleased)
 
+- Added Swimlane header 1px bottom boarder in color of the label
+
 ### Changed (unreleased)
 
 ### Depreciated (unreleased)

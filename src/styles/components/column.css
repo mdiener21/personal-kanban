@@ -371,6 +371,7 @@ body.dragging-column .column-header * {
   gap: 12px;
   padding: 5px 16px 5px 0px;
   box-sizing: border-box;
+  border-bottom: 1px solid var(--lane-accent);
 }
 
 .swimlane-row-header-main {
